@@ -27,7 +27,16 @@ VALKYRJALINT ?= go tool -modfile=.github/ci/lint/go.mod valkyrjalint
 # read this file. A value written here therefore keeps saying `Project Template`
 # in a repository that is not the template, and `make header-fix` then rewrites
 # every correct header to the wrong package.
-PACKAGE_IDENTIFIER ?= $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config)
+#
+# `:=` rather than `?=`: the value is read once, at parse time. A recursive
+# assignment re-runs `sed` at every reference. The guard then ends the build
+# where the read produced nothing, because `$(shell ...)` reports no error of its
+# own — a changed quoting style or a moved config file would otherwise reach the
+# tool as `-package ''`, and the recipe would blame a missing header for it.
+PACKAGE_IDENTIFIER := $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config)
+ifeq ($(PACKAGE_IDENTIFIER),)
+$(error Could not read IDENTIFIER from .github/ci/copyright-header/config)
+endif
 
 # The coverage floor, as a percentage. 100 is the definition of done; it is a hard
 # floor, never lowered to accommodate a gap (cover the code, or leave it out of the
