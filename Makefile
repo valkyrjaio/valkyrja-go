@@ -19,9 +19,15 @@ GOLANGCI_LINT ?= go tool -modfile=.github/ci/lint/go.mod golangci-lint
 # tool module as golangci-lint. See github.com/valkyrjaio/ci-golangcilint-go.
 VALKYRJALINT ?= go tool -modfile=.github/ci/lint/go.mod valkyrjalint
 
-# The package identifier this repository's headers name. COPYRIGHT_HEADER.md in
-# the .github repository maps every repository to its own value.
-PACKAGE_IDENTIFIER ?= Project Template
+# The package identifier this repository's headers name. It is read from the
+# copyright header config, which is the one file that records it.
+#
+# Warning: never write the value here. `_create-repo.yml` rewrites the config and
+# the header of every source file when it scaffolds a repository, and it does not
+# read this file. A value written here therefore keeps saying `Project Template`
+# in a repository that is not the template, and `make header-fix` then rewrites
+# every correct header to the wrong package.
+PACKAGE_IDENTIFIER ?= $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config)
 
 # The coverage floor, as a percentage. 100 is the definition of done; it is a hard
 # floor, never lowered to accommodate a gap (cover the code, or leave it out of the
