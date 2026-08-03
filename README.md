@@ -146,7 +146,7 @@ Valkyrja is open-source software licensed under the
 [sindri url]: https://github.com/valkyrjaio/sindri-go
 [starter url]: https://github.com/valkyrjaio/valkyrja-starter-app-go
 [lint url]: https://github.com/valkyrjaio/ci-golangcilint-go
-[ports url]: https://github.com/valkyrjaio/architecture/blob/master/PORTS.md
+[ports url]: https://github.com/valkyrjaio/architecture/blob/26.x/PORTS.md
 [php url]: https://github.com/valkyrjaio/valkyrja-php
 [contributing url]: https://github.com/valkyrjaio/.github/blob/26.x/CONTRIBUTING.md
 [vocabulary url]: https://github.com/valkyrjaio/.github/blob/26.x/VOCABULARY.md
