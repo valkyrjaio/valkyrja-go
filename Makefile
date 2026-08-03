@@ -1,5 +1,5 @@
 #
-# This file is part of the Project Template package.
+# This file is part of the Valkyrja Framework package.
 #
 # Copyright (c) 2016-present Melech Mizrachi
 #
