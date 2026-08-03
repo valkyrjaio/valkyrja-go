@@ -148,8 +148,8 @@ Valkyrja is open-source software licensed under the
 [lint url]: https://github.com/valkyrjaio/ci-golangcilint-go
 [ports url]: https://github.com/valkyrjaio/architecture/blob/master/PORTS.md
 [php url]: https://github.com/valkyrjaio/valkyrja-php
-[contributing url]: https://github.com/valkyrjaio/.github/blob/master/CONTRIBUTING.md
-[vocabulary url]: https://github.com/valkyrjaio/.github/blob/master/VOCABULARY.md
-[security vulnerabilities url]: https://github.com/valkyrjaio/.github/blob/master/SECURITY.md
+[contributing url]: https://github.com/valkyrjaio/.github/blob/26.x/CONTRIBUTING.md
+[vocabulary url]: https://github.com/valkyrjaio/.github/blob/26.x/VOCABULARY.md
+[security vulnerabilities url]: https://github.com/valkyrjaio/.github/blob/26.x/SECURITY.md
 [semantic versioning url]: https://semver.org/
 [MIT license url]: https://opensource.org/licenses/MIT
