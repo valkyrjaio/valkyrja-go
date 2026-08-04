@@ -104,6 +104,9 @@ func withParameterValues(
 
 // withValueFromMatches returns the parameter with the value that the path
 // carried, and with its default value where the path carried none.
+//
+// A parameter that names a cast carries the value that the cast returned, so a
+// handler reads the type that the route declared rather than the raw text.
 func withValueFromMatches(
 	parameter contract.ParameterContract,
 	compiled *regexp.Regexp,
@@ -115,5 +118,26 @@ func withValueFromMatches(
 		return parameter.WithValue(parameter.GetDefault())
 	}
 
-	return parameter.WithValue(matches[index])
+	return parameter.WithValue(castMatch(parameter, matches[index]))
+}
+
+// castMatch returns the value that the cast of the parameter returned.
+//
+// Warning: the regular expression is what states the shape of a value, and the
+// cast converts what the regular expression accepted already. A cast that
+// reports a failure therefore means the two disagree, which is the developer's
+// error. The parameter then carries the text as the path held it, and the
+// handler reads a string where it declared another type.
+func castMatch(parameter contract.ParameterContract, match string) any {
+	cast := parameter.GetCast()
+	if cast == nil {
+		return match
+	}
+
+	value, err := cast(match)
+	if err != nil {
+		return match
+	}
+
+	return value
 }

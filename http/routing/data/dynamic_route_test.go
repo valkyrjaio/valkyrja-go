@@ -9,6 +9,7 @@
 package data_test
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
@@ -67,10 +68,6 @@ func TestEachRemainingParameterWithMethodReturnsACopy(t *testing.T) {
 
 	parameter := data.NewParameter(parameterName, parameterRegex)
 
-	if !parameter.WithCast("int").HasCast() || parameter.WithCast("int").GetCast() != "int" {
-		t.Error("WithCast must hold the new cast, but did not")
-	}
-
 	if !parameter.WithIsOptional(true).IsOptional() {
 		t.Error("WithIsOptional must hold the new flag, but did not")
 	}
@@ -89,6 +86,20 @@ func TestEachRemainingParameterWithMethodReturnsACopy(t *testing.T) {
 
 	if parameter.IsOptional() || parameter.HasCast() || parameter.GetValue() != nil {
 		t.Error("each With method must leave the receiver unchanged, but did not")
+	}
+}
+
+func TestTheParameterCastMethodsReturnACopy(t *testing.T) {
+	t.Parallel()
+
+	parameter := data.NewParameter(parameterName, parameterRegex)
+
+	if !parameter.WithCast(castToInt).HasCast() || parameter.WithCast(castToInt).GetCast() == nil {
+		t.Error("WithCast must hold the new cast, but did not")
+	}
+
+	if parameter.HasCast() || parameter.GetCast() != nil {
+		t.Error("WithCast must leave the receiver unchanged, but did not")
 	}
 }
 
@@ -198,4 +209,9 @@ func TestAnInheritedWithMethodKeepsTheDynamicState(t *testing.T) {
 	if len(renamed.GetParameters()) != 1 {
 		t.Errorf("the copy must keep the parameters, but holds: %d", len(renamed.GetParameters()))
 	}
+}
+
+// castToInt is the cast that a parameter test gives a parameter.
+func castToInt(value string) (any, error) {
+	return strconv.Atoi(value)
 }
