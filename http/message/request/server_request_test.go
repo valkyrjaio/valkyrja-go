@@ -17,9 +17,14 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/header/value"
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/param"
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/request"
+	"github.com/valkyrjaio/valkyrja-go/v26/http/message/stream"
 )
 
-const paramKey = "key"
+const (
+	paramKey  = "key"
+	jsonValue = "two"
+	jsonBody  = `{"one":"two"}`
+)
 
 func TestNewServerRequestTakesAnEmptyCollectionForEachPart(t *testing.T) {
 	t.Parallel()
@@ -124,5 +129,108 @@ func TestTheServerRequestSatisfiesItsContract(t *testing.T) {
 
 	if built.GetMethod() != constant.RequestMethodGet {
 		t.Errorf("the contract must read the method, but read: %q", built.GetMethod())
+	}
+}
+
+// newJsonHeaders builds the headers that state a JSON content type.
+func newJsonHeaders(t *testing.T, contentType string) contract.HeaderCollectionContract {
+	t.Helper()
+
+	if contentType == "" {
+		return header.NewHeaderCollection()
+	}
+
+	built, err := header.NewHeader(constant.HeaderNameContentType, value.NewValueFromValue(contentType))
+	if err != nil {
+		t.Fatalf("the header must be valid, but reported: %v", err)
+	}
+
+	return header.NewHeaderCollection().WithHeader(built)
+}
+
+func TestAJsonServerRequestParsesItsBody(t *testing.T) {
+	t.Parallel()
+
+	built := request.NewJsonServerRequest(
+		nil,
+		constant.RequestMethodPost,
+		stream.NewStream(jsonBody, constant.ModeRead),
+		newJsonHeaders(t, constant.ContentTypeValueApplicationJson),
+	)
+
+	if built.GetParsedJson().Get("one") != jsonValue {
+		t.Errorf("the request must parse its body, but parsed: %v", built.GetParsedJson().GetAll())
+	}
+}
+
+func TestAJsonServerRequestParsesAContentTypeThatCarriesACharset(t *testing.T) {
+	t.Parallel()
+
+	built := request.NewJsonServerRequest(
+		nil,
+		constant.RequestMethodPost,
+		stream.NewStream(jsonBody, constant.ModeRead),
+		newJsonHeaders(t, constant.ContentTypeValueApplicationJson+"; charset=utf-8"),
+	)
+
+	if built.GetParsedJson().Get("one") != jsonValue {
+		t.Error("a content type that carries a charset must still be read as JSON, but was not")
+	}
+}
+
+func TestAJsonServerRequestParsesNothingWhereItCannot(t *testing.T) {
+	t.Parallel()
+
+	tests := map[string]struct {
+		body        string
+		contentType string
+	}{
+		"a request that states no content type": {body: jsonBody, contentType: ""},
+		"a content type that is not JSON":       {body: jsonBody, contentType: "text/plain"},
+		"a body that carries nothing":           {body: "", contentType: constant.ContentTypeValueApplicationJson},
+		"a body that no decoder reads":          {body: "not json", contentType: constant.ContentTypeValueApplicationJson},
+	}
+
+	for name, test := range tests {
+		built := request.NewJsonServerRequest(
+			nil,
+			constant.RequestMethodPost,
+			stream.NewStream(test.body, constant.ModeRead),
+			newJsonHeaders(t, test.contentType),
+		)
+
+		if len(built.GetParsedJson().GetAll()) != 0 {
+			t.Errorf("%s must parse nothing, but parsed: %v", name, built.GetParsedJson().GetAll())
+		}
+	}
+}
+
+func TestWithParsedJsonReturnsACopyThatIsStillAServerRequest(t *testing.T) {
+	t.Parallel()
+
+	built := request.NewJsonServerRequest(
+		nil,
+		constant.RequestMethodPost,
+		stream.NewStream(jsonBody, constant.ModeRead),
+		newJsonHeaders(t, constant.ContentTypeValueApplicationJson),
+	)
+
+	replaced := built.WithParsedJson(param.NewParamCollection(map[string]any{"three": "four"}))
+
+	if replaced.GetParsedJson().Get("three") != "four" {
+		t.Error("WithParsedJson must hold the new body, but did not")
+	}
+
+	if built.GetParsedJson().Get("one") != jsonValue {
+		t.Error("WithParsedJson must leave the receiver unchanged, but did not")
+	}
+
+	// One struct carries both shapes, so a `With` method of the server request
+	// keeps the parsed JSON rather than dropping it.
+	withAttributes := built.WithAttributes(param.NewParamCollection(map[string]any{paramKey: "value"}))
+
+	kept, isJson := withAttributes.(contract.JsonServerRequestContract)
+	if !isJson || kept.GetParsedJson().Get("one") != jsonValue {
+		t.Error("a server request With method must keep the parsed JSON, but dropped it")
 	}
 }
