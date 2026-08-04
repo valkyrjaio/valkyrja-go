@@ -252,3 +252,27 @@ func TestAnUnknownUploadErrorStatesAGeneralFailure(t *testing.T) {
 		t.Errorf("an unknown upload error must state a general failure, but is: %q", err.Error())
 	}
 }
+
+func TestAClientFailureNamesTheUriThatItTriedToReach(t *testing.T) {
+	t.Parallel()
+
+	cause := errors.New("the server is unreachable")
+
+	err := exception.NewHttpClientRequestFailedError("https://example.com/users", cause)
+
+	if err.Error() != "The request to https://example.com/users failed" {
+		t.Errorf("the error must name the URI, but reported: %q", err.Error())
+	}
+
+	if err.GetUri() != "https://example.com/users" {
+		t.Errorf("the error must carry the URI, but carried: %q", err.GetUri())
+	}
+
+	if !errors.Is(err, cause) {
+		t.Error("the error must unwrap to its cause, but did not")
+	}
+
+	if !err.IsHttpClientThrowable() || !err.IsHttpThrowable() {
+		t.Error("the error must mark itself as the HTTP client sub-component's own, but did not")
+	}
+}

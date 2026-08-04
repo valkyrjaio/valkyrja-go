@@ -338,3 +338,15 @@ func TestHandleEndsWhereTheRequestReceivedMiddlewareReturnsAResponse(t *testing.
 			got.GetBody().String())
 	}
 }
+
+func TestTheHandlerSatisfiesTheExceptionResponseContract(t *testing.T) {
+	t.Parallel()
+
+	var built contract.ExceptionResponseRequestHandlerContract = newHandler(manager.NewContainer(nil), nil, false)
+
+	response := built.CreateResponseFromThrowable(errors.New("the handler failed"))
+
+	if response.GetStatusCode() != constant.StatusCodeInternalServerError {
+		t.Errorf("a failure must reach the client as a 500, but reached it as: %d", response.GetStatusCode())
+	}
+}
