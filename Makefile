@@ -37,7 +37,7 @@ VALKYRJALINT ?= go tool -modfile=.github/ci/lint/go.mod valkyrjalint
 # `ifeq`. Make reads a top-level conditional before it chooses a target, so a
 # broken config would end every target, including `make help` and `make test`,
 # which never read the identifier.
-PACKAGE_IDENTIFIER := $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config)
+PACKAGE_IDENTIFIER := $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config 2>/dev/null)
 
 # The coverage floor, as a percentage. 100 is the definition of done; it is a hard
 # floor, never lowered to accommodate a gap (cover the code, or leave it out of the
