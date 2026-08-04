@@ -64,6 +64,37 @@ terminal escape codes.
 | `NewBanner`         | The message on a block of its own color         |
 | `NewHeader`         | The application, the framework, and the command |
 
+### Asking a Question
+
+A question reads one line and returns the answer that carries it:
+
+```go
+answer := message.NewAnswer("yes or no", "yes", "no").WithDefaultResponse("no")
+
+response := message.NewQuestion("Clear the cache?", nil, answer).Ask()
+
+if response.IsValidResponse() {
+	// …
+}
+```
+
+An answer accepts a response that its list names, and one that its validation
+callable accepts, which is how it reads a response that no list can name. An
+answer that the caller did not give reports its own default response.
+
+A reader that reports a failure, and a line that carries nothing but whitespace,
+both return the answer as it is.
+
+Warning: an output that is not interactive must not ask. Read `IsInteractive`
+before a command asks anything, so `--no-interaction` does what it says.
+
+### Reporting Progress
+
+A progress carries a percentage from 0 to 100. A percentage outside that range
+takes the nearest end of it, and the complete flag and the percentage never
+disagree: a progress at 100 reports that the command finished, and one that
+reports the command finished reports 100.
+
 ## Routing
 
 ### A Command
