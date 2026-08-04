@@ -227,10 +227,9 @@ func TestWithParsedJsonReturnsACopyThatIsStillAServerRequest(t *testing.T) {
 
 	// One struct carries both shapes, so a `With` method of the server request
 	// keeps the parsed JSON rather than dropping it.
-	withAttributes := built.WithAttributes(param.NewParamCollection(map[string]any{paramKey: "value"}))
+	kept := built.WithAttributes(param.NewParamCollection(map[string]any{paramKey: "value"}))
 
-	kept, isJson := withAttributes.(contract.JsonServerRequestContract)
-	if !isJson || kept.GetParsedJson().Get("one") != jsonValue {
+	if kept.GetParsedJson().Get("one") != jsonValue {
 		t.Error("a server request With method must keep the parsed JSON, but dropped it")
 	}
 }

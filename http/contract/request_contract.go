@@ -85,16 +85,21 @@ type ServerRequestContract interface {
 	// IsXmlHttpRequest reports whether the client sent the request from a
 	// script.
 	IsXmlHttpRequest() bool
-}
 
-// JsonServerRequestContract is a server request that carries a JSON body.
-type JsonServerRequestContract interface {
-	ServerRequestContract
-
-	// GetParsedJson returns the parsed JSON body of the request.
+	// GetParsedJson returns the parsed JSON body of the request, and an empty
+	// collection where the request carries none.
 	GetParsedJson() ParsedJsonParamCollectionContract
 
 	// WithParsedJson returns a copy of the request with another parsed JSON
 	// body.
 	WithParsedJson(params ParsedJsonParamCollectionContract) JsonServerRequestContract
 }
+
+// JsonServerRequestContract is a server request that carries a JSON body.
+//
+// The contract is an alias, because every server request of this port carries
+// the parsed JSON. The other ports declare a `JsonServerRequest` that extends
+// `ServerRequest`, and a promoted `With` would drop the parsed JSON, so one
+// struct carries both shapes here and the contract follows it. The name is kept,
+// because it states what a caller reads.
+type JsonServerRequestContract = ServerRequestContract
