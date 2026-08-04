@@ -13,6 +13,15 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
+// CastFunc converts the value that a path filled into a parameter, into the type
+// that the parameter names.
+//
+// The other ports carry a `Cast` from the Type component, and read the type from
+// it. Go has no Type component in this port, so a cast is the function that
+// converts the value, and it reports a failure the way Go does. The CLI
+// component spells its own cast the same way.
+type CastFunc func(value string) (any, error)
+
 // HttpHandlerFunc runs one route. The router passes the container and the route
 // that matched.
 type HttpHandlerFunc func(container containercontract.ContainerContract, route RouteContract) ResponseContract
@@ -72,11 +81,12 @@ type ParameterContract interface {
 	// HasCast reports whether the parameter casts its value to a type.
 	HasCast() bool
 
-	// GetCast returns the type that the parameter casts its value to.
-	GetCast() any
+	// GetCast returns what converts the value of the parameter, and nil where
+	// the parameter casts nothing.
+	GetCast() CastFunc
 
 	// WithCast returns a copy of the parameter for another cast.
-	WithCast(cast any) ParameterContract
+	WithCast(cast CastFunc) ParameterContract
 
 	// IsOptional reports whether the path matches without the parameter.
 	IsOptional() bool

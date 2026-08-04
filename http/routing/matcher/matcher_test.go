@@ -9,6 +9,8 @@
 package matcher_test
 
 import (
+	"errors"
+	"strconv"
 	"testing"
 
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
@@ -26,6 +28,9 @@ const (
 	dynamicName  = "users.show"
 	dynamicRegex = `^/users/(?P<id>\d+)$`
 )
+
+// errCast reports that a value does not convert.
+var errCast = errors.New("the value does not convert")
 
 // newHandler builds a handler that returns an empty response.
 func newHandler() contract.HttpHandlerFunc {
@@ -202,5 +207,91 @@ func TestTheMatcherSatisfiesItsContract(t *testing.T) {
 
 	if built.Match(staticPath, constant.RequestMethodGet) == nil {
 		t.Error("the contract must find the route, but did not")
+	}
+}
+
+// castCollection builds a collection whose one route casts its parameter.
+func castCollection(cast contract.CastFunc) contract.RouteCollectionContract {
+	built := collection.NewRouteCollection()
+
+	built.Add(data.NewDynamicRoute(
+		data.NewRoute("/users/{id}", dynamicName, newHandler()),
+		dynamicRegex,
+		data.NewParameter("id", `(?P<id>\d+)`).WithCast(cast),
+	))
+
+	return built
+}
+
+// firstParameterValue returns the value of the first parameter of the route.
+func firstParameterValue(t *testing.T, route contract.RouteContract) any {
+	t.Helper()
+
+	dynamic, isDynamic := route.(contract.DynamicRouteContract)
+	if !isDynamic {
+		t.Fatal("the matched route must be dynamic, but is not")
+	}
+
+	parameters := dynamic.GetParameters()
+	if len(parameters) != 1 {
+		t.Fatalf("the route must carry one parameter, but carried: %d", len(parameters))
+	}
+
+	return parameters[0].GetValue()
+}
+
+func TestMatchDynamicCastsTheValueThatThePathFilled(t *testing.T) {
+	t.Parallel()
+
+	cast := func(value string) (any, error) {
+		return strconv.Atoi(value)
+	}
+
+	route := matcher.NewMatcher(castCollection(cast)).MatchDynamic("/users/12", constant.RequestMethodGet)
+
+	if route == nil {
+		t.Fatal("MatchDynamic must find the dynamic route, but did not")
+	}
+
+	if firstParameterValue(t, route) != 12 {
+		t.Errorf("the parameter must carry the value that the cast returned, but carried: %v",
+			firstParameterValue(t, route))
+	}
+}
+
+func TestMatchDynamicKeepsTheTextWhereTheCastReportsAFailure(t *testing.T) {
+	t.Parallel()
+
+	// The regular expression states the shape of a value, and the cast converts
+	// what it accepted already. A cast that reports a failure means the two
+	// disagree, which is the developer's error.
+	cast := func(_ string) (any, error) {
+		return nil, errCast
+	}
+
+	route := matcher.NewMatcher(castCollection(cast)).MatchDynamic("/users/12", constant.RequestMethodGet)
+
+	if route == nil {
+		t.Fatal("MatchDynamic must find the dynamic route, but did not")
+	}
+
+	if firstParameterValue(t, route) != "12" {
+		t.Errorf("the parameter must carry the text as the path held it, but carried: %v",
+			firstParameterValue(t, route))
+	}
+}
+
+func TestMatchDynamicKeepsTheTextWhereTheParameterCastsNothing(t *testing.T) {
+	t.Parallel()
+
+	route := matcher.NewMatcher(newCollection()).MatchDynamic("/users/12", constant.RequestMethodGet)
+
+	if route == nil {
+		t.Fatal("MatchDynamic must find the dynamic route, but did not")
+	}
+
+	if firstParameterValue(t, route) != "12" {
+		t.Errorf("a parameter that casts nothing must carry the text, but carried: %v",
+			firstParameterValue(t, route))
 	}
 }

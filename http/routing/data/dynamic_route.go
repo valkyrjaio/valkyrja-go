@@ -16,7 +16,7 @@ import (
 type Parameter struct {
 	name          string
 	regex         string
-	cast          any
+	cast          contract.CastFunc
 	isOptional    bool
 	shouldCapture bool
 	defaultValue  any
@@ -68,13 +68,14 @@ func (p *Parameter) HasCast() bool {
 	return p.cast != nil
 }
 
-// GetCast returns the type that the parameter casts its value to.
-func (p *Parameter) GetCast() any {
+// GetCast returns what converts the value of the parameter, and nil where the
+// parameter casts nothing.
+func (p *Parameter) GetCast() contract.CastFunc {
 	return p.cast
 }
 
 // WithCast returns a copy of the parameter for another cast.
-func (p *Parameter) WithCast(cast any) contract.ParameterContract {
+func (p *Parameter) WithCast(cast contract.CastFunc) contract.ParameterContract {
 	copied := *p
 	copied.cast = cast
 

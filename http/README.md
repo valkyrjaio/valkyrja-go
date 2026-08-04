@@ -124,6 +124,26 @@ Warning: an optional parameter carries its own separator, so its path leaves the
 separator out. Write `/users{id?}`, never `/users/{id?}` — the second one needs
 the separator, so `/users` does not match it.
 
+### Casting a Parameter
+
+A parameter names the function that converts the value a path filled into it, so
+a handler reads the type that the route declared rather than the raw text:
+
+```go
+parameter := data.NewParameter("id", constant.RegexNum).
+	WithCast(func(value string) (any, error) {
+		return strconv.Atoi(value)
+	})
+```
+
+The other ports carry a `Cast` from the Type component, which this port does not
+have. The CLI component spells its own cast the same way.
+
+Warning: the regular expression states the shape of a value, and the cast
+converts what the regular expression accepted already. A cast that reports a
+failure means the two disagree, which is the developer's error. The parameter
+then carries the text as the path held it.
+
 ### The Router
 
 The router matches the request path against the static routes first, then against
