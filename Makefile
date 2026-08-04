@@ -34,6 +34,16 @@ PACKAGE_IDENTIFIER ?= $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/
 # build). Override only for a local spot check: `make coverage COVERAGE_FLOOR=90`.
 COVERAGE_FLOOR ?= 100
 
+# The path fragment that marks a package as test support. A reusable double lives
+# in a `fixtures` package, and it carries no test of its own: a double exists to
+# serve a test, so a test for a double asserts a test.
+#
+# Go attributes coverage to the package under test. A fixture that every component
+# test exercises therefore still reports 0%, because no test runs inside its own
+# package. Dropping the package from the profile is what keeps the floor a
+# statement about the framework's own code.
+COVERAGE_EXCLUDE ?= /fixtures/
+
 .DEFAULT_GOAL := ci
 
 .PHONY: ci
@@ -79,6 +89,16 @@ test: ## Run tests with the race detector
 .PHONY: coverage
 coverage: ## Run tests with coverage and fail below COVERAGE_FLOOR
 	go test -race -covermode=atomic -coverprofile=coverage.out ./...
+# The filter runs on the profile rather than on the package list, so every test
+# still runs, and the report that CI uploads drops the same packages the floor
+# drops.
+#
+# Warning: never filter with `grep -v`. `grep` exits 1 where it writes no line,
+# which ends the recipe on a profile that holds nothing else. `awk` exits 0.
+# `index` rather than a regex, because COVERAGE_EXCLUDE holds a slash and `awk`
+# reads a regex between slashes of its own.
+	@awk -v exclude='$(COVERAGE_EXCLUDE)' 'index($$0, exclude) == 0' coverage.out > coverage.out.filtered \
+		&& mv coverage.out.filtered coverage.out
 	go tool cover -func=coverage.out
 # `go tool cover` only reports and always exits 0, so without this the profile was
 # generated and then ignored — a run at 55% passed exactly like one at 100%.
