@@ -9,6 +9,7 @@
 package request
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
@@ -30,6 +31,7 @@ type ServerRequest struct {
 	queryParams   contract.QueryParamCollectionContract
 	uploadedFiles contract.UploadedFileCollectionContract
 	parsedBody    contract.ParsedBodyParamCollectionContract
+	parsedJson    contract.ParsedJsonParamCollectionContract
 	attributes    contract.AttributeParamCollectionContract
 }
 
@@ -47,8 +49,76 @@ func NewServerRequest(
 		cookieParams: param.NewParamCollection(nil),
 		queryParams:  param.NewParamCollection(nil),
 		parsedBody:   param.NewParamCollection(nil),
+		parsedJson:   param.NewParamCollection(nil),
 		attributes:   param.NewParamCollection(nil),
 	}
+}
+
+// NewJsonServerRequest builds a server request that parses its body as JSON.
+//
+// The other ports declare a `JsonServerRequest` that extends `ServerRequest`. A
+// `With` method promoted from an embedded struct copies only that struct, so an
+// inherited `With` would return a plain server request and drop the parsed JSON.
+// One struct carries both shapes here, and this constructor is what parses.
+//
+// The body is parsed as the request is built, where the content type states
+// JSON. A body that no decoder reads leaves the parsed JSON empty, because a
+// request has no return to carry the failure — whatever reads the body reports
+// what is missing instead.
+func NewJsonServerRequest(
+	requestUri contract.UriContract,
+	method constant.RequestMethod,
+	body contract.StreamContract,
+	headers contract.HeaderCollectionContract,
+) *ServerRequest {
+	built := NewServerRequest(requestUri, method, body, headers)
+	built.parsedJson = param.NewParamCollection(parseJsonBody(built))
+
+	return built
+}
+
+// parseJsonBody returns the body of the request as parsed JSON.
+//
+// It returns nothing where the content type does not state JSON, where the body
+// is empty, and where no decoder reads the body.
+func parseJsonBody(request *ServerRequest) map[string]any {
+	contentType := request.GetHeaders().GetHeaderLine(constant.HeaderNameContentType)
+	if !strings.Contains(contentType, constant.ContentTypeValueApplicationJson) {
+		return nil
+	}
+
+	body := request.GetBody()
+
+	_ = body.Rewind()
+
+	contents, err := body.GetContents()
+	if err != nil || contents == "" {
+		return nil
+	}
+
+	parsed := map[string]any{}
+
+	err = json.Unmarshal([]byte(contents), &parsed)
+	if err != nil {
+		return nil
+	}
+
+	return parsed
+}
+
+// GetParsedJson returns the parsed JSON body of the request.
+func (r *ServerRequest) GetParsedJson() contract.ParsedJsonParamCollectionContract {
+	return r.parsedJson
+}
+
+// WithParsedJson returns a copy of the request with another parsed JSON body.
+func (r *ServerRequest) WithParsedJson(
+	params contract.ParsedJsonParamCollectionContract,
+) contract.JsonServerRequestContract {
+	copied := *r
+	copied.parsedJson = params
+
+	return &copied
 }
 
 // GetServerParams returns the server parameters of the request.

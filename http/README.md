@@ -57,8 +57,26 @@ writes.
 | `NewRedirectResponseToUri` | A response that sends the client elsewhere |
 
 A server request also holds the server parameters, the cookies, the query
-parameters, the parsed body, the uploaded files, and the attributes that the
-framework fills.
+parameters, the parsed body, the parsed JSON, the uploaded files, and the
+attributes that the framework fills.
+
+`NewJsonServerRequest` parses the body as JSON as it builds the request, where
+the content type states JSON:
+
+```go
+built := request.NewJsonServerRequest(uri, constant.RequestMethodPost, body, headers)
+
+name := built.GetParsedJson().Get("name")
+```
+
+The other ports declare a `JsonServerRequest` that extends `ServerRequest`. A
+promoted `With` copies only the embedded struct, so an inherited one would return
+a plain server request and drop the parsed JSON. One struct carries both shapes
+here, and the constructor is what parses.
+
+Warning: a body that no decoder reads leaves the parsed JSON empty. A request has
+no return to carry the failure, so whatever reads the body reports what is
+missing instead.
 
 `ResponseFactory` builds each kind, and the component publishes it so a handler
 resolves one rather than building a response itself.
