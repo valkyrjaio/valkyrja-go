@@ -174,6 +174,35 @@ reports the methods that it does match.
 `Url` reads the URL of a named route, and `RoutingResponseFactory` builds a
 response that sends the client to one.
 
+## The Client
+
+The client sends a request to another server and returns its response.
+
+| Type         | Reaches                                        |
+| :----------- | :--------------------------------------------- |
+| `Client`     | The server, over Go's own HTTP client          |
+| `NullClient` | No server, and returns an empty response       |
+| `LogClient`  | No server, and records what it would have sent |
+
+```go
+response, err := client.NewClient(nil).SendRequest(request)
+if err != nil {
+	return err
+}
+```
+
+`NewClient` takes Go's own `*http.Client`, so a caller states its own timeout and
+its own transport. A caller that passes nil gets the default one, which states no
+timeout.
+
+The client reports a failure where it cannot reach the server, and where the
+request or the answer is not one that a message carries. A header that the
+framework does not accept is dropped rather than fatal, because a server that
+answered with one has still answered.
+
+An application that must not reach the network sends through `NullClient`, and a
+developer who wants to read what an application would have sent uses `LogClient`.
+
 ## Middleware
 
 | Stage             | Runs                                            |
