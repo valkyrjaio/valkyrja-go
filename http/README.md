@@ -174,6 +174,50 @@ reports the methods that it does match.
 `Url` reads the URL of a named route, and `RoutingResponseFactory` builds a
 response that sends the client to one.
 
+## Structures
+
+A structure names the fields that a request carries and that a response returns,
+so a route states its shape once rather than in each handler.
+
+The other ports spell this segment `Struct`. `struct` is a Go keyword, so it
+cannot be a package name, and this port spells the word in full.
+
+```go
+requestStructure := structure.NewJsonRequestStructure("users.create", "name", "email")
+
+data := requestStructure.GetDataFromRequest(request)
+
+if requestStructure.DetermineIfRequestContainsExtraData(request) {
+	// The client sent a field that the route does not name.
+}
+```
+
+| Constructor                     | Reads                     |
+| :------------------------------ | :------------------------ |
+| `NewQueryRequestStructure`      | The query parameters      |
+| `NewParsedBodyRequestStructure` | The parsed body           |
+| `NewJsonRequestStructure`       | The parsed JSON body      |
+| `NewRequestStructure`           | Whatever the source names |
+
+The other ports declare an abstract `RequestStruct` and override the two methods
+that read a request. Go has no abstract type and no method override, so a
+structure holds the function that names the collection to read.
+
+A response structure maps the name a field carries inside the application to the
+name that a client reads, so a rename inside never reaches a client:
+
+```go
+responseStructure := structure.NewResponseStructure("users.show", map[string]string{
+	"name": "full_name",
+})
+
+shaped := responseStructure.GetStructuredData(data, true)
+```
+
+A field that the data does not carry reads as nil where `includeAll` is true, and
+it is left out where `includeAll` is false. A field that the structure does not
+name never reaches a client.
+
 ## The Client
 
 The client sends a request to another server and returns its response.
