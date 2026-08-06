@@ -29,11 +29,23 @@ type Header struct {
 }
 
 // NewHeader builds a header from a name and its values. It reports a failure
-// where the name is not one that a header carries.
+// where the name or a value is not one that a header carries.
+//
+// Warning: a value reaches the wire as the server writes it. A value that
+// carries a bare line feed ends the header and starts another one, which is
+// header injection, so every value is validated here rather than only where a
+// header is read off the wire.
 func NewHeader(name string, values ...contract.ValueContract) (*Header, error) {
 	err := ValidateName(name)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, held := range values {
+		err = ValidateValue(held.String())
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &Header{

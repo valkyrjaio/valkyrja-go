@@ -277,3 +277,28 @@ func TestGetHeaderLineDropsAValueThatRendersToNothing(t *testing.T) {
 		t.Errorf("GetHeaderLine must drop an empty value, but is: %q", built.GetHeaderLine())
 	}
 }
+
+func TestNewHeaderRejectsAValueThatCarriesALineFeed(t *testing.T) {
+	t.Parallel()
+
+	// A value reaches the wire as the server writes it, so a bare line feed
+	// ends the header and starts another one. That is header injection.
+	_, err := header.NewHeader("X-Echo", value.NewValueFromValue("ok\r\nX-Injected: true"))
+
+	if _, isInvalid := errors.AsType[*exception.HttpHeaderInvalidValueError](err); !isInvalid {
+		t.Errorf("a value that carries a line feed must be rejected, but reported: %v", err)
+	}
+}
+
+func TestNewHeaderTakesAValueThatAHeaderCarries(t *testing.T) {
+	t.Parallel()
+
+	built, err := header.NewHeader("X-Echo", value.NewValueFromValue("ok"))
+	if err != nil {
+		t.Fatalf("a value that a header carries must be taken, but reported: %v", err)
+	}
+
+	if built.GetHeaderLine() != "ok" {
+		t.Errorf("the header must carry the value, but carried: %q", built.GetHeaderLine())
+	}
+}
