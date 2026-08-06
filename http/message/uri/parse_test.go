@@ -9,6 +9,7 @@
 package uri_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
@@ -83,6 +84,42 @@ func TestNewUriFromStringReportsAStringThatIsNotAUri(t *testing.T) {
 		_, err := uri.NewUriFromString(raw)
 		if err == nil {
 			t.Errorf("%s must report a failure, but reported none", name)
+		}
+	}
+}
+
+func TestNewUriFromStringReadsAnIpv6Literal(t *testing.T) {
+	t.Parallel()
+
+	tests := map[string]struct {
+		raw  string
+		host string
+		port int
+	}{
+		"an IPv6 literal that names no port": {raw: "https://[::1]/path", host: "[::1]", port: 0},
+		"an IPv6 literal that names a port": {
+			raw: "https://[2001:db8::1]:8080/path", host: "[2001:db8::1]", port: 8080,
+		},
+	}
+
+	for name, test := range tests {
+		built, err := uri.NewUriFromString(test.raw)
+		if err != nil {
+			t.Fatalf("%s must be read, but reported: %v", name, err)
+		}
+
+		if built.GetHost() != test.host {
+			t.Errorf("%s must read the host, but read: %q", name, built.GetHost())
+		}
+
+		if built.GetPort() != test.port {
+			t.Errorf("%s must read the port, but read: %d", name, built.GetPort())
+		}
+
+		// The brackets mark the colons as part of the address rather than as a
+		// port separator, so the host keeps them and stays unencoded.
+		if strings.Contains(built.GetHost(), "%3A") {
+			t.Errorf("%s must leave the address unencoded, but read: %q", name, built.GetHost())
 		}
 	}
 }
