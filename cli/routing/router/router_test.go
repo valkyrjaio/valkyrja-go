@@ -299,3 +299,50 @@ func readRoute(t *testing.T, container containercontract.ContainerContract) cont
 
 	return route
 }
+
+func TestAnArrayArgumentTakesOnlyTheValuesThatAreLeft(t *testing.T) {
+	t.Parallel()
+
+	ran := []string{}
+	handler := &fixtures.RecordingHandlerFixture{Ran: &ran}
+
+	// Each parameter consumes what it took, so an array parameter that follows
+	// another one must not take the value that the first one already holds.
+	route := data.NewRoute(routeName, "Clear the cache", handler.Run).
+		WithArguments(
+			data.NewArgumentParameter("name", "The name"),
+			data.NewArgumentParameter("files", "Each file").
+				WithValueMode(constant.ArgumentValueModeArray),
+		)
+
+	built, container := newRouter(route)
+
+	built.Dispatch(input.NewInput("", routeName).WithArguments(
+		argument.NewArgument("a"), argument.NewArgument("b"), argument.NewArgument("c"),
+	))
+
+	matched := readRoute(t, container)
+
+	if matched.GetArgument("name").GetFirstValue() != "a" {
+		t.Errorf("the first argument must take the first value, but took: %q",
+			matched.GetArgument("name").GetFirstValue())
+	}
+
+	files := matched.GetArgument("files").GetArguments()
+
+	if len(files) != 2 || files[0].GetValue() != "b" || files[1].GetValue() != "c" {
+		t.Errorf("the array argument must take only the values that are left, but took: %v",
+			valuesOf(files))
+	}
+}
+
+// valuesOf returns the value of each argument.
+func valuesOf(arguments []contract.ArgumentContract) []string {
+	values := make([]string, 0, len(arguments))
+
+	for _, held := range arguments {
+		values = append(values, held.GetValue())
+	}
+
+	return values
+}

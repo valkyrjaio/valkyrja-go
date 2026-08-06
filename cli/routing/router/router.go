@@ -170,12 +170,11 @@ func addArgumentsToRoute(
 	parameters := route.GetArguments()
 	filled := make([]contract.ArgumentParameterContract, 0, len(parameters))
 
-	for index, parameter := range parameters {
-		given := argumentsForParameter(parameter, typed, index)
-
-		if parameter.GetValueMode() == constant.ArgumentValueModeArray {
-			typed = nil
-		}
+	// Each parameter consumes what it took, so the next one reads what is left
+	// rather than the whole list. An array parameter consumes the rest.
+	for _, parameter := range parameters {
+		given, left := argumentsForParameter(parameter, typed)
+		typed = left
 
 		withArguments := parameter.WithArguments(given...)
 
@@ -190,21 +189,25 @@ func addArgumentsToRoute(
 	return route.WithArguments(filled...), nil
 }
 
-// argumentsForParameter returns each argument that the parameter takes.
+// argumentsForParameter returns each argument that the parameter takes, and each
+// argument that is left for the parameters after it.
+//
+// Warning: a parameter in the array value mode takes every argument that is
+// left, so it must be the last one that the command declares. A parameter that
+// follows it receives nothing.
 func argumentsForParameter(
 	parameter contract.ArgumentParameterContract,
 	typed []contract.ArgumentContract,
-	index int,
-) []contract.ArgumentContract {
+) (given []contract.ArgumentContract, left []contract.ArgumentContract) {
 	if parameter.GetValueMode() == constant.ArgumentValueModeArray {
-		return typed
+		return typed, nil
 	}
 
-	if index >= len(typed) {
-		return nil
+	if len(typed) == 0 {
+		return nil, nil
 	}
 
-	return []contract.ArgumentContract{typed[index]}
+	return typed[:1], typed[1:]
 }
 
 // addOptionsToRoute fills each option parameter from what the caller typed.
