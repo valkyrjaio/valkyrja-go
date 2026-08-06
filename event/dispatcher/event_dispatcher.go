@@ -140,7 +140,7 @@ func (d *EventDispatcher) getEventFromID(eventID string, arguments []any) (contr
 
 	argumentsCapable, isArgumentsCapable := event.(contract.ArgumentsCapableEventContract)
 	if isArgumentsCapable {
-		return argumentsCapable.SetArguments(arguments), nil
+		return argumentsCapable.WithArguments(arguments), nil
 	}
 
 	return event, nil

@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	eventID    = "io.valkyrja.tests.event.EventFixture"
-	listenerID = "io.valkyrja.tests.event.ListenerFixture"
+	eventID    = "Valkyrja.Tests.Event.EventFixture"
+	listenerID = "Valkyrja.Tests.Event.ListenerFixture"
 
 	firstListenerID  = "first"
 	secondListenerID = "second"

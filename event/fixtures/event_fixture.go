@@ -66,8 +66,8 @@ func (e *ArgumentsCapableEventFixture) GetEventID() string {
 	return ArgumentsCapableEventFixtureID
 }
 
-// SetArguments returns a copy of the event that holds the arguments.
-func (e *ArgumentsCapableEventFixture) SetArguments(arguments []any) contract.EventContract {
+// WithArguments returns a copy of the event that holds the arguments.
+func (e *ArgumentsCapableEventFixture) WithArguments(arguments []any) contract.EventContract {
 	copied := *e
 	copied.Arguments = arguments
 

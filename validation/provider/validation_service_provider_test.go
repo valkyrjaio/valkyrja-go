@@ -11,10 +11,13 @@ package provider_test
 import (
 	"testing"
 
+	containerconstant "github.com/valkyrjaio/valkyrja-go/v26/container/constant"
+	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/manager"
 	"github.com/valkyrjaio/valkyrja-go/v26/validation/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/validation/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/validation/provider"
+	"github.com/valkyrjaio/valkyrja-go/v26/validation/rule"
 )
 
 func TestTheProviderDefersItsBinding(t *testing.T) {
@@ -34,7 +37,49 @@ func TestTheProviderBindsAValidatorThatHoldsNoRule(t *testing.T) {
 
 	provider.PublishValidator(container)
 
-	resolved, err := container.GetSingleton(constant.ValidatorContractServiceID)
+	built := resolveValidator(t, container)
+
+	if !built.ValidateRules() {
+		t.Error("a validator that holds no rule must report that everything passes, but did not")
+	}
+}
+
+func TestEachResolveBuildsItsOwnValidator(t *testing.T) {
+	t.Parallel()
+
+	container := manager.NewContainer(nil)
+
+	provider.PublishValidator(container)
+
+	// A validator holds the rules and the messages of one validation in fields
+	// that it writes, so one shared instance across two requests races on them.
+	first := resolveValidator(t, container)
+	second := resolveValidator(t, container)
+
+	if first == second {
+		t.Error("each resolve must build its own validator, but returned the same one")
+	}
+
+	first.SetRules(map[string][]contract.RuleContract{"name": {rule.NewRequired("")}})
+	first.ValidateRules()
+
+	if second.HasFirstErrorMessage() {
+		t.Error("one validator must not reach another, but the messages crossed")
+	}
+}
+
+// resolveValidator returns a validator that the container built.
+func resolveValidator(
+	t *testing.T,
+	container containercontract.ContainerContract,
+) contract.ValidatorContract {
+	t.Helper()
+
+	resolved, err := container.Get(
+		constant.ValidatorContractServiceID,
+		nil,
+		containerconstant.NewInstanceOrThrowException,
+	)
 	if err != nil {
 		t.Fatalf("the provider must bind the validator, but reported: %v", err)
 	}
@@ -44,9 +89,7 @@ func TestTheProviderBindsAValidatorThatHoldsNoRule(t *testing.T) {
 		t.Fatal("the container must hold a validator, but held another value")
 	}
 
-	if !built.ValidateRules() {
-		t.Error("a validator that holds no rule must report that everything passes, but did not")
-	}
+	return built
 }
 
 func TestTheComponentProviderNamesEveryProviderOfTheComponent(t *testing.T) {

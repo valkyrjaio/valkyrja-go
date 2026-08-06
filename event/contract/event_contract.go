@@ -18,7 +18,7 @@ package contract
 // The other ports identify an event by its class: PHP reads `$event::class` and
 // Java holds a `Class<?>`. Go has no class, so an event states its own
 // identifier. That identifier is the key that the collection files a listener
-// under, and it takes the binding-key format, `io.valkyrja.{component}.{Name}`.
+// under, and it takes the binding-key format, `Valkyrja.{Component}.{SubComponent}.{Name}`.
 type EventContract interface {
 	// GetEventID returns the identifier of the event.
 	GetEventID() string
@@ -41,8 +41,8 @@ type StoppableEventContract interface {
 type ArgumentsCapableEventContract interface {
 	EventContract
 
-	// SetArguments returns a copy of the event that holds the arguments.
-	SetArguments(arguments []any) EventContract
+	// WithArguments returns a copy of the event that holds the arguments.
+	WithArguments(arguments []any) EventContract
 }
 
 // DispatchCollectableEventContract is an event that collects what each listener

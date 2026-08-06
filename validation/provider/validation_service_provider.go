@@ -30,12 +30,23 @@ func (p *ValidationServiceProvider) Publishers() map[string]containercontract.Pu
 	}
 }
 
-// PublishValidator binds a validator that holds no rule.
+// PublishValidator binds a factory that builds a validator that holds no rule.
 //
 // A caller states the rules of one validation, so the validator is bound with
 // none, and the caller sets them before it validates.
+//
+// Warning: the binding is a factory rather than a singleton. A validator holds
+// the rules and the messages of one validation in fields that `SetRules` and
+// `ValidateRules` write, and Go's map is not safe for a concurrent read and
+// write. One shared validator across two requests races on those fields, which
+// ends the process rather than the request. Each resolve therefore builds one.
 func PublishValidator(container containercontract.ContainerContract) {
-	container.SetSingleton(constant.ValidatorContractServiceID, validator.NewValidator(nil))
+	container.Bind(constant.ValidatorContractServiceID, func(
+		_ containercontract.ContainerContract,
+		_ []any,
+	) any {
+		return validator.NewValidator(nil)
+	})
 }
 
 // ValidationComponentProvider is the validation component's top-level provider.

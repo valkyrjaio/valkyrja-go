@@ -72,14 +72,15 @@ A listener provider returns a literal slice. `sindri` reads the slice from the
 source rather than by running it, so a computed slice generates nothing.
 
 ```go
-func (p *CacheEventListenerProvider) GetListeners() []contract.ListenerFactory {
-	return []contract.ListenerFactory{
-		func() contract.ListenerContract {
-			return data.NewListener(cacheClearedEventID, "cache.cleared.warm", warmHandler)
-		},
+func (p *CacheEventListenerProvider) GetListeners() []contract.ListenerContract {
+	return []contract.ListenerContract{
+		data.NewListener(cacheClearedEventID, "cache.cleared.warm", warmHandler),
 	}
 }
 ```
+
+The collection turns each one into a factory as it files it, so the generated
+cache states how to build a listener rather than holding one.
 
 ## Dispatching
 
