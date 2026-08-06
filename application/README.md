@@ -79,14 +79,21 @@ inside of the application.
 
 ## Directories
 
-`application/directory` reads a path inside the application:
+`application/directory` reads a path inside the application. A caller builds one
+over the base directory, and reads each path from it:
 
 ```go
-path := directory.App("Http/Controller")
+built := directory.NewDirectory(config.GetDir())
+
+path := built.GetAppDirectory("Http/Controller")
 ```
 
-Each function takes the application's base directory, which a caller sets once
-with `SetBasePath`.
+| Method             | Returns                                      |
+| :----------------- | :------------------------------------------- |
+| `GetPath`          | A path under the base directory              |
+| `GetBaseDirectory` | A path under the base directory              |
+| `GetAppDirectory`  | A path under the application's own directory |
+| `GetDataDirectory` | A path under the generated data directory    |
 
 ## Application Information
 

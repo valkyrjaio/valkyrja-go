@@ -49,11 +49,19 @@ building the context itself.
 | `LogLevelAlert`     | `alert`     |
 | `LogLevelEmergency` | `emergency` |
 
-`Log` writes at the severity that a caller names, and reports a failure where the
-severity is not one of the eight:
+A caller that reads the contract writes through the method of the severity:
 
 ```go
-err := built.Log(constant.LogLevelWarning, "The cache is stale.", nil)
+built.Warning("The cache is stale.", nil)
+```
+
+Each logger also carries a `Log` method, which writes at the severity that a
+caller names and reports a failure where the severity is not one of the eight.
+It is not on the contract, so a caller reaches it through the concrete logger
+rather than through the container:
+
+```go
+err := logger.NewStreamLogger(os.Stderr).Log(constant.LogLevelWarning, "The cache is stale.", nil)
 if err != nil {
 	return err
 }

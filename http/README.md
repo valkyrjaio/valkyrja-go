@@ -88,10 +88,9 @@ error. Where an argument can be invalid, the receiver keeps its own value, and a
 separate function validates:
 
 ```go
-// Right — the caller validates first, then sets.
-err := uri.ValidatePort(port)
-if err != nil {
-	return err
+// Right — the caller checks first, then sets.
+if !constant.IsValidPort(port) {
+	return exception.NewHttpUriInvalidPortError(port)
 }
 
 built = built.WithPort(port)
