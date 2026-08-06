@@ -159,23 +159,26 @@ func TestDispatchReportsAMethodNotAllowed(t *testing.T) {
 
 	container := manager.NewContainer(nil)
 
-	// The route matches the any method, so the path matches for every method.
-	// The request asks for a method that the collection files, so the router
-	// reads the any method and reports 405 rather than 404.
-	built := collection.NewRouteCollection()
-	built.Add(newRoute(usersPath, constant.RequestMethodPost))
-
-	router := dispatcher.NewRouter(
-		container,
-		&anyMatchingMatcherFixture{},
-		&responseFactoryFixture{},
-		handler.NewRouteMatchedHandler(container),
-		handler.NewRouteNotMatchedHandler(container),
-		handler.NewRouteDispatchedHandler(container),
-	)
+	// The real matcher and collection, rather than a fixture: the collection
+	// files a route under each method that it takes, and never under the any
+	// method itself, so a fixture that fabricates an any-method match would hide
+	// whether the router walks the methods at all.
+	router := newRouter(container, newRoute(usersPath, constant.RequestMethodPost))
 
 	if router.Dispatch(newRequest(t, usersPath)).GetStatusCode() != constant.StatusCodeMethodNotAllowed {
 		t.Error("a path that another method matches must report 405, but did not")
+	}
+}
+
+func TestDispatchReportsANotFoundForAPathThatNoMethodMatches(t *testing.T) {
+	t.Parallel()
+
+	container := manager.NewContainer(nil)
+
+	router := newRouter(container, newRoute(usersPath, constant.RequestMethodPost))
+
+	if router.Dispatch(newRequest(t, "/missing")).GetStatusCode() != constant.StatusCodeNotFound {
+		t.Error("a path that no method matches must report 404, but did not")
 	}
 }
 
@@ -254,39 +257,6 @@ func TestTheRouterSatisfiesItsContract(t *testing.T) {
 	if router.Dispatch(newRequest(t, usersPath)).GetStatusCode() != constant.StatusCodeOk {
 		t.Error("the contract must run the route, but did not")
 	}
-}
-
-// anyMatchingMatcherFixture matches nothing for a concrete request method, and
-// matches for the any method. That is the state that makes the router report
-// that the method is not allowed.
-type anyMatchingMatcherFixture struct{}
-
-// Match returns a route for the any method only.
-func (m *anyMatchingMatcherFixture) Match(
-	path string,
-	requestMethod constant.RequestMethod,
-) contract.RouteContract {
-	if requestMethod == constant.RequestMethodAny {
-		return newRoute(path)
-	}
-
-	return nil
-}
-
-// MatchStatic returns what Match returns.
-func (m *anyMatchingMatcherFixture) MatchStatic(
-	path string,
-	requestMethod constant.RequestMethod,
-) contract.RouteContract {
-	return m.Match(path, requestMethod)
-}
-
-// MatchDynamic returns what Match returns.
-func (m *anyMatchingMatcherFixture) MatchDynamic(
-	path string,
-	requestMethod constant.RequestMethod,
-) contract.RouteContract {
-	return m.Match(path, requestMethod)
 }
 
 // endingRouteMatchedFixture is a route-matched middleware that ends the run.

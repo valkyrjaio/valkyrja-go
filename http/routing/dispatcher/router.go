@@ -112,14 +112,38 @@ func (r *Router) matchRoute(request contract.ServerRequestContract) contract.Rou
 
 // getNotMatchedResponse returns the response for a request that matches no
 // route.
+//
+// A path that matches a route of another request method reports 405 rather than
+// 404, because the path is there and the method is what the route does not take.
+//
+// Warning: the collection files a route under each method that it takes, and a
+// route that takes the any method files under every one of them rather than
+// under `RequestMethodAny` itself. Asking the matcher for `RequestMethodAny`
+// therefore matches nothing at all, and this walks the methods instead.
 func (r *Router) getNotMatchedResponse(request contract.ServerRequestContract) contract.ResponseContract {
 	path := decodePath(request.GetUri().GetPath())
 
-	if r.matcher.Match(path, constant.RequestMethodAny) != nil {
+	if r.matchesAnotherMethod(path, request.GetMethod()) {
 		return r.responseFactory.CreateResponse("", constant.StatusCodeMethodNotAllowed, nil)
 	}
 
 	return r.responseFactory.CreateResponse("", constant.StatusCodeNotFound, nil)
+}
+
+// matchesAnotherMethod reports whether the path matches a route of a request
+// method other than the one that the client used.
+func (r *Router) matchesAnotherMethod(path string, method constant.RequestMethod) bool {
+	for _, other := range constant.GetAllRequestMethods() {
+		if other == method {
+			continue
+		}
+
+		if r.matcher.Match(path, other) != nil {
+			return true
+		}
+	}
+
+	return false
 }
 
 // decodePath returns the path with each percent-encoded triplet decoded, and the
