@@ -22,7 +22,6 @@ import (
 // namespaceSeparator separates a namespace from the rest of a command name.
 const namespaceSeparator = ":"
 
-// ListBashCommand prints every command of the application, for bash completion.
 type ListBashCommand struct{}
 
 // NewListBashCommand builds the command.
@@ -52,9 +51,6 @@ func (c *ListBashCommand) GetHelpText() contract.MessageContract {
 }
 
 // Run prints the name of every command, separated by a space.
-//
-// A namespace that carries a colon prints the rest of each name, so bash
-// completes the part that the caller has not typed yet.
 func (c *ListBashCommand) Run(
 	container containercontract.ContainerContract,
 	route contract.RouteContract,

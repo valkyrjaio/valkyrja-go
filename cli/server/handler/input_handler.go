@@ -18,11 +18,6 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// InputHandler is the server's entry point for one input.
-//
-// It runs the input-received middleware, dispatches the router, and turns a
-// failure into an output. The output then writes its messages, and the
-// process-exiting middleware runs before the process ends.
 type InputHandler struct {
 	container containercontract.ContainerContract
 	router    contract.RouterContract
@@ -37,9 +32,6 @@ type InputHandler struct {
 
 // NewInputHandler builds the handler over a container, a router, the middleware
 // handler of each stage, and an output factory.
-//
-// The exiter ends the process. A caller that passes nil gets a handler that ends
-// no process, which is what a test and a long-running worker both need.
 func NewInputHandler(
 	container containercontract.ContainerContract,
 	router contract.RouterContract,
@@ -61,10 +53,6 @@ func NewInputHandler(
 }
 
 // Handle returns the output for the input.
-//
-// A command that panics reaches the caller as an output that reports the
-// failure, rather than ending the process. The other ports catch a throw here;
-// Go has no throw, so this recovers a panic instead.
 func (h *InputHandler) Handle(input contract.InputContract) contract.OutputContract {
 	output := h.dispatch(input)
 

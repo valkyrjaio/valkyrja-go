@@ -24,7 +24,6 @@ import (
 // namespaceOptionName names the option that filters the list.
 const namespaceOptionName = "namespace"
 
-// ListCommand prints every command of the application.
 type ListCommand struct{}
 
 // NewListCommand builds the command.
@@ -56,9 +55,6 @@ func (c *ListCommand) GetHelpText() contract.MessageContract {
 }
 
 // Run prints every command of the application, in the order of its name.
-//
-// The namespace option keeps the commands whose name starts with the namespace.
-// A namespace that matches no command reports a failure.
 func (c *ListCommand) Run(
 	container containercontract.ContainerContract,
 	route contract.RouteContract,

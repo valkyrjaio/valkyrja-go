@@ -19,7 +19,7 @@ import (
 	middlewarehandler "github.com/valkyrjaio/valkyrja-go/v26/cli/middleware/handler"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/collection"
 	routingconstant "github.com/valkyrjaio/valkyrja-go/v26/cli/routing/constant"
-	routingrouter "github.com/valkyrjaio/valkyrja-go/v26/cli/routing/router"
+	routingdispatcher "github.com/valkyrjaio/valkyrja-go/v26/cli/routing/dispatcher"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/server/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/server/provider"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/manager"
@@ -72,7 +72,7 @@ func TestTheProviderBindsTheInputHandler(t *testing.T) {
 		interactionconstant.OutputFactoryContractServiceID,
 		interactionfactory.NewOutputFactory(nil),
 	)
-	container.SetSingleton(routingconstant.RouterContractServiceID, routingrouter.NewRouter(
+	container.SetSingleton(routingconstant.RouterContractServiceID, routingdispatcher.NewRouter(
 		container,
 		built,
 		interactionfactory.NewOutputFactory(nil),

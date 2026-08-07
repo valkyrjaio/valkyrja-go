@@ -18,12 +18,10 @@ import (
 	middlewarehandler "github.com/valkyrjaio/valkyrja-go/v26/cli/middleware/handler"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/collection"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/constant"
-	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/router"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/dispatcher"
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// CliRoutingServiceProvider publishes the bindings of the CLI routing
-// sub-component.
 type CliRoutingServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the sub-component
@@ -52,7 +50,7 @@ func PublishRouteCollection(container containercontract.ContainerContract) {
 func PublishRouter(container containercontract.ContainerContract) {
 	config := getCliConfig(container)
 
-	container.SetSingleton(constant.RouterContractServiceID, router.NewRouter(
+	container.SetSingleton(constant.RouterContractServiceID, dispatcher.NewRouter(
 		container,
 		getCollection(container),
 		getOutputFactory(container),

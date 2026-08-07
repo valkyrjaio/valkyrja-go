@@ -22,8 +22,8 @@ import (
 	middlewarehandler "github.com/valkyrjaio/valkyrja-go/v26/cli/middleware/handler"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/collection"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/data"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/dispatcher"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/fixtures"
-	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/router"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/server/handler"
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/manager"
@@ -31,7 +31,7 @@ import (
 
 const (
 	routeName     = "cache:clear"
-	middlewareKey = "Valkyrja.Tests.Cli.EndingMiddleware"
+	middlewareKey = "valkyrja.tests.cli.EndingMiddleware"
 )
 
 // newHandler builds the server's entry point over one command, and returns the
@@ -51,7 +51,7 @@ func newHandler(
 		built.Add(route)
 	}
 
-	dispatcher := router.NewRouter(
+	routing := dispatcher.NewRouter(
 		container,
 		built,
 		factory.NewOutputFactory(nil),
@@ -64,7 +64,7 @@ func newHandler(
 
 	return handler.NewInputHandler(
 		container,
-		dispatcher,
+		routing,
 		middlewarehandler.NewInputReceivedHandler(container, inputReceived...),
 		middlewarehandler.NewThrowableCaughtHandler(container),
 		middlewarehandler.NewProcessExitingHandler(container),

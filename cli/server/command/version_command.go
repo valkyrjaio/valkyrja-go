@@ -26,7 +26,6 @@ const shortOptionName = "short"
 // plainOptionName names the option that prints the version with no frame.
 const plainOptionName = "plain"
 
-// VersionCommand prints the version of the application.
 type VersionCommand struct{}
 
 // NewVersionCommand builds the command.
@@ -56,9 +55,6 @@ func (c *VersionCommand) GetHelpText() contract.MessageContract {
 }
 
 // Run prints the version of the application.
-//
-// The short option prints the version number alone, so a script reads it. The
-// plain option prints the same lines as the frame does, with no frame.
 func (c *VersionCommand) Run(
 	container containercontract.ContainerContract,
 	route contract.RouteContract,
@@ -89,9 +85,6 @@ func (c *VersionCommand) Run(
 }
 
 // hasOptionValue reports whether the caller typed the option.
-//
-// The route holds the parameter whether the caller typed it or not, so the
-// parameter reports whether a value reached it.
 func hasOptionValue(route contract.RouteContract, name string) bool {
 	option := route.GetOption(name)
 

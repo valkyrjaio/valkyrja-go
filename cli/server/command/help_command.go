@@ -30,7 +30,6 @@ const textIndent = "  "
 // listIndent opens the description of one parameter.
 const listIndent = "    "
 
-// HelpCommand prints the help text of one command.
 type HelpCommand struct{}
 
 // NewHelpCommand builds the command.
@@ -62,8 +61,6 @@ func (c *HelpCommand) GetHelpText() contract.MessageContract {
 }
 
 // Run prints the help text of the command that the caller names.
-//
-// A name that no command of the application carries reports a failure.
 func (c *HelpCommand) Run(
 	container containercontract.ContainerContract,
 	route contract.RouteContract,

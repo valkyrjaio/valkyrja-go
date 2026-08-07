@@ -25,11 +25,6 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// CliServerCliRoutesProvider registers every command that the CLI server ships.
-//
-// The other ports read a command from an annotation on its class. Go has no
-// annotation, so each command declares its own route, and this provider returns
-// them as a literal slice that `sindri` reads from the source.
 type CliServerCliRoutesProvider struct{}
 
 // GetRoutes returns each command that the CLI server registers.
@@ -42,8 +37,6 @@ func (p *CliServerCliRoutesProvider) GetRoutes() []clicontract.RouteContract {
 	}
 }
 
-// CliServerServiceProvider publishes the bindings of the CLI server
-// sub-component.
 type CliServerServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the sub-component

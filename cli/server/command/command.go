@@ -29,10 +29,6 @@ import (
 
 // resolve returns the service under the binding key, and the zero value of the
 // type where the container resolves nothing under it.
-//
-// A command reads a service that the CLI component publishes, so a container
-// that resolves nothing means the application registered no CLI component. The
-// command then reports what it can, rather than ending the process.
 func resolve[T any](container containercontract.ContainerContract, id string) T {
 	var empty T
 
@@ -106,9 +102,6 @@ func newHeader(
 }
 
 // getProjectRoot returns the directory that the caller ran the command in.
-//
-// A process that cannot report its own directory returns an empty string, which
-// the header prints as an empty line.
 func getProjectRoot() string {
 	root, _ := os.Getwd()
 
