@@ -68,7 +68,7 @@ const (
 
 // The binding key of each service that the HTTP message sub-component publishes.
 const (
-	ResponseFactoryContractServiceID = "Valkyrja.Http.Message.Factory.ResponseFactoryContract"
+	ResponseFactoryContractServiceID = "valkyrja.http.message.factory.ResponseFactoryContract"
 
-	ServerRequestContractServiceID = "Valkyrja.Http.Message.Request.ServerRequestContract"
+	ServerRequestContractServiceID = "valkyrja.http.message.request.ServerRequestContract"
 )

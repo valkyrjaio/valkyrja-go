@@ -8,7 +8,6 @@
 
 package constant
 
-// ProtocolVersion is the HTTP protocol version of a message.
 type ProtocolVersion string
 
 // The ProtocolVersion values that the framework knows.

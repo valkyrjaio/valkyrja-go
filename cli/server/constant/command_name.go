@@ -22,5 +22,5 @@ const (
 
 // The binding key of each service that the CLI server publishes.
 const (
-	InputHandlerContractServiceID = "Valkyrja.Cli.Server.Handler.InputHandlerContract"
+	InputHandlerContractServiceID = "valkyrja.cli.server.handler.InputHandlerContract"
 )

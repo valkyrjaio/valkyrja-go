@@ -24,9 +24,6 @@ const (
 )
 
 // IsValidPort reports whether the port number is one that a URI accepts.
-//
-// The other ports declare this beside the constants, as a static method on the
-// constant class. Go has no class, so it is a function in the same package.
 func IsValidPort(port int) bool {
 	return port >= PortMin && port <= PortMax
 }

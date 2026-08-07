@@ -8,7 +8,6 @@
 
 package constant
 
-// RequestMethod is the request method of an HTTP request.
 type RequestMethod string
 
 // The RequestMethod values that the framework knows.

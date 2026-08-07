@@ -8,7 +8,6 @@
 
 package constant
 
-// ModeTranslation is the translation flag of a stream mode.
 type ModeTranslation string
 
 // The ModeTranslation values that the framework knows.

@@ -108,29 +108,29 @@ const (
 // The HTTP routing component's binding keys.
 const (
 	// RouterContractServiceID is the binding key for the router.
-	RouterContractServiceID = "Valkyrja.Http.Routing.Dispatcher.RouterContract"
+	RouterContractServiceID = "valkyrja.http.routing.dispatcher.RouterContract"
 
 	// RouteCollectionContractServiceID is the binding key for the route
 	// collection.
-	RouteCollectionContractServiceID = "Valkyrja.Http.Routing.Collection.RouteCollectionContract"
+	RouteCollectionContractServiceID = "valkyrja.http.routing.collection.RouteCollectionContract"
 
 	// RouteContractServiceID is the binding key for the route that matched. The
 	// router binds it before it runs the handler, so a handler reads the route.
-	RouteContractServiceID = "Valkyrja.Http.Routing.Data.RouteContract"
+	RouteContractServiceID = "valkyrja.http.routing.data.RouteContract"
 
 	// HttpRoutingDataServiceID is the binding key for the routing data.
-	HttpRoutingDataServiceID = "Valkyrja.Http.Routing.Data.HttpRoutingData"
+	HttpRoutingDataServiceID = "valkyrja.http.routing.data.HttpRoutingData"
 
 	// MatcherContractServiceID is the binding key for the matcher.
-	MatcherContractServiceID = "Valkyrja.Http.Routing.Matcher.MatcherContract"
+	MatcherContractServiceID = "valkyrja.http.routing.matcher.MatcherContract"
 
 	// ProcessorContractServiceID is the binding key for the processor.
-	ProcessorContractServiceID = "Valkyrja.Http.Routing.Processor.ProcessorContract"
+	ProcessorContractServiceID = "valkyrja.http.routing.processor.ProcessorContract"
 
 	// UrlContractServiceID is the binding key for the URL generator.
-	UrlContractServiceID = "Valkyrja.Http.Routing.Url.UrlContract"
+	UrlContractServiceID = "valkyrja.http.routing.url.UrlContract"
 )
 
 // RoutingResponseFactoryContractServiceID is the binding key for what builds a
 // response that sends the client to a named route.
-const RoutingResponseFactoryContractServiceID = "Valkyrja.Http.Routing.Factory.RoutingResponseFactoryContract"
+const RoutingResponseFactoryContractServiceID = "valkyrja.http.routing.factory.RoutingResponseFactoryContract"

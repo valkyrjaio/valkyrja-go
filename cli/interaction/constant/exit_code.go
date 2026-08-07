@@ -13,7 +13,6 @@
 // for that reason.
 package constant
 
-// ExitCode is the code that the process exits with.
 type ExitCode int
 
 // The exit codes that the framework uses. The values from 64 to 78 are the
@@ -41,7 +40,6 @@ const (
 	ExitCodeAutoExit ExitCode = 255
 )
 
-// OptionType says how a caller spells an option.
 type OptionType string
 
 // The option types that the framework knows.

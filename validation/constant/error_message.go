@@ -60,4 +60,4 @@ const (
 )
 
 // ValidatorContractServiceID is the binding key for the validator.
-const ValidatorContractServiceID = "Valkyrja.Validation.Validator.ValidatorContract"
+const ValidatorContractServiceID = "valkyrja.validation.validator.ValidatorContract"

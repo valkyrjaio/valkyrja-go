@@ -8,7 +8,6 @@
 
 package constant
 
-// SameSite is the SameSite attribute of a cookie.
 type SameSite string
 
 // The SameSite values that the framework knows.

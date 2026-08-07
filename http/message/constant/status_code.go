@@ -14,7 +14,6 @@
 // segment for that reason.
 package constant
 
-// StatusCode is the status code of an HTTP response.
 type StatusCode int
 
 // The status code of each response that the framework builds.

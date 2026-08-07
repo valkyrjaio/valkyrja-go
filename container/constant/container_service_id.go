@@ -16,8 +16,8 @@ package constant
 // Each key names one thing that the container resolves.
 const (
 	// ContainerContractServiceID is the binding key for the container itself.
-	ContainerContractServiceID = "Valkyrja.Container.Manager.ContainerContract"
+	ContainerContractServiceID = "valkyrja.container.manager.ContainerContract"
 
 	// ContainerDataServiceID is the binding key for the container's data.
-	ContainerDataServiceID = "Valkyrja.Container.Data.ContainerData"
+	ContainerDataServiceID = "valkyrja.container.data.ContainerData"
 )

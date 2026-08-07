@@ -12,15 +12,15 @@ package constant
 // The event component's binding keys.
 const (
 	// EventDataServiceID is the binding key for the event component's data.
-	EventDataServiceID = "Valkyrja.Event.Data.EventData"
+	EventDataServiceID = "valkyrja.event.data.EventData"
 
 	// ListenerCollectionContractServiceID is the binding key for the listener
 	// collection.
-	ListenerCollectionContractServiceID = "Valkyrja.Event.Collection.ListenerCollectionContract"
+	ListenerCollectionContractServiceID = "valkyrja.event.collection.ListenerCollectionContract"
 
 	// EventDispatcherContractServiceID is the binding key for the event
 	// dispatcher.
-	EventDispatcherContractServiceID = "Valkyrja.Event.Dispatcher.EventDispatcherContract"
+	EventDispatcherContractServiceID = "valkyrja.event.dispatcher.EventDispatcherContract"
 )
 
 // EventArgumentKey is the key that the dispatcher files the event under, in the

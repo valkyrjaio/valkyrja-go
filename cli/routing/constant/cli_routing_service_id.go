@@ -13,9 +13,9 @@ package constant
 // A language with no class token spells a binding key as a string, and the
 // TypeScript port spells it the same way.
 const (
-	RouterContractServiceID = "Valkyrja.Cli.Routing.Dispatcher.RouterContract"
+	RouterContractServiceID = "valkyrja.cli.routing.dispatcher.RouterContract"
 
-	RouteCollectionContractServiceID = "Valkyrja.Cli.Routing.Collection.RouteCollectionContract"
+	RouteCollectionContractServiceID = "valkyrja.cli.routing.collection.RouteCollectionContract"
 
-	RouteContractServiceID = "Valkyrja.Cli.Routing.Data.RouteContract"
+	RouteContractServiceID = "valkyrja.cli.routing.data.RouteContract"
 )

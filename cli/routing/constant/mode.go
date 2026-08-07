@@ -9,7 +9,6 @@
 // Package constant holds the CLI routing component's enumerations.
 package constant
 
-// ArgumentMode says whether a command needs the argument.
 type ArgumentMode string
 
 // The argument modes that the framework knows.
@@ -18,7 +17,6 @@ const (
 	ArgumentModeOptional ArgumentMode = "OPTIONAL"
 )
 
-// ArgumentValueMode says how many values the argument takes.
 type ArgumentValueMode string
 
 // The argument value modes that the framework knows.
@@ -27,7 +25,6 @@ const (
 	ArgumentValueModeArray   ArgumentValueMode = "ARRAY"
 )
 
-// OptionMode says whether a command needs the option.
 type OptionMode string
 
 // The option modes that the framework knows.
@@ -36,7 +33,6 @@ const (
 	OptionModeOptional OptionMode = "OPTIONAL"
 )
 
-// OptionValueMode says how many values the option takes.
 type OptionValueMode string
 
 // The option value modes that the framework knows.

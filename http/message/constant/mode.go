@@ -10,7 +10,6 @@ package constant
 
 import "slices"
 
-// Mode is the mode that a stream opens in.
 type Mode string
 
 // The Mode values that the framework knows.

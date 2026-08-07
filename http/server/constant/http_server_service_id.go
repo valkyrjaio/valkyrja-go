@@ -13,10 +13,10 @@ package constant
 const (
 	// RequestHandlerContractServiceID is the binding key for the request
 	// handler.
-	RequestHandlerContractServiceID = "Valkyrja.Http.Server.Handler.RequestHandlerContract"
+	RequestHandlerContractServiceID = "valkyrja.http.server.handler.RequestHandlerContract"
 
 	// ResponseContractServiceID is the binding key for the response that the
 	// handler built. The handler binds it before it returns, so something later
 	// in the request reads what the client receives.
-	ResponseContractServiceID = "Valkyrja.Http.Message.Response.ResponseContract"
+	ResponseContractServiceID = "valkyrja.http.message.response.ResponseContract"
 )

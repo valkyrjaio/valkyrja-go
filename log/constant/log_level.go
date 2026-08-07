@@ -9,10 +9,6 @@
 // Package constant holds the log component's severities and binding keys.
 package constant
 
-// LogLevel is the severity that a message carries.
-//
-// The severities are the eight of RFC 5424, which every port keeps, so a message
-// reads the same in each one.
 type LogLevel string
 
 // The severities that the framework reports.
@@ -36,7 +32,7 @@ const (
 
 // The binding key of each service that the log component publishes.
 const (
-	LogConfigContractServiceID = "Valkyrja.Log.Data.LogConfigContract"
+	LogConfigContractServiceID = "valkyrja.log.data.LogConfigContract"
 
-	LoggerContractServiceID = "Valkyrja.Log.Logger.LoggerContract"
+	LoggerContractServiceID = "valkyrja.log.logger.LoggerContract"
 )

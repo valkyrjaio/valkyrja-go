@@ -11,11 +11,11 @@ package constant
 // The binding key of each service that the CLI interaction sub-component
 // publishes.
 const (
-	InputContractServiceID = "Valkyrja.Cli.Interaction.Input.InputContract"
+	InputContractServiceID = "valkyrja.cli.interaction.input.InputContract"
 
-	OutputContractServiceID = "Valkyrja.Cli.Interaction.Output.OutputContract"
+	OutputContractServiceID = "valkyrja.cli.interaction.output.OutputContract"
 
-	OutputFactoryContractServiceID = "Valkyrja.Cli.Interaction.Output.Factory.OutputFactoryContract"
+	OutputFactoryContractServiceID = "valkyrja.cli.interaction.factory.OutputFactoryContract"
 
-	CliInteractionConfigContractServiceID = "Valkyrja.Cli.Interaction.Data.CliInteractionConfigContract"
+	CliInteractionConfigContractServiceID = "valkyrja.cli.interaction.data.CliInteractionConfigContract"
 )

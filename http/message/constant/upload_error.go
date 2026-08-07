@@ -8,7 +8,6 @@
 
 package constant
 
-// UploadError is what went wrong with one uploaded file.
 type UploadError int
 
 // The UploadError values that the framework knows. The numbers are PHP's own

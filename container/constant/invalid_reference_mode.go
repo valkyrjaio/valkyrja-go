@@ -8,11 +8,6 @@
 
 package constant
 
-// InvalidReferenceMode says what the container does where it resolves nothing
-// for a binding key.
-//
-// Go has no enum, so the other ports' enum is a defined type over a `const`
-// block. The taxonomy puts it in the `constant` segment for that reason.
 type InvalidReferenceMode int
 
 const (

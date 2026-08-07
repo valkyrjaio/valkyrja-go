@@ -8,7 +8,6 @@
 
 package constant
 
-// Scheme is the scheme of a URI.
 type Scheme string
 
 // The Scheme values that the framework knows.

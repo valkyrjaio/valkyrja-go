@@ -13,17 +13,17 @@ package constant
 // The application component's binding keys.
 const (
 	// ApplicationContractServiceID is the binding key for the application.
-	ApplicationContractServiceID = "Valkyrja.Application.Kernel.ApplicationContract"
+	ApplicationContractServiceID = "valkyrja.application.kernel.ApplicationContract"
 
 	// ConfigContractServiceID is the binding key for the application config.
-	ConfigContractServiceID = "Valkyrja.Application.Data.ConfigContract"
+	ConfigContractServiceID = "valkyrja.application.data.ConfigContract"
 
 	// CliConfigContractServiceID is the binding key for the CLI config.
-	CliConfigContractServiceID = "Valkyrja.Application.Data.CliConfigContract"
+	CliConfigContractServiceID = "valkyrja.application.data.CliConfigContract"
 
 	// HttpConfigContractServiceID is the binding key for the HTTP config.
-	HttpConfigContractServiceID = "Valkyrja.Application.Data.HttpConfigContract"
+	HttpConfigContractServiceID = "valkyrja.application.data.HttpConfigContract"
 
 	// ConfigServiceID is the binding key for the default config.
-	ConfigServiceID = "Valkyrja.Application.Data.Config"
+	ConfigServiceID = "valkyrja.application.data.Config"
 )

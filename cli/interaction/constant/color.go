@@ -8,7 +8,6 @@
 
 package constant
 
-// TextColor is the terminal code that colors the text of a message.
 type TextColor int
 
 // The text colors that the framework writes.
@@ -34,7 +33,6 @@ const (
 // TextColorDefault is the code that returns the text to its own color.
 const TextColorDefault = 39
 
-// BackgroundColor is the terminal code that colors the background of a message.
 type BackgroundColor int
 
 // The background colors that the framework writes.
@@ -61,7 +59,6 @@ const (
 // color.
 const BackgroundColorDefault = 49
 
-// Style is the terminal code that styles the text of a message.
 type Style int
 
 // The styles that the framework writes.
