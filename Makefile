@@ -6,7 +6,7 @@
 # Released under the MIT License. See LICENSE.md for details.
 #
 
-# Root task runner for the Valkyrja Go template — the analog of PHP's
+# Root task runner for this repository — the analog of PHP's
 # composer.json, TypeScript's package.json, and Java's Gradle scripts. Drive
 # every CI tool through these targets; check here first for exact target names.
 #
@@ -27,7 +27,17 @@ VALKYRJALINT ?= go tool -modfile=.github/ci/lint/go.mod valkyrjalint
 # read this file. A value written here therefore keeps saying `Project Template`
 # in a repository that is not the template, and `make header-fix` then rewrites
 # every correct header to the wrong package.
-PACKAGE_IDENTIFIER ?= $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config)
+#
+# `:=` rather than `?=`: the value is read once, at parse time. A recursive
+# assignment re-runs `sed` at every reference.
+#
+# `$(shell ...)` reports no error of its own, so a changed quoting style or a
+# moved config file yields an empty value. `require-package-identifier` below
+# catches that. Warning: keep the check in a target, never in a top-level
+# `ifeq`. Make reads a top-level conditional before it chooses a target, so a
+# broken config would end every target, including `make help` and `make test`,
+# which never read the identifier.
+PACKAGE_IDENTIFIER := $(shell sed -n "s/^IDENTIFIER='\\(.*\\)'$$/\\1/p" .github/ci/copyright-header/config 2>/dev/null)
 
 # The coverage floor, as a percentage. 100 is the definition of done; it is a hard
 # floor, never lowered to accommodate a gap (cover the code, or leave it out of the
@@ -68,12 +78,19 @@ config-check: ## Fail where .golangci.yml differs from the shared configuration
 		&& { diff -u .golangci.yml "$$generated" \
 			|| { echo 'FAIL  .golangci.yml is stale. Run: make config-write'; exit 1; }; }
 
+.PHONY: require-package-identifier
+require-package-identifier:
+	@test -n '$(PACKAGE_IDENTIFIER)' || { \
+		printf 'Could not read IDENTIFIER from %s\n' .github/ci/copyright-header/config >&2; \
+		exit 1; \
+	}
+
 .PHONY: header-fix
-header-fix: ## Write the copyright header into every Go file that lacks it
+header-fix: require-package-identifier ## Write the copyright header into every Go file that lacks it
 	$(VALKYRJALINT) header -package '$(PACKAGE_IDENTIFIER)' -w .
 
 .PHONY: header-check
-header-check: ## Fail where a Go file carries no copyright header, or the wrong one
+header-check: require-package-identifier ## Fail where a Go file carries no copyright header, or the wrong one
 	@$(VALKYRJALINT) header -package '$(PACKAGE_IDENTIFIER)' . \
 		&& echo 'PASS  every Go file carries the copyright header' \
 		|| { echo 'FAIL  the files above need the header. Run: make header-fix'; exit 1; }
