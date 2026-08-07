@@ -16,7 +16,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// EventRuntimeError is the event component's base runtime error.
 type EventRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -26,8 +25,6 @@ func (e *EventRuntimeError) IsEventThrowable() bool {
 	return true
 }
 
-// EventInvalidArgumentError is the event component's base invalid-argument
-// error.
 type EventInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }

@@ -8,7 +8,6 @@
 
 package exception
 
-// HttpClientRuntimeError is the HTTP client sub-component's base runtime error.
 type HttpClientRuntimeError struct {
 	HttpRuntimeError
 }
@@ -27,7 +26,6 @@ func (e *HttpClientRuntimeError) IsHttpClientThrowable() bool {
 	return true
 }
 
-// HttpClientRequestFailedError reports that the client did not reach the server.
 type HttpClientRequestFailedError struct {
 	HttpClientRuntimeError
 

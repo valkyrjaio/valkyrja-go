@@ -23,9 +23,9 @@ import (
 )
 
 const (
-	firstID  = "Valkyrja.Tests.Http.FirstMiddleware"
-	secondID = "Valkyrja.Tests.Http.SecondMiddleware"
-	endingID = "Valkyrja.Tests.Http.EndingMiddleware"
+	firstID  = "valkyrja.tests.http.FirstMiddleware"
+	secondID = "valkyrja.tests.http.SecondMiddleware"
+	endingID = "valkyrja.tests.http.EndingMiddleware"
 )
 
 // newContainer builds a container that resolves a recording middleware under
@@ -199,7 +199,7 @@ func TestAHandlerSkipsAMiddlewareThatTheContainerCannotResolve(t *testing.T) {
 
 	built := request.NewServerRequest(nil, "", nil, nil)
 
-	result := handler.NewRequestReceivedHandler(container, "Valkyrja.Tests.Http.Unbound").RequestReceived(built)
+	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.Unbound").RequestReceived(built)
 
 	if result.IsResponse() {
 		t.Error("a handler must skip a middleware that the container cannot resolve, but ended the run")
@@ -215,11 +215,11 @@ func TestAHandlerSkipsABindingThatIsNoMiddleware(t *testing.T) {
 
 	record := []string{}
 	container := newContainer(&record, nil)
-	container.Bind("Valkyrja.Tests.Http.NotMiddleware", func(_ containercontract.ContainerContract, _ []any) any {
+	container.Bind("valkyrja.tests.http.NotMiddleware", func(_ containercontract.ContainerContract, _ []any) any {
 		return "not a middleware"
 	})
 
-	result := handler.NewRequestReceivedHandler(container, "Valkyrja.Tests.Http.NotMiddleware").
+	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.NotMiddleware").
 		RequestReceived(request.NewServerRequest(nil, "", nil, nil))
 
 	if result.IsResponse() {

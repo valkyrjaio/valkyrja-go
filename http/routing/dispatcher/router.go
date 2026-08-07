@@ -18,7 +18,6 @@ import (
 	routingconstant "github.com/valkyrjaio/valkyrja-go/v26/http/routing/constant"
 )
 
-// Router runs the route that a request matches.
 type Router struct {
 	container       containercontract.ContainerContract
 	matcher         contract.MatcherContract
@@ -50,11 +49,6 @@ func NewRouter(
 }
 
 // Dispatch matches the request to a route and runs it.
-//
-// A path that matches no route of the request method, but matches one of another
-// method, reports 405. A path that matches no route at all reports 404. Either
-// way the route-not-matched middleware runs, so an application shapes the
-// response.
 func (r *Router) Dispatch(request contract.ServerRequestContract) contract.ResponseContract {
 	route := r.matchRoute(request)
 	if route == nil {
@@ -65,10 +59,6 @@ func (r *Router) Dispatch(request contract.ServerRequestContract) contract.Respo
 }
 
 // DispatchRoute runs the route for the request.
-//
-// The route-matched middleware runs first, and it ends the run where it returns
-// a response. The router then binds the route in the container, so a handler
-// reads the route that matched, and runs the handler.
 func (r *Router) DispatchRoute(
 	request contract.ServerRequestContract,
 	route contract.RouteContract,
@@ -89,9 +79,6 @@ func (r *Router) DispatchRoute(
 
 // runHandler runs what the route holds, and returns an empty response where the
 // route holds no handler.
-//
-// The other ports type the handler as callable, so the value cannot be absent. A
-// Go function value can be nil, and calling it panics in the middle of a request.
 func (r *Router) runHandler(route contract.RouteContract) contract.ResponseContract {
 	handler := route.GetHandler()
 	if handler == nil {
@@ -103,18 +90,12 @@ func (r *Router) runHandler(route contract.RouteContract) contract.ResponseContr
 
 // matchRoute returns the route that the request matches, and nil where none
 // matches.
-//
-// The path is decoded first, so a route matches a path that the client escaped.
-// A path that no decoder reads is matched as it arrived.
 func (r *Router) matchRoute(request contract.ServerRequestContract) contract.RouteContract {
 	return r.matcher.Match(decodePath(request.GetUri().GetPath()), request.GetMethod())
 }
 
 // getNotMatchedResponse returns the response for a request that matches no
 // route.
-//
-// A path that matches a route of another request method reports 405 rather than
-// 404, because the path is there and the method is what the route does not take.
 //
 // Warning: the collection files a route under each method that it takes, and a
 // route that takes the any method files under every one of them rather than

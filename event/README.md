@@ -16,7 +16,7 @@ the binding-key format.
 ```go
 // Right — the event names itself, and nothing reads its type to find the name.
 func (e *CacheClearedEvent) GetEventID() string {
-	return "Valkyrja.App.Event.CacheClearedEvent"
+	return "valkyrja.app.event.CacheClearedEvent"
 }
 ```
 
@@ -101,9 +101,9 @@ work with no cache at all.
 
 | Binding key                                            | Holds               |
 | :----------------------------------------------------- | :------------------ |
-| `Valkyrja.Event.Data.EventData`                        | The component state |
-| `Valkyrja.Event.Collection.ListenerCollectionContract` | Every listener      |
-| `Valkyrja.Event.Dispatcher.EventDispatcherContract`    | The dispatcher      |
+| `valkyrja.event.data.EventData`                        | The component state |
+| `valkyrja.event.collection.ListenerCollectionContract` | Every listener      |
+| `valkyrja.event.dispatcher.EventDispatcherContract`    | The dispatcher      |
 
 The state is a value that the framework stores and reloads. `sindri` generates it
 for an application, so the framework loads every listener at boot without reading

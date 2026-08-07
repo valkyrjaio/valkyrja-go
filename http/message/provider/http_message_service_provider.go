@@ -15,8 +15,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/factory"
 )
 
-// HttpMessageServiceProvider publishes the bindings of the HTTP message
-// sub-component.
 type HttpMessageServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the sub-component

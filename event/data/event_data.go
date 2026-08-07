@@ -15,13 +15,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/event/contract"
 )
 
-// EventData is the event component's state. `sindri` generates one of these for
-// the whole application, and the collection loads it at boot.
-//
-// The listener names of one event are a slice rather than a map, because the
-// dispatcher runs the listeners in the order that the collection recorded them.
-// The other ports rely on an ordered map for this — PHP on an array, Java on a
-// `LinkedHashMap` — and a Go map has no order at all.
 type EventData struct {
 	events    map[string][]string
 	listeners map[string]contract.ListenerFactory

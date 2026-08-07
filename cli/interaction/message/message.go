@@ -13,7 +13,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 )
 
-// Message is one message that a command writes.
 type Message struct {
 	text      string
 	formatter contract.FormatterContract

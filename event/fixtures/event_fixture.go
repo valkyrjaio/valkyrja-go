@@ -18,17 +18,17 @@ import (
 // The identifiers of the events that these fixtures stand for.
 const (
 	// EventFixtureID identifies EventFixture.
-	EventFixtureID = "Valkyrja.Tests.Event.EventFixture"
+	EventFixtureID = "valkyrja.tests.event.EventFixture"
 
 	// StoppableEventFixtureID identifies StoppableEventFixture.
-	StoppableEventFixtureID = "Valkyrja.Tests.Event.StoppableEventFixture"
+	StoppableEventFixtureID = "valkyrja.tests.event.StoppableEventFixture"
 
 	// ArgumentsCapableEventFixtureID identifies ArgumentsCapableEventFixture.
-	ArgumentsCapableEventFixtureID = "Valkyrja.Tests.Event.ArgumentsCapableEventFixture"
+	ArgumentsCapableEventFixtureID = "valkyrja.tests.event.ArgumentsCapableEventFixture"
 
 	// DispatchCollectableEventFixtureID identifies
 	// DispatchCollectableEventFixture.
-	DispatchCollectableEventFixtureID = "Valkyrja.Tests.Event.DispatchCollectableEventFixture"
+	DispatchCollectableEventFixtureID = "valkyrja.tests.event.DispatchCollectableEventFixture"
 )
 
 // EventFixture is an event that carries nothing but its identifier.
@@ -40,7 +40,6 @@ func (e *EventFixture) GetEventID() string {
 }
 
 // StoppableEventFixture is an event that stops the listeners after it once a
-// listener sets Stopped.
 type StoppableEventFixture struct {
 	Stopped bool
 }
@@ -56,7 +55,6 @@ func (e *StoppableEventFixture) IsPropagationStopped() bool {
 }
 
 // ArgumentsCapableEventFixture is an event that the dispatcher fills with the
-// arguments that the caller gave.
 type ArgumentsCapableEventFixture struct {
 	Arguments []any
 }
@@ -75,7 +73,6 @@ func (e *ArgumentsCapableEventFixture) WithArguments(arguments []any) contract.E
 }
 
 // DispatchCollectableEventFixture is an event that collects what each listener
-// returned.
 type DispatchCollectableEventFixture struct {
 	Dispatches []any
 }
@@ -97,11 +94,9 @@ func (e *DispatchCollectableEventFixture) GetDispatches() []any {
 }
 
 // NotAnEventFixture is a value that the container resolves and the dispatcher
-// rejects, because it is no event.
 type NotAnEventFixture struct{}
 
 // ListenerProviderFixture is a listener provider that registers the listeners it
-// holds.
 type ListenerProviderFixture struct {
 	Listeners []contract.ListenerContract
 }

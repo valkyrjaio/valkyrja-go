@@ -157,7 +157,6 @@ func TestTheClientTakesGoOwnClientWhereTheCallerNamesNone(t *testing.T) {
 	}
 }
 
-// failingTransport is a transport that reaches no server.
 type failingTransport struct{}
 
 // RoundTrip reports the failure.
@@ -165,8 +164,6 @@ func (t *failingTransport) RoundTrip(_ *http.Request) (*http.Response, error) {
 	return nil, errors.New("the server is unreachable")
 }
 
-// craftedTransport answers with the response that the test built, rather than
-// reaching a server.
 type craftedTransport struct {
 	response *http.Response
 }
@@ -176,7 +173,6 @@ func (t *craftedTransport) RoundTrip(_ *http.Request) (*http.Response, error) {
 	return t.response, nil
 }
 
-// failingBody is a body that reports a failure rather than its contents.
 type failingBody struct{}
 
 // Read reports the failure.

@@ -27,10 +27,6 @@ const ipLiteralOpen = "["
 const ipLiteralClose = "]"
 
 // NewUriFromString builds a URI by reading the string.
-//
-// The other ports read the string with the platform's own parser, and this port
-// reads it with `net/url`. A string that no parser reads reports a failure, and
-// so does a port, a path, or a query that a URI does not carry.
 func NewUriFromString(raw string) (*Uri, error) {
 	parsed, err := url.Parse(raw)
 	if err != nil {
@@ -57,11 +53,6 @@ func NewUriFromString(raw string) (*Uri, error) {
 }
 
 // readHost returns the host that the authority names.
-//
-// An IPv6 literal keeps its brackets, because the brackets are what mark the
-// colons inside it as part of the address rather than as a port separator, and
-// the URI leaves a bracketed host unencoded for the same reason. `url.Hostname`
-// strips them, so this puts them back.
 func readHost(parsed *url.URL) string {
 	host := parsed.Hostname()
 	if !strings.Contains(host, ipLiteralSeparator) {

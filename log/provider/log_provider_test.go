@@ -24,7 +24,6 @@ import (
 )
 
 // configFixture is an application configuration that also holds the settings of
-// the log component.
 type configFixture struct {
 	*applicationdata.Config
 

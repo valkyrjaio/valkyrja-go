@@ -17,7 +17,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/event/throwable/exception"
 )
 
-// EventDispatcher runs the listeners for an event.
 type EventDispatcher struct {
 	collection contract.ListenerCollectionContract
 	container  containercontract.ContainerContract
@@ -97,10 +96,6 @@ func (d *EventDispatcher) DispatchListeners(
 
 // DispatchListener runs one listener and records what it returned on an event
 // that collects it.
-//
-// A listener with no handler runs nothing. The other ports type the handler as
-// callable, so the value cannot be absent; a Go function value can be nil, and
-// calling it panics in the middle of a dispatch.
 func (d *EventDispatcher) DispatchListener(
 	event contract.EventContract,
 	listener contract.ListenerContract,
@@ -121,12 +116,6 @@ func (d *EventDispatcher) DispatchListener(
 }
 
 // getEventFromID builds the event that the binding key names.
-//
-// PHP and Java build the event from its own class name. Go cannot construct a
-// type from a string, so this port resolves the binding key through the
-// container, which is the framework's own answer to "build the thing that this
-// identifier names". An application binds each event that it dispatches by
-// identifier.
 func (d *EventDispatcher) getEventFromID(eventID string, arguments []any) (contract.EventContract, error) {
 	resolved, err := d.container.Get(eventID, arguments, containerconstant.NewInstanceOrThrowException)
 	if err != nil {

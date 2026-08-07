@@ -14,7 +14,6 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// InputReceivedHandler runs the input-received middleware.
 type InputReceivedHandler struct {
 	Handler
 }
@@ -38,7 +37,6 @@ func (h *InputReceivedHandler) InputReceived(input contract.InputContract) contr
 	return middleware.InputReceived(input, h)
 }
 
-// RouteMatchedHandler runs the route-matched middleware.
 type RouteMatchedHandler struct {
 	Handler
 }
@@ -65,7 +63,6 @@ func (h *RouteMatchedHandler) RouteMatched(
 	return middleware.RouteMatched(input, route, h)
 }
 
-// RouteNotMatchedHandler runs the route-not-matched middleware.
 type RouteNotMatchedHandler struct {
 	Handler
 }
@@ -92,7 +89,6 @@ func (h *RouteNotMatchedHandler) RouteNotMatched(
 	return middleware.RouteNotMatched(input, output, h)
 }
 
-// RouteDispatchedHandler runs the route-dispatched middleware.
 type RouteDispatchedHandler struct {
 	Handler
 }
@@ -120,7 +116,6 @@ func (h *RouteDispatchedHandler) RouteDispatched(
 	return middleware.RouteDispatched(input, output, route, h)
 }
 
-// ThrowableCaughtHandler runs the throwable-caught middleware.
 type ThrowableCaughtHandler struct {
 	Handler
 }
@@ -148,7 +143,6 @@ func (h *ThrowableCaughtHandler) ThrowableCaught(
 	return middleware.ThrowableCaught(input, output, throwable, h)
 }
 
-// ProcessExitingHandler runs the process-exiting middleware.
 type ProcessExitingHandler struct {
 	Handler
 }

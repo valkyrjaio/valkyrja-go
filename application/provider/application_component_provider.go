@@ -18,12 +18,6 @@ import (
 	httpcontract "github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// ApplicationComponentProvider is the application's top-level provider. It names
-// the container, which every application needs.
-//
-// The other ports declare a CLI variant and an HTTP variant that override
-// `getComponentProviders`. Go has no method override, so each variant is its own
-// provider once the CLI and the HTTP components land.
 type ApplicationComponentProvider struct{}
 
 // GetComponentProviders returns each component that the application needs.

@@ -16,7 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/throwable/exception"
 )
 
-// OptionParameter is one option parameter of a command.
 type OptionParameter struct {
 	parameter
 
@@ -30,9 +29,6 @@ type OptionParameter struct {
 }
 
 // NewOptionParameter builds an optional option that takes one value.
-//
-// A caller states another mode, another value mode, a short name, a valid value,
-// or a cast with the `With` methods, the way every other port does.
 func NewOptionParameter(name string, description string) *OptionParameter {
 	return &OptionParameter{
 		parameter: parameter{
@@ -94,9 +90,6 @@ func (p *OptionParameter) WithShortNames(shortNames ...string) contract.OptionPa
 
 // WithAddedShortNames returns a copy of the option with the short names
 // appended.
-//
-// A short name that the option holds already is not appended twice, because a
-// help text that names it twice reads as two options.
 func (p *OptionParameter) WithAddedShortNames(shortNames ...string) contract.OptionParameterContract {
 	copied := *p
 	copied.shortNames = appendUnique(p.shortNames, shortNames)
@@ -254,9 +247,6 @@ func (p *OptionParameter) GetFirstValue() string {
 }
 
 // AreValuesValid reports whether every value is one that the option accepts.
-//
-// A required option needs a value. An option in the default value mode takes one
-// value at most. An option that names its valid values takes those values alone.
 func (p *OptionParameter) AreValuesValid() bool {
 	if len(p.validValues) > 0 && !p.areValuesInValidValues() {
 		return false

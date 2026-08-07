@@ -14,13 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// HttpRoutingDataContract is the HTTP routing component's state, as a value that
-// the framework stores and reloads. `sindri` generates one for the whole
-// application, and the route collection loads it at boot.
-//
-// The contract names an interface rather than a concrete type, for the reason
-// that `ContainerDataContract` does: the data holds a route, and a route names
-// contracts in this package.
 type HttpRoutingDataContract interface {
 	// GetRoutes returns each route, keyed by its own name.
 	GetRoutes() map[string]RouteContract
@@ -34,8 +27,6 @@ type HttpRoutingDataContract interface {
 	GetRegexes() map[constant.RequestMethod]map[string]string
 }
 
-// RouteCollectionContract holds every route of the application.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type RouteCollectionContract interface {
 	// GetData returns the collection's state.
@@ -85,7 +76,6 @@ type RouteCollectionContract interface {
 // Go compares an interface by its method set, so the two would be one type. A
 // route reaches the collection through its provider.
 
-// MatcherContract finds the route that a request path matches.
 type MatcherContract interface {
 	// Match returns the route that the path matches, and nil where none
 	// matches.
@@ -100,14 +90,11 @@ type MatcherContract interface {
 	MatchDynamic(path string, requestMethod constant.RequestMethod) RouteContract
 }
 
-// ProcessorContract prepares a route before the collection holds it. It compiles
-// the regular expression of a dynamic route.
 type ProcessorContract interface {
 	// Route returns the route, prepared.
 	Route(route RouteContract) RouteContract
 }
 
-// RouterContract runs the route that a request matches.
 type RouterContract interface {
 	// Dispatch matches the request to a route and runs it.
 	Dispatch(request ServerRequestContract) ResponseContract
@@ -116,15 +103,12 @@ type RouterContract interface {
 	DispatchRoute(request ServerRequestContract, route RouteContract) ResponseContract
 }
 
-// UrlContract builds the URL of a named route.
 type UrlContract interface {
 	// GetUrl returns the URL of the route, with the data filled into each
 	// parameter of its path.
 	GetUrl(name string, data map[string]string) string
 }
 
-// RoutingResponseFactoryContract builds a response that sends the client to a
-// named route.
 type RoutingResponseFactoryContract interface {
 	// CreateRouteRedirectResponse builds a response that sends the client to
 	// the route.
@@ -136,11 +120,6 @@ type RoutingResponseFactoryContract interface {
 	) RedirectResponseContract
 }
 
-// RequestHandlerContract is the server's entry point for one request.
-//
-// The TypeScript port types the writer as Node's `ServerResponse`. The Go
-// equivalent is `http.ResponseWriter`, which is the one place where this port
-// names a type outside the framework.
 type RequestHandlerContract interface {
 	// Handle returns the response for the request.
 	Handle(request ServerRequestContract) ResponseContract
@@ -155,8 +134,6 @@ type RequestHandlerContract interface {
 	Run(request ServerRequestContract, writer http.ResponseWriter)
 }
 
-// ExceptionResponseRequestHandlerContract is a request handler that turns a
-// failure into a response.
 type ExceptionResponseRequestHandlerContract interface {
 	RequestHandlerContract
 
@@ -164,7 +141,6 @@ type ExceptionResponseRequestHandlerContract interface {
 	CreateResponseFromThrowable(throwable error) ResponseContract
 }
 
-// ClientContract sends a request to another server and returns its response.
 type ClientContract interface {
 	// SendRequest sends the request. It reports a failure where the client
 	// cannot reach the server.

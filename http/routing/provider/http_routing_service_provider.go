@@ -26,8 +26,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/routing/url"
 )
 
-// HttpRoutingServiceProvider publishes the bindings of the HTTP routing
-// sub-component.
 type HttpRoutingServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the sub-component
@@ -51,9 +49,6 @@ func PublishProcessor(container containercontract.ContainerContract) {
 
 // PublishRouteCollection binds the collection, and files every route that a
 // route provider of the application registers.
-//
-// The processor reads each route before the collection files it, because the
-// matcher reads the regular expression that the processor builds.
 func PublishRouteCollection(container containercontract.ContainerContract) {
 	built := collection.NewRouteCollection()
 	routeProcessor := getProcessor(container)

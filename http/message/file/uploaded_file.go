@@ -23,7 +23,6 @@ import (
 // and write, and every other reader read.
 const filePermissions = 0o644
 
-// UploadedFile is one file that arrived with a request.
 type UploadedFile struct {
 	body            contract.StreamContract
 	size            int
@@ -34,9 +33,6 @@ type UploadedFile struct {
 }
 
 // NewUploadedFile builds an uploaded file over its stream.
-//
-// A size below zero states that the client named none, which is what `HasSize`
-// reports.
 func NewUploadedFile(
 	body contract.StreamContract,
 	size int,
@@ -59,9 +55,6 @@ func (f *UploadedFile) GetStream() contract.StreamContract {
 }
 
 // MoveTo writes the file to the target path.
-//
-// It reports a failure where the upload went wrong, where the file moved
-// already, or where the write fails.
 func (f *UploadedFile) MoveTo(targetPath string) error {
 	if f.uploadError != constant.UploadErrorOk {
 		return exception.NewHttpUploadedFileUploadError(f.uploadError)
@@ -130,7 +123,6 @@ func (f *UploadedFile) GetClientMediaType() string {
 	return f.clientMediaType
 }
 
-// UploadedFileCollection holds the files that arrived with one request.
 type UploadedFileCollection struct {
 	files map[string]contract.UploadedFileContract
 }

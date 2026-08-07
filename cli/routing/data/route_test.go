@@ -21,7 +21,7 @@ import (
 const (
 	routeName        = "cache:clear"
 	routeDescription = "Clear the cache"
-	middlewareKey    = "Valkyrja.Test.Middleware"
+	middlewareKey    = "valkyrja.test.Middleware"
 )
 
 // noopHandler is a handler that a route test gives a route.

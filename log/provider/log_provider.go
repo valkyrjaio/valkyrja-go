@@ -30,7 +30,6 @@ import (
 // writes the file, and every other user reads it.
 const filePermissions = 0o644
 
-// LogServiceProvider publishes the bindings of the log component.
 type LogServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the component defers.
@@ -42,9 +41,6 @@ func (p *LogServiceProvider) Publishers() map[string]containercontract.PublishFu
 }
 
 // PublishLogConfig binds the configuration of the component.
-//
-// The application's own configuration is bound where it holds the settings.
-// Where it does not, the framework's default is bound instead.
 func PublishLogConfig(container containercontract.ContainerContract) {
 	container.SetSingleton(constant.LogConfigContractServiceID, resolveConfig(container))
 }
@@ -71,10 +67,6 @@ func resolveConfig(container containercontract.ContainerContract) contract.LogCo
 }
 
 // resolveWriter returns the stream that the logger writes to.
-//
-// An application that names no file writes to the standard error of the process.
-// So does one that names a file that no process can open, because a logger that
-// reports its own failure has nowhere to report it.
 func resolveWriter(container containercontract.ContainerContract) io.Writer {
 	path := resolveStreamPath(container)
 	if path == "" {
@@ -107,7 +99,6 @@ func resolveStreamPath(container containercontract.ContainerContract) string {
 	return config.GetStreamFilePath()
 }
 
-// LogComponentProvider is the log component's top-level provider.
 type LogComponentProvider struct{}
 
 // GetComponentProviders returns each component that the log needs.

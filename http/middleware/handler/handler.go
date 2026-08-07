@@ -18,12 +18,6 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// Handler holds the middleware of one stage and walks them in order.
-//
-// Warning: a handler appends each middleware and never dedupes. A middleware
-// that is added twice runs twice. That is the developer's error, and the
-// framework does not correct it, because the generated cache must match what the
-// runtime collects.
 type Handler struct {
 	container  containercontract.ContainerContract
 	middleware []string
@@ -50,11 +44,6 @@ func (h *Handler) hasNext() bool {
 }
 
 // getNext resolves the next middleware and advances the handler past it.
-//
-// It returns nil where the handler holds no next middleware, and where the
-// container resolves nothing for the binding key. A middleware that the
-// container cannot resolve is skipped rather than fatal, so one unregistered
-// middleware does not end the request.
 func (h *Handler) getNext() any {
 	if !h.hasNext() {
 		return nil

@@ -17,15 +17,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/stream"
 )
 
-// Message is the state that a request and a response share.
-//
-// The other ports declare this a trait or an abstract class, and each message
-// type mixes it in. Go has neither, so a message type embeds this struct and
-// takes its methods.
-//
-// Warning: an embedded method returns this type, not the type that embeds it. A
-// message type therefore declares its own `With` methods, and this struct holds
-// the state and the readers.
 type Message struct {
 	protocolVersion constant.ProtocolVersion
 	headers         contract.HeaderCollectionContract
@@ -96,9 +87,6 @@ func (m *Message) SetBody(body contract.StreamContract) {
 }
 
 // InjectHeader returns the headers with the header in them.
-//
-// It merges the values into a header of the same name, and it replaces that
-// header where override is true.
 func InjectHeader(
 	injected contract.HeaderContract,
 	headers contract.HeaderCollectionContract,

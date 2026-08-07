@@ -19,7 +19,6 @@ import (
 )
 
 // RecordingHandlerFixture is a command handler that records the route it ran
-// for, and returns an output that names it.
 type RecordingHandlerFixture struct {
 	Ran *[]string
 }

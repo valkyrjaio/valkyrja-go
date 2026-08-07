@@ -12,9 +12,6 @@ import (
 	throwablecontract "github.com/valkyrjaio/valkyrja-go/v26/throwable/contract"
 )
 
-// ContainerThrowable is the contract that every error of the container
-// component satisfies. A caller that handles any container failure asserts
-// against this contract.
 type ContainerThrowable interface {
 	throwablecontract.ValkyrjaThrowable
 

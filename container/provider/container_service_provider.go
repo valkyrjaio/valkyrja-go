@@ -19,7 +19,6 @@ import (
 	httpcontract "github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// ContainerServiceProvider publishes the container component's own bindings.
 type ContainerServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the component
@@ -32,9 +31,6 @@ func (p *ContainerServiceProvider) Publishers() map[string]contract.PublishFunc 
 
 // PublishContainerData registers every service provider that the application
 // names, and sets the container's own state as a singleton.
-//
-// The publisher is a package-level function rather than a method, which is one
-// of the two forms that `sindri` reads.
 func PublishContainerData(container contract.ContainerContract) {
 	resolved, err := container.GetSingleton(applicationconstant.ApplicationContractServiceID)
 	if err != nil {
@@ -55,7 +51,6 @@ func PublishContainerData(container contract.ContainerContract) {
 	container.SetSingleton(constant.ContainerDataServiceID, container.GetData())
 }
 
-// ContainerComponentProvider is the container component's top-level provider.
 type ContainerComponentProvider struct{}
 
 // GetComponentProviders returns each component that the container needs.

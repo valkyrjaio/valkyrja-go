@@ -12,7 +12,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// Parameter is one dynamic segment of a route path.
 type Parameter struct {
 	name          string
 	regex         string
@@ -25,10 +24,6 @@ type Parameter struct {
 
 // NewParameter builds a parameter under a name, that matches a regular
 // expression.
-//
-// Go's regular expressions are RE2, so the pattern carries no delimiter, it
-// spells a named group `(?P<name>…)`, and it holds no lookahead, no lookbehind,
-// and no backreference.
 func NewParameter(name string, regex string) *Parameter {
 	return &Parameter{
 		name:          name,
@@ -145,11 +140,6 @@ func NewDynamicRoute(route *Route, regex string, parameters ...contract.Paramete
 }
 
 // IsDynamic reports whether the route carries a parameter.
-//
-// A route is dynamic where it names a regular expression or a parameter. The
-// other ports test the type instead; Go compares an interface by its method set,
-// so every route would satisfy the dynamic contract and the test would always
-// pass.
 func (r *Route) IsDynamic() bool {
 	return r.regex != "" || len(r.parameters) > 0
 }

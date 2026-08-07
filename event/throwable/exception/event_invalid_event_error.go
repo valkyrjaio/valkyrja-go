@@ -8,12 +8,6 @@
 
 package exception
 
-// EventInvalidEventError reports a binding key that the container resolves to
-// something which is not an event.
-//
-// No other port raises this. PHP and Java build the event from its own class, so
-// the built value is an event by construction. Go builds it through the
-// container, which resolves a binding key to any value at all.
 type EventInvalidEventError struct {
 	EventInvalidArgumentError
 

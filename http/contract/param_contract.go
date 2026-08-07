@@ -8,19 +8,6 @@
 
 package contract
 
-// ParamCollectionContract holds a set of parameters that arrived with a request.
-//
-// Each named collection below is an alias rather than its own interface. Go
-// compares an interface by its method set, so a second interface with the same
-// methods is the same type and adds no safety at all — the `iface` linter
-// reports it. The TypeScript port declares each one as an alias for the same
-// reason.
-//
-// The TypeScript port makes the value type a type parameter, and narrows it per
-// collection — a query parameter is a string or a list of strings, and an
-// attribute is anything. A Go interface that carries a type parameter cannot be
-// named without instantiating it, so this port erases the value to `any`, which
-// is what the Java port does.
 type ParamCollectionContract interface {
 	// Has reports whether the collection holds a parameter under the key.
 	Has(key string) bool
@@ -46,26 +33,18 @@ type ParamCollectionContract interface {
 	WithAdded(params map[string]any) ParamCollectionContract
 }
 
-// ServerParamCollectionContract holds the server parameters of a request.
 type ServerParamCollectionContract = ParamCollectionContract
 
-// CookieParamCollectionContract holds the cookie parameters of a request.
 type CookieParamCollectionContract = ParamCollectionContract
 
-// QueryParamCollectionContract holds the query parameters of a request.
 type QueryParamCollectionContract = ParamCollectionContract
 
-// ParsedBodyParamCollectionContract holds the parsed body of a request.
 type ParsedBodyParamCollectionContract = ParamCollectionContract
 
-// ParsedJsonParamCollectionContract holds the parsed JSON body of a request.
 type ParsedJsonParamCollectionContract = ParamCollectionContract
 
-// AttributeParamCollectionContract holds the attributes that the framework puts
-// on a request as it passes through.
 type AttributeParamCollectionContract = ParamCollectionContract
 
-// UploadedFileContract is one file that arrived with a request.
 type UploadedFileContract interface {
 	// GetStream returns the contents of the file as a stream.
 	GetStream() StreamContract
@@ -96,7 +75,6 @@ type UploadedFileContract interface {
 	GetClientMediaType() string
 }
 
-// UploadedFileCollectionContract holds the files that arrived with one request.
 type UploadedFileCollectionContract interface {
 	// Has reports whether the collection holds a file under the key.
 	Has(key string) bool

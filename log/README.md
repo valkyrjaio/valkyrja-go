@@ -93,7 +93,7 @@ An application config type implements the contracts of the adapters that it uses
 
 | Contract                  | Method              | Default                            |
 | :------------------------ | :------------------ | :--------------------------------- |
-| `LogConfigContract`       | `GetDefaultLogger`  | `Valkyrja.Log.Logger.StreamLogger` |
+| `LogConfigContract`       | `GetDefaultLogger`  | `valkyrja.log.logger.StreamLogger` |
 | `LogStreamConfigContract` | `GetStreamFilePath` | `""`, the standard error           |
 
 An empty path writes to the standard error of the process. So does a path that no
@@ -115,8 +115,8 @@ type LogStreamConfigContract interface {
 
 | Binding key                           | Holds                       |
 | :------------------------------------ | :-------------------------- |
-| `Valkyrja.Log.Data.LogConfigContract` | The component configuration |
-| `Valkyrja.Log.Logger.LoggerContract`  | The active logger           |
+| `valkyrja.log.data.LogConfigContract` | The component configuration |
+| `valkyrja.log.logger.LoggerContract`  | The active logger           |
 
 The provider binds the application's own config where it implements the contract,
 and the framework default where it does not.

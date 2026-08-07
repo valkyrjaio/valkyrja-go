@@ -13,7 +13,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// ValidationRuntimeError is the validation component's base runtime error.
 type ValidationRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -32,8 +31,6 @@ func (e *ValidationRuntimeError) IsValidationThrowable() bool {
 	return true
 }
 
-// ValidationInvalidArgumentError is the validation component's base
-// invalid-argument error.
 type ValidationInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }
@@ -52,10 +49,6 @@ func (e *ValidationInvalidArgumentError) IsValidationThrowable() bool {
 	return true
 }
 
-// ValidationRuleFailureError reports that a subject failed a rule.
-//
-// The message is the one that the rule carries, so a caller prints it to the
-// person who gave the subject.
 type ValidationRuleFailureError struct {
 	ValidationInvalidArgumentError
 }

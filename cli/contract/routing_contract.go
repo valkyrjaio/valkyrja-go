@@ -13,25 +13,12 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// CliHandlerFunc runs one command. The router passes the container and the route
-// that matched.
 type CliHandlerFunc func(container containercontract.ContainerContract, route RouteContract) OutputContract
 
-// CastFunc converts one value that the caller typed into the type that a
-// parameter names.
-//
-// The other ports carry a `Cast` from the Type component, and read the type from
-// it. Go has no Type component in this port, so a cast is the function that
-// converts the value, and it reports a failure the way Go does.
 type CastFunc func(value string) (any, error)
 
-// HelpTextFunc builds the help text of one command. The route holds a function
-// rather than the message, so a command builds its help text only where the
-// caller asks for it.
 type HelpTextFunc func() MessageContract
 
-// ParameterContract is what an argument and an option have in common.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ParameterContract interface {
 	// GetName returns the name of the parameter.
@@ -82,7 +69,6 @@ type ParameterContract interface {
 	ValidateValues() error
 }
 
-// ArgumentParameterContract is one positional parameter of a command.
 type ArgumentParameterContract interface {
 	ParameterContract
 
@@ -110,8 +96,6 @@ type ArgumentParameterContract interface {
 	WithAddedArguments(arguments ...ArgumentContract) ArgumentParameterContract
 }
 
-// OptionParameterContract is one option parameter of a command.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type OptionParameterContract interface {
 	ParameterContract
@@ -182,15 +166,6 @@ type OptionParameterContract interface {
 	WithAddedOptions(options ...OptionContract) (OptionParameterContract, error)
 }
 
-// RouteContract is one command of the CLI router.
-//
-// Each middleware is named by its binding key, which is what the TypeScript port
-// does on this side as well.
-//
-// Warning: a route appends each middleware and never dedupes. A middleware that
-// is registered twice runs twice. That is the developer's error, and neither the
-// route nor `sindri` corrects it.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type RouteContract interface {
 	// GetName returns the name of the command.
@@ -309,14 +284,11 @@ type RouteContract interface {
 	WithHandler(handler CliHandlerFunc) RouteContract
 }
 
-// CliRoutingDataContract is the CLI routing component's state, as a value that
-// the framework stores and reloads.
 type CliRoutingDataContract interface {
 	// GetRoutes returns each route, keyed by its own name.
 	GetRoutes() map[string]RouteContract
 }
 
-// RouteCollectionContract holds every command of the application.
 type RouteCollectionContract interface {
 	// GetData returns the collection's state.
 	GetData() CliRoutingDataContract
@@ -337,7 +309,6 @@ type RouteCollectionContract interface {
 	All() map[string]RouteContract
 }
 
-// RouterContract runs the command that an input matches.
 type RouterContract interface {
 	// Dispatch matches the input to a command and runs it.
 	Dispatch(input InputContract) OutputContract
@@ -346,7 +317,6 @@ type RouterContract interface {
 	DispatchRoute(input InputContract, route RouteContract) OutputContract
 }
 
-// InputHandlerContract is the server's entry point for one input.
 type InputHandlerContract interface {
 	// Handle returns the output for the input.
 	Handle(input InputContract) OutputContract
@@ -358,14 +328,6 @@ type InputHandlerContract interface {
 	Run(input InputContract)
 }
 
-// CliRouteProviderContract registers the commands of one component.
-//
-// A provider returns a literal slice, and never a computed one, because `sindri`
-// reads the slice from the source rather than by running it.
-//
-// The other ports also read a command from an annotation, and declare
-// `getControllerClasses` for the scanner to read. Go has no annotation, so that
-// method is absent and a command is always registered here.
 type CliRouteProviderContract interface {
 	// GetRoutes returns each command that the component registers.
 	GetRoutes() []RouteContract

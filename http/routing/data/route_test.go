@@ -22,8 +22,8 @@ import (
 const (
 	routeName    = "users.index"
 	routePath    = "/users"
-	firstIDName  = "Valkyrja.Tests.Http.FirstMiddleware"
-	secondIDName = "Valkyrja.Tests.Http.SecondMiddleware"
+	firstIDName  = "valkyrja.tests.http.FirstMiddleware"
+	secondIDName = "valkyrja.tests.http.SecondMiddleware"
 )
 
 // newHandler builds a handler that returns an empty response.

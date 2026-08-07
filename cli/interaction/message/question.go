@@ -19,7 +19,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/format"
 )
 
-// Question is a message that asks the caller for an answer.
 type Question struct {
 	Message
 
@@ -30,9 +29,6 @@ type Question struct {
 
 // NewQuestion builds a question that carries the text, and that reads the
 // standard input of the process.
-//
-// A caller that reads somewhere else uses `NewQuestionForReader`, which is what
-// a test does.
 func NewQuestion(
 	text string,
 	callable contract.QuestionCallableFunc,
@@ -60,10 +56,6 @@ func NewQuestionForReader(
 }
 
 // WithText returns a copy of the question with another text.
-//
-// The method is declared here rather than promoted from the embedded message,
-// because a promoted `With` copies only the embedded struct and would return a
-// plain message, dropping every field of the question.
 func (q *Question) WithText(text string) contract.MessageContract {
 	copied := *q
 	copied.text = text
@@ -114,10 +106,6 @@ func (q *Question) WithAnswer(answer contract.AnswerContract) contract.QuestionC
 }
 
 // Ask reads one line and returns the answer that carries it.
-//
-// A reader that reports a failure, and a line that carries nothing but
-// whitespace, both return the answer as it is. The answer then reports its own
-// default response, so a caller that gives no answer still reads one.
 func (q *Question) Ask() contract.AnswerContract {
 	line, err := bufio.NewReader(q.reader).ReadString('\n')
 

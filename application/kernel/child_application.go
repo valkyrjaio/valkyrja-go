@@ -16,8 +16,6 @@ import (
 	httpcontract "github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// ChildApplication is an application that holds its own container and reads
-// everything else from a parent application.
 type ChildApplication struct {
 	parent    contract.ApplicationContract
 	container containercontract.ContainerContract

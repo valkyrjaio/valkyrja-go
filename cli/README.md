@@ -220,16 +220,16 @@ that each stage runs.
 
 ## Service Registration
 
-| Binding key                                                     | Holds                    |
-| :-------------------------------------------------------------- | :----------------------- |
-| `Valkyrja.Cli.Interaction.Data.CliInteractionConfigContract`    | The interaction config   |
-| `Valkyrja.Cli.Interaction.Output.Factory.OutputFactoryContract` | The output factory       |
-| `Valkyrja.Cli.Interaction.Input.InputContract`                  | The input of the run     |
-| `Valkyrja.Cli.Interaction.Output.OutputContract`                | The output of the run    |
-| `Valkyrja.Cli.Routing.Collection.RouteCollectionContract`       | Every command            |
-| `Valkyrja.Cli.Routing.Dispatcher.RouterContract`                | The router               |
-| `Valkyrja.Cli.Routing.Data.RouteContract`                       | The command that matched |
-| `Valkyrja.Cli.Server.Handler.InputHandlerContract`              | The entry point          |
+| Binding key                                                  | Holds                    |
+| :----------------------------------------------------------- | :----------------------- |
+| `valkyrja.cli.interaction.data.CliInteractionConfigContract` | The interaction config   |
+| `valkyrja.cli.interaction.factory.OutputFactoryContract`     | The output factory       |
+| `valkyrja.cli.interaction.input.InputContract`               | The input of the run     |
+| `valkyrja.cli.interaction.output.OutputContract`             | The output of the run    |
+| `valkyrja.cli.routing.collection.RouteCollectionContract`    | Every command            |
+| `valkyrja.cli.routing.dispatcher.RouterContract`             | The router               |
+| `valkyrja.cli.routing.data.RouteContract`                    | The command that matched |
+| `valkyrja.cli.server.handler.InputHandlerContract`           | The entry point          |
 
 `CliServerCliRoutesProvider` registers the four built-in commands. The other
 ports read a command from an annotation on its class; Go has no annotation, so

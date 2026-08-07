@@ -21,7 +21,6 @@ import (
 	serverprovider "github.com/valkyrjaio/valkyrja-go/v26/http/server/provider"
 )
 
-// HttpComponentProvider is the HTTP component's top-level provider.
 type HttpComponentProvider struct{}
 
 // GetComponentProviders returns each component that HTTP needs.

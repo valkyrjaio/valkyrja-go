@@ -18,8 +18,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// RequestReceivedResult is what a request-received middleware returns: either the
-// request that the next middleware receives, or a response that ends the run.
 type RequestReceivedResult struct {
 	request  contract.ServerRequestContract
 	response contract.ResponseContract
@@ -51,8 +49,6 @@ func (r *RequestReceivedResult) IsResponse() bool {
 	return r.response != nil
 }
 
-// RouteMatchedResult is what a route-matched middleware returns: either the route
-// that the next middleware receives, or a response that ends the run.
 type RouteMatchedResult struct {
 	route    contract.RouteContract
 	response contract.ResponseContract

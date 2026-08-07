@@ -23,10 +23,6 @@ import (
 // timezone from, the same one that the TypeScript port writes.
 const timezoneEnvName = "TZ"
 
-// Valkyrja is the application.
-//
-// It walks the provider tree once and holds what it found, so a second call
-// returns the same providers rather than walking again.
 type Valkyrja struct {
 	container containercontract.ContainerContract
 	config    contract.ConfigContract
@@ -68,10 +64,6 @@ func (a *Valkyrja) PublishProviderCallbacks() {
 
 // GetProviders returns every component provider, including the ones that a
 // component provider names.
-//
-// A provider that names itself, or that two providers both name, is collected
-// once. The other ports rely on a set for that; Go has no set, so the walk keeps
-// a map of what it saw.
 func (a *Valkyrja) GetProviders() []contract.ComponentProviderContract {
 	if len(a.providers) > 0 {
 		return a.providers

@@ -14,7 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/middleware/data"
 )
 
-// RequestReceivedHandler runs the request-received middleware.
 type RequestReceivedHandler struct {
 	Handler
 }
@@ -40,7 +39,6 @@ func (h *RequestReceivedHandler) RequestReceived(
 	return middleware.RequestReceived(request, h)
 }
 
-// RouteMatchedHandler runs the route-matched middleware.
 type RouteMatchedHandler struct {
 	Handler
 }
@@ -67,7 +65,6 @@ func (h *RouteMatchedHandler) RouteMatched(
 	return middleware.RouteMatched(request, route, h)
 }
 
-// RouteNotMatchedHandler runs the route-not-matched middleware.
 type RouteNotMatchedHandler struct {
 	Handler
 }
@@ -94,7 +91,6 @@ func (h *RouteNotMatchedHandler) RouteNotMatched(
 	return middleware.RouteNotMatched(request, response, h)
 }
 
-// RouteDispatchedHandler runs the route-dispatched middleware.
 type RouteDispatchedHandler struct {
 	Handler
 }
@@ -122,7 +118,6 @@ func (h *RouteDispatchedHandler) RouteDispatched(
 	return middleware.RouteDispatched(request, response, route, h)
 }
 
-// ThrowableCaughtHandler runs the throwable-caught middleware.
 type ThrowableCaughtHandler struct {
 	Handler
 }
@@ -150,7 +145,6 @@ func (h *ThrowableCaughtHandler) ThrowableCaught(
 	return middleware.ThrowableCaught(request, response, throwable, h)
 }
 
-// SendingResponseHandler runs the sending-response middleware.
 type SendingResponseHandler struct {
 	Handler
 }
@@ -177,7 +171,6 @@ func (h *SendingResponseHandler) SendingResponse(
 	return middleware.SendingResponse(request, response, h)
 }
 
-// ResponseSentHandler runs the response-sent middleware.
 type ResponseSentHandler struct {
 	Handler
 }

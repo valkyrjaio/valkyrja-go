@@ -25,10 +25,6 @@ const parameterEnd = "}"
 // optionalMarker marks a parameter that the path may leave out.
 const optionalMarker = "?"
 
-// Processor prepares a route before the collection holds it.
-//
-// It normalizes the path, and it builds the regular expression of a dynamic
-// route that carries none.
 type Processor struct{}
 
 // NewProcessor builds the processor.
@@ -37,9 +33,6 @@ func NewProcessor() *Processor {
 }
 
 // Route returns the route, prepared.
-//
-// The path takes one leading separator and no trailing one, so two routes that a
-// developer wrote differently file under the same path.
 //
 // Warning: an optional parameter carries its own separator, so its path leaves
 // the separator out. Write `/users{id?}`, never `/users/{id?}` — the second one

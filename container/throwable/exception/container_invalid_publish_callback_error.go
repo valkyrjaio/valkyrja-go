@@ -8,12 +8,6 @@
 
 package exception
 
-// ContainerInvalidPublishCallbackError reports a service provider that defers a
-// binding key without a publisher for it.
-//
-// The other ports raise this where the publisher is not callable. Go types the
-// publisher, so the one value that reaches the container without a publisher is
-// a nil function.
 type ContainerInvalidPublishCallbackError struct {
 	ContainerRuntimeError
 

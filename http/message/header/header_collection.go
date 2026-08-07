@@ -17,8 +17,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/throwable/exception"
 )
 
-// HeaderCollection holds the headers of one message, keyed by the normalized
-// name of each header.
 type HeaderCollection struct {
 	headers map[string]contract.HeaderContract
 }
@@ -105,11 +103,6 @@ func (c *HeaderCollection) WithHeaders(headers ...contract.HeaderContract) contr
 
 // WithAddedHeaders returns a copy of the collection with the headers added to
 // the ones it holds.
-//
-// A header of a name that the collection holds already keeps both sets of
-// values: the values of the added header follow the ones that the collection
-// holds. That is what the other ports do, and it is why this differs from
-// `WithHeader`, which replaces.
 func (c *HeaderCollection) WithAddedHeaders(headers ...contract.HeaderContract) contract.HeaderCollectionContract {
 	copied := c.clone()
 

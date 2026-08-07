@@ -22,8 +22,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/server/handler"
 )
 
-// HttpServerServiceProvider publishes the bindings of the HTTP server
-// sub-component.
 type HttpServerServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the sub-component

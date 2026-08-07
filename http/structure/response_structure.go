@@ -12,10 +12,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// ResponseStructure shapes the data that a response returns.
-//
-// The structure maps the name a field carries inside the application to the name
-// that a client reads, so a rename inside never reaches a client.
 type ResponseStructure struct {
 	name   string
 	value  any
@@ -55,10 +51,6 @@ func (s *ResponseStructure) GetFields() map[string]string {
 }
 
 // GetStructuredData returns the data in the shape that the structure names.
-//
-// A field that the data does not carry reads as nil where includeAll is true,
-// and it is left out where includeAll is false. A field that the structure does
-// not name never reaches a client, whether the data carries it or not.
 func (s *ResponseStructure) GetStructuredData(data map[string]any, includeAll bool) map[string]any {
 	structured := make(map[string]any, len(s.fields))
 

@@ -16,10 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/data"
 )
 
-// Collection holds every command of the application, keyed by name.
-//
-// A command name is unique, so a command that is added under a name that the
-// collection holds already replaces the one that is there.
 type Collection struct {
 	routes map[string]contract.RouteContract
 }

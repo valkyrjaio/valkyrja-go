@@ -22,7 +22,6 @@ const componentDeliminator = "="
 // valueDeliminator separates one component of a value from the next.
 const valueDeliminator = ";"
 
-// Component is one token-and-text pair inside a header value.
 type Component struct {
 	token string
 	text  string
@@ -84,7 +83,6 @@ func (c *Component) String() string {
 	return c.token
 }
 
-// Value is one value of one header, built from components.
 type Value struct {
 	components []contract.ComponentContract
 }
@@ -132,9 +130,6 @@ func (v *Value) WithAddedComponents(components ...contract.ComponentContract) co
 
 // String returns the whole value as a string, with each component separated by
 // the value deliminator.
-//
-// The value holds no component that renders to nothing, because every path that
-// sets the components filters them, so this needs no guard of its own.
 func (v *Value) String() string {
 	parts := make([]string, 0, len(v.components))
 

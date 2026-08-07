@@ -16,14 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 )
 
-// parameter carries what an argument parameter and an option parameter have in
-// common.
-//
-// The other ports declare an abstract `Parameter` that each one extends. Go has
-// no abstract type, so each concrete parameter embeds this struct. Only a getter
-// is promoted from it; each `With` method is declared on the concrete type,
-// because a promoted `With` copies the embedded struct alone and returns the
-// wrong type.
 type parameter struct {
 	name        string
 	description string
@@ -52,8 +44,6 @@ func (p *parameter) GetDescription() string {
 }
 
 // getCastValues returns each value, cast to the type that the parameter names.
-//
-// A parameter that casts nothing returns each value as the caller typed it.
 func getCastValues(cast contract.CastFunc, values []string) ([]any, error) {
 	castValues := make([]any, 0, len(values))
 

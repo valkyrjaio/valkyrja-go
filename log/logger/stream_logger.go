@@ -25,11 +25,6 @@ const levelSeparator = ": "
 // contextSeparator separates a message from the context that goes with it.
 const contextSeparator = " "
 
-// StreamLogger writes each message to a stream.
-//
-// A message reads `SEVERITY: text`, with the context after it as JSON where the
-// caller gives one. That shape is what every port writes, so a reader of one
-// port's log reads another port's log.
 type StreamLogger struct {
 	writer io.Writer
 }
@@ -98,10 +93,6 @@ func (l *StreamLogger) Log(level constant.LogLevel, message string, context map[
 }
 
 // write puts one message on the stream.
-//
-// A stream that reports a failure changes nothing that a caller can act on — a
-// logger that reports its own failure has nowhere to report it — so the failure
-// is dropped.
 func (l *StreamLogger) write(level constant.LogLevel, message string, context map[string]any) {
 	line := &strings.Builder{}
 

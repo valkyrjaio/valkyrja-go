@@ -21,7 +21,6 @@ import (
 	httpcontract "github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// CliComponentProvider is the CLI component's top-level provider.
 type CliComponentProvider struct{}
 
 // GetComponentProviders returns each component that the CLI needs.

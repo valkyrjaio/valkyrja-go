@@ -16,10 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// Matcher finds the route that a request path matches.
-//
-// It reads the static paths first, because a static path is one map lookup and a
-// dynamic path costs a regular expression for each route of the method.
 type Matcher struct {
 	collection contract.RouteCollectionContract
 }
@@ -50,14 +46,6 @@ func (m *Matcher) MatchStatic(path string, requestMethod constant.RequestMethod)
 
 // MatchDynamic returns the dynamic route that the path matches, and nil where
 // none matches.
-//
-// The matched route carries the value of each parameter that the path filled, so
-// the handler reads them from the route.
-//
-// Go's regular expressions are RE2. A pattern therefore carries no delimiter,
-// and the `^` and `$` anchors are load-bearing: `MatchString` searches, where
-// Java's `matches` implies a whole match on its own. A pattern that RE2 rejects
-// matches nothing rather than ending the request.
 func (m *Matcher) MatchDynamic(path string, requestMethod constant.RequestMethod) contract.RouteContract {
 	for regex := range m.collection.GetRegexes(requestMethod) {
 		compiled, err := regexp.Compile(regex)
@@ -83,9 +71,6 @@ func (m *Matcher) MatchDynamic(path string, requestMethod constant.RequestMethod
 
 // withParameterValues returns the route with the value that the path filled into
 // each parameter.
-//
-// A parameter reads its value by name, with `SubexpIndex`, so the order of the
-// groups in the pattern does not have to match the order of the parameters.
 func withParameterValues(
 	route contract.DynamicRouteContract,
 	compiled *regexp.Regexp,
@@ -104,9 +89,6 @@ func withParameterValues(
 
 // withValueFromMatches returns the parameter with the value that the path
 // carried, and with its default value where the path carried none.
-//
-// A parameter that names a cast carries the value that the cast returned, so a
-// handler reads the type that the route declared rather than the raw text.
 func withValueFromMatches(
 	parameter contract.ParameterContract,
 	compiled *regexp.Regexp,

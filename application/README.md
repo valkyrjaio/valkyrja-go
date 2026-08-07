@@ -114,10 +114,10 @@ needs, and registers no service of its own.
 
 | Binding key                                       | Holds                  |
 | :------------------------------------------------ | :--------------------- |
-| `Valkyrja.Application.Kernel.ApplicationContract` | The application        |
-| `Valkyrja.Application.Data.ConfigContract`        | The configuration      |
-| `Valkyrja.Application.Data.CliConfigContract`     | The CLI configuration  |
-| `Valkyrja.Application.Data.HttpConfigContract`    | The HTTP configuration |
+| `valkyrja.application.kernel.ApplicationContract` | The application        |
+| `valkyrja.application.data.ConfigContract`        | The configuration      |
+| `valkyrja.application.data.CliConfigContract`     | The CLI configuration  |
+| `valkyrja.application.data.HttpConfigContract`    | The HTTP configuration |
 
 A component reads its own settings from these keys. The container component's
 publisher registers every service provider that the application names.

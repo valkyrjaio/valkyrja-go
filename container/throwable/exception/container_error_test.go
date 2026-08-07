@@ -19,9 +19,9 @@ import (
 func TestInvalidReferenceErrorReportsTheBindingKey(t *testing.T) {
 	t.Parallel()
 
-	err := exception.NewContainerInvalidReferenceError("Valkyrja.Container.Manager.ContainerContract")
+	err := exception.NewContainerInvalidReferenceError("valkyrja.container.manager.ContainerContract")
 
-	if err.GetID() != "Valkyrja.Container.Manager.ContainerContract" {
+	if err.GetID() != "valkyrja.container.manager.ContainerContract" {
 		t.Errorf("GetID must be the binding key, but is: %s", err.GetID())
 	}
 }

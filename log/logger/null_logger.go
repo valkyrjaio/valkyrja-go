@@ -14,10 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/log/contract"
 )
 
-// NullLogger writes nothing.
-//
-// An application that reports no message writes through this logger, and a test
-// that must not write to a file does the same.
 type NullLogger struct{}
 
 // NewNullLogger builds the logger.

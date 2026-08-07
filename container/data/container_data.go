@@ -16,11 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// ContainerData is the container's state. `sindri` generates one of these for
-// the whole application, and the container loads it at boot.
-//
-// Each field is unexported, and each getter returns a copy, so a holder of the
-// data cannot change the container behind its back.
 type ContainerData struct {
 	aliases           map[string]string
 	deferredCallbacks map[string]contract.PublishFunc

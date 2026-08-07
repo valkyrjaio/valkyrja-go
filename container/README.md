@@ -18,7 +18,7 @@ its own constants file, and the format is
 `Valkyrja.{Component}.{SubComponent}.{Name}`:
 
 ```go
-const RouterContractServiceID = "Valkyrja.Http.Routing.Dispatcher.RouterContract"
+const RouterContractServiceID = "valkyrja.http.routing.dispatcher.RouterContract"
 ```
 
 ## Binding a Service
@@ -101,7 +101,7 @@ package implements it.
 
 | Binding key                             | Holds                     |
 | :-------------------------------------- | :------------------------ |
-| `Valkyrja.Container.Data.ContainerData` | The container's own state |
+| `valkyrja.container.data.ContainerData` | The container's own state |
 
 Its publisher registers every service provider that the application names, then
 records the state.

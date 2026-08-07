@@ -25,7 +25,6 @@ import (
 // rootTarget is the request target of a request whose URI names no path.
 const rootTarget = "/"
 
-// Request is an HTTP request.
 type Request struct {
 	message.Message
 
@@ -37,8 +36,6 @@ type Request struct {
 // NewRequest builds a request over a URI, a method, a body, and headers. It
 // takes the defaults of the other ports where an argument is nil or empty: an
 // empty URI, the GET method, an empty body, and no header.
-//
-// The request adds a `Host` header from the URI where the headers carry none.
 func NewRequest(
 	requestUri contract.UriContract,
 	method constant.RequestMethod,
@@ -88,10 +85,6 @@ func (r *Request) GetRequestTarget() string {
 // WithRequestTarget returns a copy of the request for another target. It keeps
 // the target of the receiver where the new one carries whitespace, which no
 // request target does.
-//
-// The other ports throw here. A `With` method returns the contract in every
-// port, so there is no return to carry a failure; `ValidateRequestTarget`
-// reports one for a caller that needs it.
 func (r *Request) WithRequestTarget(requestTarget string) contract.RequestContract {
 	if ValidateRequestTarget(requestTarget) != nil {
 		return r
@@ -122,9 +115,6 @@ func (r *Request) GetUri() contract.UriContract {
 }
 
 // WithUri returns a copy of the request for another URI.
-//
-// The `Host` header follows the new URI, unless preserveHost is true and the
-// request carries a host already, or the new URI names no host.
 func (r *Request) WithUri(requestUri contract.UriContract, preserveHost bool) contract.RequestContract {
 	copied := *r
 	copied.requestUri = requestUri

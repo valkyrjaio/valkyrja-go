@@ -11,13 +11,8 @@ package data
 
 // DefaultLogger is the binding key of the logger that an application writes
 // through until it states another one.
-const DefaultLogger = "Valkyrja.Log.Logger.StreamLogger"
+const DefaultLogger = "valkyrja.log.logger.StreamLogger"
 
-// LogConfig holds the settings that apply to the whole log component.
-//
-// The component config holds the component-wide setting alone. Each adapter gets
-// a config contract of its own, so an application never builds the
-// configuration of an adapter that it does not use.
 type LogConfig struct {
 	DefaultLoggerServiceID string
 }
@@ -34,19 +29,12 @@ func (c *LogConfig) GetDefaultLogger() string {
 	return c.DefaultLoggerServiceID
 }
 
-// LogStreamConfig holds the settings of the logger that writes to a stream.
-//
-// Every property carries the adapter name, so one application config class can
-// hold the settings of several adapters at once.
 type LogStreamConfig struct {
 	StreamFilePath string
 }
 
 // NewLogStreamConfig builds the configuration that every field takes its default
 // value in.
-//
-// An empty path writes to the standard error of the process, which is where a
-// application with no log file reads its messages.
 func NewLogStreamConfig() *LogStreamConfig {
 	return &LogStreamConfig{}
 }

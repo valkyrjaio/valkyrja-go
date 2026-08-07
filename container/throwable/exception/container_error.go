@@ -16,7 +16,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// ContainerRuntimeError is the container's base runtime error.
 type ContainerRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -33,7 +32,6 @@ func newContainerRuntimeError(message string, cause error) ContainerRuntimeError
 	}
 }
 
-// ContainerInvalidArgumentError is the container's base invalid-argument error.
 type ContainerInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }

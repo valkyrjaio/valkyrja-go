@@ -10,8 +10,6 @@ package exception
 
 import "strconv"
 
-// HttpUriInvalidArgumentError is the URI sub-component's base invalid-argument
-// error.
 type HttpUriInvalidArgumentError struct {
 	HttpInvalidArgumentError
 }
@@ -23,7 +21,6 @@ func newUriInvalidArgumentError(message string) HttpUriInvalidArgumentError {
 	}
 }
 
-// HttpUriInvalidPortError reports a port outside the range that a URI carries.
 type HttpUriInvalidPortError struct {
 	HttpUriInvalidArgumentError
 
@@ -45,7 +42,6 @@ func (e *HttpUriInvalidPortError) GetPort() int {
 	return e.port
 }
 
-// HttpUriInvalidPathError reports a path that carries a query string.
 type HttpUriInvalidPathError struct {
 	HttpUriInvalidArgumentError
 
@@ -67,7 +63,6 @@ func (e *HttpUriInvalidPathError) GetPath() string {
 	return e.path
 }
 
-// HttpUriInvalidQueryError reports a query string that carries a fragment.
 type HttpUriInvalidQueryError struct {
 	HttpUriInvalidArgumentError
 
@@ -89,14 +84,10 @@ func (e *HttpUriInvalidQueryError) GetQuery() string {
 	return e.query
 }
 
-// HttpRequestInvalidArgumentError is the request sub-component's base
-// invalid-argument error.
 type HttpRequestInvalidArgumentError struct {
 	HttpInvalidArgumentError
 }
 
-// HttpRequestInvalidRequestTargetError reports a request target that carries
-// whitespace.
 type HttpRequestInvalidRequestTargetError struct {
 	HttpRequestInvalidArgumentError
 

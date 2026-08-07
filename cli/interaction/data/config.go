@@ -9,11 +9,6 @@
 // Package data holds the CLI interaction component's configuration.
 package data
 
-// CliInteractionConfig holds the settings that apply to every output of the
-// application.
-//
-// An application that states none of them gets an interactive output that writes
-// every message.
 type CliInteractionConfig struct {
 	quiet       bool
 	interactive bool

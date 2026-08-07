@@ -12,10 +12,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/application/contract"
 )
 
-// HttpConfig is the configuration that an HTTP application adds.
-//
-// Each middleware list holds a binding key, which is the framework's own class
-// reference in every port that has no class token.
 type HttpConfig struct {
 	Config
 

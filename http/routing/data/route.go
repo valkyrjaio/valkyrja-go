@@ -16,22 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// Route is one route of the HTTP router.
-//
-// The other ports declare a `DynamicRoute` that extends `Route` and adds the
-// regular expression and the parameters. Go embeds rather than inherits, and a
-// `With` method promoted from an embedded struct copies only that struct — so an
-// inherited `With` on a dynamic route would return a static one and drop its
-// regular expression. One struct carries both, and `IsDynamic` reports which it
-// is.
-//
-// Each middleware is named by its binding key. The other ports pass a class
-// reference, and Go has none, so it passes the same string constant that it
-// binds the middleware under.
-//
-// Warning: a route appends each middleware and never dedupes. A middleware that
-// is registered twice runs twice. That is the developer's error, and neither the
-// route nor `sindri` corrects it.
 type Route struct {
 	path           string
 	name           string
@@ -52,9 +36,6 @@ type Route struct {
 }
 
 // NewRoute builds a route at a path, under a name, that runs a handler.
-//
-// A route with no request method matches the GET method, which is what every
-// port does.
 func NewRoute(
 	path string,
 	name string,

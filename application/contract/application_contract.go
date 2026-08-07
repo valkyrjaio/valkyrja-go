@@ -24,11 +24,8 @@ import (
 	throwablecontract "github.com/valkyrjaio/valkyrja-go/v26/throwable/contract"
 )
 
-// ApplicationCallbackFunc runs against the application once the application
-// publishes its providers.
 type ApplicationCallbackFunc func(app ApplicationContract)
 
-// ApplicationContract is the application itself.
 type ApplicationContract interface {
 	// GetContainer returns the container of the application.
 	GetContainer() containercontract.ContainerContract
@@ -62,11 +59,6 @@ type ApplicationContract interface {
 	GetVersion() string
 }
 
-// ComponentProviderContract is the top-level provider of one component. It names
-// the providers of every kind that the component registers.
-//
-// A provider returns a literal slice, and never a computed one, because `sindri`
-// reads the slice from the source rather than by running it.
 type ComponentProviderContract interface {
 	// GetComponentProviders returns each component that this component needs.
 	GetComponentProviders(app ApplicationContract) []ComponentProviderContract
@@ -84,19 +76,11 @@ type ComponentProviderContract interface {
 	GetHttpProviders(app ApplicationContract) []httpcontract.HttpRouteProviderContract
 }
 
-// PublishableComponentProviderContract is a component provider that runs
-// something of its own once the application publishes it.
 type PublishableComponentProviderContract interface {
 	// Publish runs what the component needs at boot.
 	Publish(app ApplicationContract)
 }
 
-// ConfigContract is the configuration of the application.
-//
-// The other ports declare each of these as a readonly property. Go has no
-// property, so each one is a getter, which the method naming rules require in
-// any case.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ConfigContract interface {
 	// GetNamespace returns the namespace of the application.
@@ -136,10 +120,6 @@ type ConfigContract interface {
 	GetCallbacks() []ApplicationCallbackFunc
 }
 
-// CliConfigContract is the configuration that a CLI application adds.
-//
-// Each middleware list holds a binding key, which is the framework's own class
-// reference in every port that has no class token.
 type CliConfigContract interface {
 	ConfigContract
 
@@ -175,10 +155,6 @@ type CliConfigContract interface {
 	GetProcessExitingMiddleware() []string
 }
 
-// HttpConfigContract is the configuration that an HTTP application adds.
-//
-// Each middleware list holds a binding key, which is the framework's own class
-// reference in every port that has no class token.
 type HttpConfigContract interface {
 	ConfigContract
 
@@ -211,8 +187,6 @@ type HttpConfigContract interface {
 	GetResponseSentMiddleware() []string
 }
 
-// ApplicationThrowable is the contract that every error of the application
-// component satisfies.
 type ApplicationThrowable interface {
 	throwablecontract.ValkyrjaThrowable
 

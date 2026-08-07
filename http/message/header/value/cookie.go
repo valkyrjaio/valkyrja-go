@@ -32,7 +32,6 @@ const defaultPath = "/"
 // its expiry and a test cannot assert a value that moves.
 var nowFunc = time.Now
 
-// Cookie is a cookie, which is one kind of header value.
 type Cookie struct {
 	name     string
 	value    string
@@ -212,9 +211,6 @@ func (c *Cookie) WithSameSite(sameSite constant.SameSite) contract.CookieContrac
 }
 
 // String returns the whole cookie as a `Set-Cookie` value.
-//
-// A deleted cookie carries the value `delete`, and it expires one second over a
-// year in the past, which is how every port tells a client to remove it.
 func (c *Cookie) String() string {
 	value := c.value
 	expire := c.expire

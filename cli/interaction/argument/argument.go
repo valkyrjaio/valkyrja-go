@@ -14,7 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
 )
 
-// Argument is one positional argument of a command.
 type Argument struct {
 	value string
 }
@@ -37,7 +36,6 @@ func (a *Argument) WithValue(value string) contract.ArgumentContract {
 	return &copied
 }
 
-// Option is one option of a command.
 type Option struct {
 	name       string
 	value      string
@@ -68,10 +66,6 @@ func (o *Option) WithName(name string) contract.OptionContract {
 }
 
 // HasValue reports whether the caller gave the option a value.
-//
-// An option that carries an empty value still has one, because the caller wrote
-// `--name=` on purpose. That is why the option holds a flag rather than testing
-// the value.
 func (o *Option) HasValue() bool {
 	return o.hasValue
 }

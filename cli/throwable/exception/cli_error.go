@@ -17,7 +17,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// CliRuntimeError is the CLI component's base runtime error.
 type CliRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -34,7 +33,6 @@ func (e *CliRuntimeError) IsCliThrowable() bool {
 	return true
 }
 
-// CliInvalidArgumentError is the CLI component's base invalid-argument error.
 type CliInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }

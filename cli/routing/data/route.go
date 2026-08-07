@@ -12,11 +12,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 )
 
-// Route is one command of the CLI router.
-//
-// Warning: a route appends each middleware and never dedupes. A middleware that
-// is registered twice runs twice. That is the developer's error, and neither the
-// route nor `sindri` corrects it.
 type Route struct {
 	name        string
 	description string
@@ -86,10 +81,6 @@ func (r *Route) GetHelpText() contract.HelpTextFunc {
 
 // GetHelpTextMessage returns the help text as a message, and nil where the route
 // builds none.
-//
-// The other ports throw where the route builds no help text. Go returns nil, and
-// `HasHelpText` reports which one the route is, because the caller that prints
-// the help text builds a default from the description.
 func (r *Route) GetHelpTextMessage() contract.MessageContract {
 	if r.helpText == nil {
 		return nil
@@ -170,9 +161,6 @@ func (r *Route) HasOption(name string) bool {
 
 // GetOption returns the option under the name, and nil where the command takes
 // no option under it.
-//
-// The name is the long name of the option. A short name reaches the same option,
-// because an option names each of its short names.
 func (r *Route) GetOption(name string) contract.OptionParameterContract {
 	for _, option := range r.options {
 		if option.GetName() == name {

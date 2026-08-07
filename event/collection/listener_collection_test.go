@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	otherEventID     = "Valkyrja.Tests.Event.OtherEventFixture"
+	otherEventID     = "valkyrja.tests.event.OtherEventFixture"
 	firstListenerID  = "first"
 	secondListenerID = "second"
 	thirdListenerID  = "third"

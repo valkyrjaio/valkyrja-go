@@ -23,20 +23,12 @@ import (
 // writes the file, and every other user reads it.
 const filePermissions = 0o644
 
-// OutputFactory builds each kind of output.
-//
-// Every output carries the settings of the configuration, so an application that
-// states a quiet output gets one from each method.
 type OutputFactory struct {
 	config contract.CliInteractionConfigContract
 	writer io.Writer
 }
 
 // NewOutputFactory builds the factory over a configuration.
-//
-// The default output writes to the standard output of the process. A caller that
-// writes somewhere else uses `NewOutputFactoryForWriter`, which is what a test
-// does.
 func NewOutputFactory(config contract.CliInteractionConfigContract) *OutputFactory {
 	if config == nil {
 		config = data.NewCliInteractionConfig()
@@ -82,11 +74,6 @@ func (f *OutputFactory) CreatePlainOutput(
 }
 
 // CreateFileOutput builds an output that writes to the file.
-//
-// The file is created where it does not exist, and each message is appended to
-// what the file holds already. An output that cannot open the file writes
-// nothing, because a command that reports a failure to write is a command that
-// cannot report it.
 func (f *OutputFactory) CreateFileOutput(
 	filepath string,
 	exitCode constant.ExitCode,

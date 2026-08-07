@@ -19,11 +19,6 @@ import (
 	serverconstant "github.com/valkyrjaio/valkyrja-go/v26/http/server/constant"
 )
 
-// RequestHandler is the server's entry point for one request.
-//
-// It runs the request-received middleware, dispatches the router, and turns a
-// failure into a response. The response then passes the sending-response
-// middleware, reaches the client, and passes the response-sent middleware.
 type RequestHandler struct {
 	container containercontract.ContainerContract
 	router    contract.RouterContract
@@ -39,9 +34,6 @@ type RequestHandler struct {
 
 // NewRequestHandler builds the handler over a container, a router, the
 // middleware handler of each stage, and a response factory.
-//
-// The debug flag states whether a response carries what went wrong. A production
-// application leaves it false, so a failure never reaches a client as a message.
 func NewRequestHandler(
 	container containercontract.ContainerContract,
 	router contract.RouterContract,
@@ -65,10 +57,6 @@ func NewRequestHandler(
 }
 
 // Handle returns the response for the request.
-//
-// The request-received middleware runs first, and it ends the run where it
-// returns a response. The handler then binds the response in the container, so
-// something later in the request reads what the client receives.
 func (h *RequestHandler) Handle(request contract.ServerRequestContract) contract.ResponseContract {
 	response := h.dispatch(request)
 
@@ -78,10 +66,6 @@ func (h *RequestHandler) Handle(request contract.ServerRequestContract) contract
 }
 
 // Send writes the response to the writer.
-//
-// Go's `http.ResponseWriter` takes the headers before the status code, and the
-// status code before the body. A write in another order is silently dropped, so
-// this order is not a style choice.
 func (h *RequestHandler) Send(
 	response contract.ResponseContract,
 	writer http.ResponseWriter,
@@ -128,10 +112,6 @@ func (h *RequestHandler) Run(request contract.ServerRequestContract, writer http
 }
 
 // CreateResponseFromThrowable returns the response for the failure.
-//
-// The response states what went wrong only in debug mode. A production
-// application returns the status alone, so a failure never tells a client about
-// the inside of the application.
 func (h *RequestHandler) CreateResponseFromThrowable(throwable error) contract.ResponseContract {
 	content := ""
 
@@ -144,10 +124,6 @@ func (h *RequestHandler) CreateResponseFromThrowable(throwable error) contract.R
 
 // dispatch runs the request through the router, and turns a failure into a
 // response.
-//
-// A handler that panics reaches the client as a 500 rather than ending the
-// process. The other ports catch a throw here; Go has no throw, so this recovers
-// a panic instead, which is the one place in the framework that does.
 func (h *RequestHandler) dispatch(request contract.ServerRequestContract) (response contract.ResponseContract) {
 	defer func() {
 		recovered := recover()

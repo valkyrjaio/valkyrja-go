@@ -12,11 +12,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 )
 
-// CliRoutingData is the CLI routing component's state, as a value that the
-// framework stores and reloads.
-//
-// `sindri` generates one of these for the application, so the framework loads
-// every command without reading a provider at boot.
 type CliRoutingData struct {
 	routes map[string]contract.RouteContract
 }

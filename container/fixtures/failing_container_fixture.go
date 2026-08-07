@@ -19,16 +19,6 @@ import (
 var ErrFailingContainerFixture = errors.New("the parent container failed")
 
 // FailingContainerFixture is a container that claims to hold every binding key
-// and then fails to resolve it.
-//
-// A child container reads its parent through the contract, so a real parent
-// cannot reach the child's error branches: a parent that reports a binding
-// resolves it. The fixture separates the two answers, which is what makes each
-// branch reachable.
-//
-// Each field says which report the fixture answers true for. A child reads the
-// three reports in order, so a fixture that claims every binding never reaches
-// the second lookup or the third one.
 type FailingContainerFixture struct {
 	*manager.Container
 

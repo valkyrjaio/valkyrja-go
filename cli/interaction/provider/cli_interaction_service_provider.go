@@ -18,8 +18,6 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// CliInteractionServiceProvider publishes the bindings of the CLI interaction
-// sub-component.
 type CliInteractionServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the sub-component
@@ -32,10 +30,6 @@ func (p *CliInteractionServiceProvider) Publishers() map[string]containercontrac
 }
 
 // PublishCliInteractionConfig binds the configuration that every output carries.
-//
-// The application's own configuration is bound where it holds the settings.
-// Where it does not, the framework's default is bound instead, so an application
-// that states nothing still gets an interactive output.
 func PublishCliInteractionConfig(container containercontract.ContainerContract) {
 	container.SetSingleton(constant.CliInteractionConfigContractServiceID, resolveConfig(container))
 }

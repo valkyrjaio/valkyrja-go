@@ -14,7 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/throwable/exception"
 )
 
-// ArgumentParameter is one positional parameter of a command.
 type ArgumentParameter struct {
 	parameter
 
@@ -24,9 +23,6 @@ type ArgumentParameter struct {
 }
 
 // NewArgumentParameter builds an optional argument that takes one value.
-//
-// A caller states another mode, another value mode, or a cast with the `With`
-// methods, the way every other port does.
 func NewArgumentParameter(name string, description string) *ArgumentParameter {
 	return &ArgumentParameter{
 		parameter: parameter{
@@ -146,10 +142,6 @@ func (p *ArgumentParameter) GetFirstValue() string {
 }
 
 // AreValuesValid reports whether every value is one that the argument accepts.
-//
-// A required argument needs a value. An argument in the default value mode takes
-// one value at most; an argument in the array value mode takes as many as the
-// caller gives.
 func (p *ArgumentParameter) AreValuesValid() bool {
 	if p.mode == constant.ArgumentModeRequired && len(p.arguments) == 0 {
 		return false

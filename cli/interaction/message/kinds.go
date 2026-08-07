@@ -38,7 +38,6 @@ func NewNewLine() *Message {
 	return NewMessage("\n")
 }
 
-// Messages is several messages that a caller passes as one.
 type Messages struct {
 	messages []contract.MessageContract
 }
@@ -50,9 +49,6 @@ func NewMessages(messages ...contract.MessageContract) *Messages {
 
 // NewBanner builds a message that prints the message on a block of its own
 // color.
-//
-// The banner pads the text on each side, and it prints a line of the same width
-// above and below the text, so the color reads as a block rather than a line.
 func NewBanner(message contract.MessageContract) *Messages {
 	text := bannerPadding + message.GetText() + bannerPadding
 	spaces := strings.Repeat(" ", len(text))
@@ -80,10 +76,6 @@ func (m *Messages) GetFormattedText() string {
 }
 
 // WithText returns a copy that carries the text as its one message.
-//
-// The other ports let a caller replace the text of a group. A group holds
-// several messages, each with its own formatter, so one text replaces all of
-// them.
 func (m *Messages) WithText(text string) contract.MessageContract {
 	return NewMessages(NewMessage(text))
 }

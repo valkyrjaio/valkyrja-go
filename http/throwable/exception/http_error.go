@@ -17,7 +17,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// HttpRuntimeError is the HTTP component's base runtime error.
 type HttpRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -34,7 +33,6 @@ func (e *HttpRuntimeError) IsHttpThrowable() bool {
 	return true
 }
 
-// HttpInvalidArgumentError is the HTTP component's base invalid-argument error.
 type HttpInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }

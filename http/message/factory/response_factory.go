@@ -16,7 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/uri"
 )
 
-// ResponseFactory builds each kind of response.
 type ResponseFactory struct{}
 
 // NewResponseFactory builds the factory.
@@ -78,9 +77,6 @@ func (f *ResponseFactory) CreateJsonpResponse(
 }
 
 // CreateRedirectResponse builds a response that sends the client to the URI.
-//
-// A string that no parser reads sends the client to the root, because a redirect
-// with no target sends the client nowhere.
 func (f *ResponseFactory) CreateRedirectResponse(
 	target string,
 	statusCode constant.StatusCode,
@@ -95,9 +91,6 @@ func (f *ResponseFactory) CreateRedirectResponse(
 }
 
 // rootUri returns the URI of the root path.
-//
-// The path is a literal that every URI carries, so no caller can reach the
-// failure that `NewUri` reports.
 func rootUri() contract.UriContract {
 	built, _ := uri.NewUri("", "", "", "", 0, "/", "", "")
 

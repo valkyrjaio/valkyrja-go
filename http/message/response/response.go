@@ -18,7 +18,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/stream"
 )
 
-// Response is an HTTP response.
 type Response struct {
 	message.Message
 

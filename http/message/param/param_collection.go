@@ -16,12 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// ParamCollection holds a set of parameters that arrived with a request.
-//
-// The other ports declare this abstract, and each named collection extends it
-// without adding a method. Go has no abstract type, and a Go interface with the
-// same method set is the same type, so this port declares one collection and
-// gives each name an alias in the contract package.
 type ParamCollection struct {
 	params map[string]any
 }

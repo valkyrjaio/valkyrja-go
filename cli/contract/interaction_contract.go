@@ -24,7 +24,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
 )
 
-// ArgumentContract is one positional argument of a command.
 type ArgumentContract interface {
 	// GetValue returns the value of the argument.
 	GetValue() string
@@ -33,7 +32,6 @@ type ArgumentContract interface {
 	WithValue(value string) ArgumentContract
 }
 
-// OptionContract is one option of a command.
 type OptionContract interface {
 	// GetName returns the name of the option.
 	GetName() string
@@ -61,7 +59,6 @@ type OptionContract interface {
 	WithType(optionType constant.OptionType) OptionContract
 }
 
-// FormatContract is one pair of terminal codes that wrap a piece of text.
 type FormatContract interface {
 	// GetSetCode returns the code that starts the format.
 	GetSetCode() string
@@ -76,7 +73,6 @@ type FormatContract interface {
 	WithUnsetCode(unsetCode string) FormatContract
 }
 
-// FormatterContract applies each of its formats to a piece of text.
 type FormatterContract interface {
 	// GetFormats returns each format that the formatter applies.
 	GetFormats() []FormatContract
@@ -88,7 +84,6 @@ type FormatterContract interface {
 	FormatText(text string) string
 }
 
-// MessageContract is one message that a command writes.
 type MessageContract interface {
 	// GetText returns the text of the message.
 	GetText() string
@@ -112,7 +107,6 @@ type MessageContract interface {
 	WithoutFormatter() MessageContract
 }
 
-// QuestionContract is a message that asks the caller for an answer.
 type QuestionContract interface {
 	MessageContract
 
@@ -132,15 +126,10 @@ type QuestionContract interface {
 	Ask() AnswerContract
 }
 
-// QuestionCallableFunc runs once the caller answers a question.
 type QuestionCallableFunc func(output OutputContract, answer AnswerContract) OutputContract
 
-// AnswerValidationFunc reports whether a response is one that the answer
-// accepts.
 type AnswerValidationFunc func(response string) bool
 
-// AnswerContract is what the caller answered to one question.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type AnswerContract interface {
 	MessageContract
@@ -194,7 +183,6 @@ type AnswerContract interface {
 	IsValidResponse() bool
 }
 
-// ProgressContract is a message that reports how far a command has come.
 type ProgressContract interface {
 	MessageContract
 
@@ -212,7 +200,6 @@ type ProgressContract interface {
 	WithPercentage(percentage int) ProgressContract
 }
 
-// WriterContract writes one message to one destination.
 type WriterContract interface {
 	// ShouldWriteMessage reports whether this writer writes the message.
 	ShouldWriteMessage(message MessageContract) bool
@@ -221,8 +208,6 @@ type WriterContract interface {
 	Write(output OutputContract, message MessageContract) OutputContract
 }
 
-// InputContract is what the caller typed.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type InputContract interface {
 	// GetCaller returns the path that the caller ran.
@@ -277,8 +262,6 @@ type InputContract interface {
 	WithoutOptions() InputContract
 }
 
-// OutputContract is what a command writes back.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type OutputContract interface {
 	// GetMessages returns every message that the output holds.
@@ -344,26 +327,14 @@ type OutputContract interface {
 	WithExitCode(exitCode constant.ExitCode) OutputContract
 }
 
-// PlainOutputContract is an output that applies no format.
-//
-// The contract is an alias, because it adds no method. Go compares an interface
-// by its method set, so a second interface with the same methods is the same
-// type.
 type PlainOutputContract = OutputContract
 
-// EmptyOutputContract is an output that writes nothing.
 type EmptyOutputContract = OutputContract
 
-// StreamOutputContract is an output that writes to a stream.
 type StreamOutputContract = OutputContract
 
-// FileOutputContract is an output that writes to a file.
 type FileOutputContract = OutputContract
 
-// OutputFactoryContract builds each kind of output.
-//
-// Go has no default parameter, so a caller passes the exit code that the other
-// ports leave out.
 type OutputFactoryContract interface {
 	// CreateOutput builds an output that writes through the default writers.
 	CreateOutput(exitCode constant.ExitCode, messages ...MessageContract) OutputContract
@@ -389,8 +360,6 @@ type OutputFactoryContract interface {
 	) StreamOutputContract
 }
 
-// CliInteractionConfigContract holds the settings that apply to every output of
-// the application.
 type CliInteractionConfigContract interface {
 	// IsQuiet reports whether an output writes less.
 	IsQuiet() bool

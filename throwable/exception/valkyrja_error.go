@@ -30,8 +30,6 @@ const traceDepth = 32
 // first recorded frame is the site that raised the error.
 const traceSkip = 3
 
-// valkyrjaError carries the state that every framework error holds. It is
-// unexported, so only a base error in this package embeds it.
 type valkyrjaError struct {
 	message string
 	cause   error
@@ -61,11 +59,6 @@ func (e *valkyrjaError) Unwrap() error {
 }
 
 // GetTraceCode returns a stable identifier for the site that raised the error.
-//
-// The other ports hash the error name and the stack with MD5. This port hashes
-// the recorded frames with SHA-256, because `gosec` rejects MD5. The code is an
-// opaque identifier, so the digest only has to be stable, and no port can match
-// another port's value in any case.
 func (e *valkyrjaError) GetTraceCode() string {
 	digest := sha256.Sum256([]byte(e.getTraceSignature()))
 
@@ -94,9 +87,6 @@ func (e *valkyrjaError) getTraceSignature() string {
 	return signature.String()
 }
 
-// ValkyrjaRuntimeError is the base for every runtime error in the framework. A
-// runtime error reports a failure that the caller cannot prevent by passing a
-// different argument.
 type ValkyrjaRuntimeError struct {
 	valkyrjaError
 }
@@ -107,9 +97,6 @@ func NewValkyrjaRuntimeError(message string, cause error) ValkyrjaRuntimeError {
 	return ValkyrjaRuntimeError{valkyrjaError: newValkyrjaError(message, cause)}
 }
 
-// ValkyrjaInvalidArgumentError is the base for every invalid-argument error in
-// the framework. An invalid-argument error reports a value that the caller
-// passed, and the caller prevents it by passing a different value.
 type ValkyrjaInvalidArgumentError struct {
 	valkyrjaError
 }

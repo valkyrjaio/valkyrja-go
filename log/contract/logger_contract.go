@@ -9,10 +9,6 @@
 // Package contract holds every contract of the log component.
 package contract
 
-// LoggerContract writes a message at each severity that the framework reports.
-//
-// The severities are the eight of RFC 5424, which every port keeps, so a message
-// reads the same in each one.
 type LoggerContract interface {
 	// Throwable writes a failure and the message that goes with it.
 	Throwable(throwable error, message string)
@@ -42,15 +38,12 @@ type LoggerContract interface {
 	Emergency(message string, context map[string]any)
 }
 
-// LogConfigContract holds the settings that apply to the whole log component.
 type LogConfigContract interface {
 	// GetDefaultLogger returns the binding key of the logger that the
 	// application writes through.
 	GetDefaultLogger() string
 }
 
-// LogStreamConfigContract holds the settings of the logger that writes to a
-// stream.
 type LogStreamConfigContract interface {
 	// GetStreamFilePath returns the file that the logger writes to, and an
 	// empty string where it writes to the standard error of the process.

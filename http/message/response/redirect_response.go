@@ -14,7 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/uri"
 )
 
-// RedirectResponse is a response that sends the client to another URI.
 type RedirectResponse struct {
 	Response
 
@@ -68,9 +67,6 @@ func (r *RedirectResponse) Secure(
 
 // Back returns a copy of the response that sends the client to the URI that it
 // came from.
-//
-// A request that names no referer sends the client to the root, because a
-// redirect with no target sends the client nowhere.
 func (r *RedirectResponse) Back(request contract.ServerRequestContract) contract.RedirectResponseContract {
 	referer := request.GetHeaders().GetHeaderLine(constant.HeaderNameReferer)
 
@@ -87,9 +83,6 @@ func (r *RedirectResponse) Back(request contract.ServerRequestContract) contract
 }
 
 // rootUri returns the URI of the root path.
-//
-// The path is a literal that every URI carries, so no caller can reach the
-// failure that `NewUri` reports.
 func rootUri() contract.UriContract {
 	built, _ := uri.NewUri("", "", "", "", 0, "/", "", "")
 

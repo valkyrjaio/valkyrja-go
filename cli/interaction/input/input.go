@@ -26,7 +26,6 @@ const shortPrefix = "-"
 // valueSeparator separates the name of an option from its value.
 const valueSeparator = "="
 
-// Input is what the caller typed.
 type Input struct {
 	caller      string
 	commandName string
@@ -45,13 +44,6 @@ func NewInput(caller string, commandName string) *Input {
 }
 
 // NewInputFromArgs builds an input by reading what the caller typed.
-//
-// Go's `os.Args` leads with the path that the caller ran, and the command name
-// follows it. That is the shape that PHP and TypeScript read as well; the Java
-// port has no caller slot, because the JVM does not pass one.
-//
-// An argument list with no command name gives an input that names none, and the
-// server then runs the default command.
 func NewInputFromArgs(args []string) *Input {
 	built := NewInput("", "")
 
@@ -173,8 +165,6 @@ func (i *Input) GetOptions() []contract.OptionContract {
 }
 
 // GetOption returns each option under the name.
-//
-// A caller repeats an option, so the result is a list rather than one option.
 func (i *Input) GetOption(name string) []contract.OptionContract {
 	found := make([]contract.OptionContract, 0, len(i.options))
 

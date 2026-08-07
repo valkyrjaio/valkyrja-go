@@ -19,7 +19,6 @@ import (
 )
 
 // ComponentProviderFixture is a component provider that returns what the test
-// gave it.
 type ComponentProviderFixture struct {
 	ComponentProviders []contract.ComponentProviderContract
 	ContainerProviders []containercontract.ServiceProviderContract

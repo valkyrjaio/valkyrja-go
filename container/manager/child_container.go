@@ -14,12 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// ChildContainer resolves what its own state holds, and falls back to a parent
-// container for everything else.
-//
-// The child takes only the singleton bindings and the deferred publishers from
-// the state. It reads each alias, each service, and each singleton instance
-// through the parent.
 type ChildContainer struct {
 	*Container
 

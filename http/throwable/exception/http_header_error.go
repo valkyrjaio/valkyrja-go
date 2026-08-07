@@ -8,13 +8,10 @@
 
 package exception
 
-// HttpHeaderInvalidArgumentError is the header sub-component's base
-// invalid-argument error.
 type HttpHeaderInvalidArgumentError struct {
 	HttpInvalidArgumentError
 }
 
-// HttpHeaderInvalidNameError reports a header name that no header carries.
 type HttpHeaderInvalidNameError struct {
 	HttpHeaderInvalidArgumentError
 
@@ -39,7 +36,6 @@ func (e *HttpHeaderInvalidNameError) GetName() string {
 	return e.name
 }
 
-// HttpHeaderInvalidValueError reports a header value that no header carries.
 type HttpHeaderInvalidValueError struct {
 	HttpHeaderInvalidArgumentError
 
@@ -64,8 +60,6 @@ func (e *HttpHeaderInvalidValueError) GetValue() string {
 	return e.value
 }
 
-// HttpHeaderInvalidHeaderNameError reports a header that a collection does not
-// hold.
 type HttpHeaderInvalidHeaderNameError struct {
 	HttpHeaderInvalidArgumentError
 

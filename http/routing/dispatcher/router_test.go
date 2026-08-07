@@ -226,7 +226,7 @@ func TestDispatchRouteEndsWhereTheRouteMatchedMiddlewareReturnsAResponse(t *test
 	container := manager.NewContainer(nil)
 	ending := response.NewResponseFromContent("ended", constant.StatusCodeAccepted, nil)
 
-	container.Bind("Valkyrja.Tests.Http.EndingMiddleware",
+	container.Bind("valkyrja.tests.http.EndingMiddleware",
 		func(_ containercontract.ContainerContract, _ []any) any {
 			return &endingRouteMatchedFixture{response: ending}
 		})
@@ -235,7 +235,7 @@ func TestDispatchRouteEndsWhereTheRouteMatchedMiddlewareReturnsAResponse(t *test
 		container,
 		matcher.NewMatcher(collection.NewRouteCollection()),
 		&responseFactoryFixture{},
-		handler.NewRouteMatchedHandler(container, "Valkyrja.Tests.Http.EndingMiddleware"),
+		handler.NewRouteMatchedHandler(container, "valkyrja.tests.http.EndingMiddleware"),
 		handler.NewRouteNotMatchedHandler(container),
 		handler.NewRouteDispatchedHandler(container),
 	)
@@ -274,10 +274,6 @@ func (m *endingRouteMatchedFixture) RouteMatched(
 }
 
 // rawPathUriFixture is a URI that returns a path which no decoder reads.
-//
-// A real URI encodes its path, so a decoder always reads one back. This fixture
-// is what makes the router's fallback reachable: it hands over the path as it
-// arrived, invalid escape and all.
 type rawPathUriFixture struct {
 	contract.UriContract
 }

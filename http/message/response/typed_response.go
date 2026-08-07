@@ -50,9 +50,6 @@ func NewHtmlResponse(
 }
 
 // NewEmptyResponse builds a response that carries no body, at status 204.
-//
-// The body opens in a mode that no writer writes, which is how every port states
-// that the response carries nothing.
 func NewEmptyResponse(headers contract.HeaderCollectionContract) *Response {
 	return NewResponse(
 		stream.NewStream("", constant.ModeRead),
@@ -62,10 +59,6 @@ func NewEmptyResponse(headers contract.HeaderCollectionContract) *Response {
 }
 
 // NewJsonResponse builds a response that carries the data as JSON.
-//
-// Data that no encoder can render leaves the body empty, because a response has
-// no return to carry the failure. A caller that needs the failure encodes the
-// data itself and builds a text response.
 func NewJsonResponse(
 	data map[string]any,
 	statusCode constant.StatusCode,

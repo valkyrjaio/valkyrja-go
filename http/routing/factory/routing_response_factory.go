@@ -14,8 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// RoutingResponseFactory builds a response that sends the client to a named
-// route.
 type RoutingResponseFactory struct {
 	url             contract.UrlContract
 	responseFactory contract.ResponseFactoryContract

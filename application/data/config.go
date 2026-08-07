@@ -26,11 +26,6 @@ const (
 	DefaultDataNamespace = "App/Provider/Data"
 )
 
-// Config is the configuration of the application.
-//
-// The other ports give the constructor a default for each parameter. Go has no
-// default parameter, so `NewConfig` takes the values that an application states
-// most often, and a caller changes a field afterwards.
 type Config struct {
 	Namespace     string
 	Dir           string
@@ -65,10 +60,6 @@ func NewConfig(providers ...contract.ComponentProviderContract) *Config {
 
 // getWorkingDirectory returns the directory that the process runs from, and an
 // empty string where the process cannot read it.
-//
-// `os.Getwd` returns an empty directory together with its error, so a guard on
-// the error would return the value that the call already gives, and no test
-// could reach the guard.
 func getWorkingDirectory() string {
 	directory, _ := os.Getwd()
 

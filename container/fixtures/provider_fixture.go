@@ -27,11 +27,6 @@ const (
 )
 
 // ProviderFixture is a service provider that records each publisher that the
-// container runs.
-//
-// The other ports record the calls in a static field. This port records them on
-// the instance, so a test that runs in parallel with another test reads its own
-// provider rather than a shared one.
 type ProviderFixture struct {
 	PublishCalled          bool
 	PublishSecondaryCalled bool
@@ -52,7 +47,6 @@ func (p *ProviderFixture) Publishers() map[string]contract.PublishFunc {
 }
 
 // InvalidProviderFixture is a service provider that defers a binding key
-// without a publisher for it.
 type InvalidProviderFixture struct{}
 
 // Publishers returns a nil publisher, which is the one value that reaches the

@@ -21,7 +21,6 @@ const nameDeliminator = ":"
 // headerValueDeliminator separates one value of a header from the next.
 const headerValueDeliminator = ","
 
-// Header is one header of a message.
 type Header struct {
 	name           string
 	normalizedName string
@@ -94,10 +93,6 @@ func (h *Header) GetNormalizedName() string {
 }
 
 // WithName returns a copy of the header under another name.
-//
-// The other ports throw where the name is invalid. A `With` method returns the
-// contract in every port, so this one keeps the receiver's name instead, and a
-// caller that needs the failure builds the header with `NewHeader`.
 func (h *Header) WithName(name string) contract.HeaderContract {
 	if !IsValidName(name) {
 		return h

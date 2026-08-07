@@ -20,7 +20,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/validation/validator"
 )
 
-// ValidationServiceProvider publishes the bindings of the validation component.
 type ValidationServiceProvider struct{}
 
 // Publishers returns a publisher for each binding key that the component defers.
@@ -31,9 +30,6 @@ func (p *ValidationServiceProvider) Publishers() map[string]containercontract.Pu
 }
 
 // PublishValidator binds a factory that builds a validator that holds no rule.
-//
-// A caller states the rules of one validation, so the validator is bound with
-// none, and the caller sets them before it validates.
 //
 // Warning: the binding is a factory rather than a singleton. A validator holds
 // the rules and the messages of one validation in fields that `SetRules` and
@@ -49,7 +45,6 @@ func PublishValidator(container containercontract.ContainerContract) {
 	})
 }
 
-// ValidationComponentProvider is the validation component's top-level provider.
 type ValidationComponentProvider struct{}
 
 // GetComponentProviders returns each component that validation needs.

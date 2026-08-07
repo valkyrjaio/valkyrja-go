@@ -14,11 +14,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 )
 
-// Answer is what the caller answered to one question.
-//
-// The answer states the responses that it accepts, a response that it uses where
-// the caller gives none, and a function that reads a response the list does not
-// name.
 type Answer struct {
 	Message
 
@@ -39,10 +34,6 @@ func NewAnswer(text string, allowedResponses ...string) *Answer {
 }
 
 // WithText returns a copy of the answer with another text.
-//
-// The method is declared here rather than promoted from the embedded message,
-// because a promoted `With` copies only the embedded struct and would return a
-// plain message, dropping every field of the answer.
 func (a *Answer) WithText(text string) contract.MessageContract {
 	copied := *a
 	copied.text = text
@@ -107,9 +98,6 @@ func (a *Answer) GetUserResponse() string {
 
 // WithUserResponse returns a copy of the answer with another response from the
 // caller.
-//
-// The copy reports that the caller answered, so a question that asks again reads
-// the answer rather than the terminal.
 func (a *Answer) WithUserResponse(userResponse string) contract.AnswerContract {
 	copied := *a
 	copied.userResponse = userResponse
@@ -165,10 +153,6 @@ func (a *Answer) WithHasBeenAnswered(hasBeenAnswered bool) contract.AnswerContra
 
 // IsValidResponse reports whether what the caller typed is a response that the
 // answer accepts.
-//
-// A response that the allowed list names is valid. So is one that the validation
-// callable accepts, which is how an answer reads a response that no list can
-// name.
 func (a *Answer) IsValidResponse() bool {
 	response := a.GetUserResponse()
 

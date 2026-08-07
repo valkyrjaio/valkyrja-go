@@ -19,21 +19,10 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 )
 
-// ServiceFactory builds a service. The container passes itself and the
-// arguments that the caller gave to `Get`.
 type ServiceFactory func(container ContainerContract, arguments []any) any
 
-// PublishFunc registers the bindings that one binding key needs. A service
-// provider returns one for each key that it defers.
 type PublishFunc func(container ContainerContract)
 
-// ContainerDataContract is the container's state, as a value that the framework
-// stores and reloads.
-//
-// The other ports type `GetData` with the concrete `ContainerData`. In Go that
-// is a cycle: `ContainerData` holds a `ServiceFactory`, and a `ServiceFactory`
-// takes a `ContainerContract`. The contract therefore names an interface, and
-// the `data` package implements it.
 type ContainerDataContract interface {
 	// GetAliases returns each alias, keyed by the alias, valued by the binding
 	// key that it points to.
@@ -50,8 +39,6 @@ type ContainerDataContract interface {
 	GetSingletons() map[string]string
 }
 
-// ProvidersAwareContract is the part of the container that registers a service
-// provider and publishes what the provider defers.
 type ProvidersAwareContract interface {
 	// Register records each publisher that the provider defers. It reports a
 	// failure where a publisher is nil.
@@ -68,15 +55,6 @@ type ProvidersAwareContract interface {
 	Publish(id string)
 }
 
-// ContainerContract is the framework's service container.
-//
-// Go has no default parameter, so each method takes every argument that the
-// other ports make optional. A caller that binds no arguments passes nil.
-//
-// The contract mirrors the PHP reference implementation method for method.
-// Splitting it to satisfy the method count would give this port an API that no
-// other port has, so the count is suppressed instead.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ContainerContract interface {
 	ProvidersAwareContract
@@ -139,10 +117,6 @@ type ContainerContract interface {
 	GetSingleton(id string) (any, error)
 }
 
-// ServiceProviderContract publishes the container bindings of one component.
-//
-// A provider returns a literal map, and never a computed one, because `sindri`
-// reads the map from the source rather than by running it.
 type ServiceProviderContract interface {
 	// Publishers returns each publisher, keyed by the binding key that it
 	// publishes.

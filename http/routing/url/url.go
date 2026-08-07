@@ -15,7 +15,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// Url builds the URL of a named route.
 type Url struct {
 	collection contract.RouteCollectionContract
 }
@@ -27,10 +26,6 @@ func NewUrl(collection contract.RouteCollectionContract) *Url {
 
 // GetUrl returns the URL of the route, with the data filled into each parameter
 // of its path.
-//
-// It returns an empty string where the collection holds no route under the name.
-// A parameter that the data does not name stays in the path, so a reader sees
-// which value the caller left out.
 func (u *Url) GetUrl(name string, data map[string]string) string {
 	route := u.collection.GetByName(name)
 	if route == nil {

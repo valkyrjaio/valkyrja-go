@@ -36,7 +36,6 @@ const (
 	DefaultVendorPath           = "vendor"
 )
 
-// Directory resolves each directory of an application.
 type Directory struct {
 	BasePath             string
 	AppPath              string
@@ -150,9 +149,6 @@ func (d *Directory) GetTestsDirectory(path string) string {
 }
 
 // GetVendorDirectory returns the path under the vendor directory.
-//
-// The TypeScript port names this `node_modules`, and the Go default is `vendor`,
-// which is where the Go toolchain puts a dependency.
 func (d *Directory) GetVendorDirectory(path string) string {
 	return d.GetBaseDirectory(d.VendorPath + d.GetPath(path))
 }

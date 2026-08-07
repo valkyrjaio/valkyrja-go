@@ -29,7 +29,6 @@ import (
 const routePath = "/users/{id}"
 
 // routeProviderFixture registers one route with a parameter in its path, so the
-// processor has something to build a regular expression from.
 type routeProviderFixture struct{}
 
 // GetRoutes returns the one route that the fixture registers.

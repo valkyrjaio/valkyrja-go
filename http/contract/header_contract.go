@@ -13,7 +13,6 @@ import (
 	throwablecontract "github.com/valkyrjaio/valkyrja-go/v26/throwable/contract"
 )
 
-// ComponentContract is one token-and-text pair inside a header value.
 type ComponentContract interface {
 	// GetToken returns the token of the component.
 	GetToken() string
@@ -31,12 +30,6 @@ type ComponentContract interface {
 	String() string
 }
 
-// ValueContract is one value of one header.
-//
-// The other ports accept a component or a bare string for each component, as a
-// union type. Go has no union, so a bare string is wrapped in a component. That
-// keeps the contract typed rather than erasing it to `any`, which is what the
-// Java port does.
 type ValueContract interface {
 	// GetComponents returns each component of the value.
 	GetComponents() []ComponentContract
@@ -52,8 +45,6 @@ type ValueContract interface {
 	String() string
 }
 
-// CookieContract is a cookie, which is one kind of header value.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type CookieContract interface {
 	ValueContract
@@ -120,7 +111,6 @@ type CookieContract interface {
 	WithSameSite(sameSite constant.SameSite) CookieContract
 }
 
-// HeaderContract is one header of a message.
 type HeaderContract interface {
 	// GetName returns the name of the header, as the sender wrote it.
 	GetName() string
@@ -150,7 +140,6 @@ type HeaderContract interface {
 	String() string
 }
 
-// HeaderCollectionContract holds the headers of one message.
 type HeaderCollectionContract interface {
 	// Has reports whether the collection holds a header under the name.
 	Has(name string) bool
@@ -189,8 +178,6 @@ type HeaderCollectionContract interface {
 	WithAddedHeaders(headers ...HeaderContract) HeaderCollectionContract
 }
 
-// HttpThrowable is the contract that every error of the HTTP component
-// satisfies.
 type HttpThrowable interface {
 	throwablecontract.ValkyrjaThrowable
 

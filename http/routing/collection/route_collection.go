@@ -18,12 +18,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/routing/data"
 )
 
-// RouteCollection holds every route of the application.
-//
-// A route files under its own name, and under its path or its regular
-// expression, for each request method that it matches. A route that matches the
-// any method files under every request method, so a lookup reads one map rather
-// than testing the any method at each read.
 type RouteCollection struct {
 	routes  map[string]contract.RouteContract
 	paths   map[constant.RequestMethod]map[string]string

@@ -12,9 +12,6 @@ import (
 	throwablecontract "github.com/valkyrjaio/valkyrja-go/v26/throwable/contract"
 )
 
-// EventThrowable is the contract that every error of the event component
-// satisfies. A caller that handles any event failure asserts against this
-// contract.
 type EventThrowable interface {
 	throwablecontract.ValkyrjaThrowable
 

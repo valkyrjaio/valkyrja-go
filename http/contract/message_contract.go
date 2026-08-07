@@ -22,7 +22,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// MessageContract is what an HTTP request and an HTTP response have in common.
 type MessageContract interface {
 	// GetProtocolVersion returns the HTTP protocol version of the message.
 	GetProtocolVersion() constant.ProtocolVersion
@@ -44,12 +43,6 @@ type MessageContract interface {
 	WithBody(body StreamContract) MessageContract
 }
 
-// StreamContract is the body of a message, as a stream that a reader reads and a
-// writer writes.
-//
-// Each method that fails reports the failure with an error. The other ports
-// throw instead, which is the one difference in this contract.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type StreamContract interface {
 	// String returns the whole stream as a string.
@@ -102,8 +95,6 @@ type StreamContract interface {
 	GetMetadataItem(key string) any
 }
 
-// UriContract is the URI of a request.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type UriContract interface {
 	// GetScheme returns the scheme of the URI.

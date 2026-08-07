@@ -16,14 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
 )
 
-// Output is what a command writes back.
-//
-// A message starts unwritten. `WriteMessages` moves each one to the written
-// list, and the writers put it where the caller reads it.
-//
-// Warning: a silent output writes nothing at all, and a quiet output writes
-// nothing while the exit code reports success. A command that must always reach
-// the caller reports a failure instead of writing.
 type Output struct {
 	unwrittenMessages []contract.MessageContract
 	writtenMessages   []contract.MessageContract
@@ -36,9 +28,6 @@ type Output struct {
 }
 
 // NewOutput builds an output that writes through the writers.
-//
-// The output is interactive, and it exits with success, until a caller states
-// otherwise.
 func NewOutput(writers []contract.WriterContract, messages ...contract.MessageContract) *Output {
 	return &Output{
 		unwrittenMessages: messages,
@@ -112,10 +101,6 @@ func (o *Output) WriteMessages() contract.OutputContract {
 }
 
 // WriteMessage writes one message, and records it as written.
-//
-// A silent output records the message and writes nothing. A quiet output does
-// the same while the exit code reports success, so a failure still reaches the
-// caller.
 func (o *Output) WriteMessage(message contract.MessageContract) contract.OutputContract {
 	copied := *o
 	copied.writtenMessages = appendMessages(o.writtenMessages, []contract.MessageContract{message})
@@ -214,7 +199,6 @@ func appendMessages(
 	return combined
 }
 
-// StreamWriter writes each message to a stream.
 type StreamWriter struct {
 	writer io.Writer
 }
@@ -230,9 +214,6 @@ func (w *StreamWriter) ShouldWriteMessage(_ contract.MessageContract) bool {
 }
 
 // Write writes the formatted text of the message, followed by a line break.
-//
-// A stream that reports a failure changes nothing that a command can act on, so
-// the output returns as it is.
 func (w *StreamWriter) Write(
 	output contract.OutputContract,
 	message contract.MessageContract,
@@ -242,7 +223,6 @@ func (w *StreamWriter) Write(
 	return output
 }
 
-// PlainWriter writes each message with no format applied.
 type PlainWriter struct {
 	writer io.Writer
 }

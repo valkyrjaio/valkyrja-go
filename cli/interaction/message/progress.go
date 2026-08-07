@@ -18,7 +18,6 @@ const lowestPercentage = 0
 // highestPercentage is how far a command has come once it finished.
 const highestPercentage = 100
 
-// Progress is a message that reports how far a command has come.
 type Progress struct {
 	Message
 
@@ -33,10 +32,6 @@ func NewProgress(text string) *Progress {
 }
 
 // WithText returns a copy of the progress with another text.
-//
-// The method is declared here rather than promoted from the embedded message,
-// because a promoted `With` copies only the embedded struct and would return a
-// plain message, dropping every field of the progress.
 func (p *Progress) WithText(text string) contract.MessageContract {
 	copied := *p
 	copied.text = text
@@ -66,9 +61,6 @@ func (p *Progress) IsComplete() bool {
 }
 
 // WithIsComplete returns a copy of the progress with another complete flag.
-//
-// A progress that reports the command finished reports 100 as well, so the two
-// never disagree.
 func (p *Progress) WithIsComplete(isComplete bool) contract.ProgressContract {
 	copied := *p
 	copied.isComplete = isComplete
@@ -86,10 +78,6 @@ func (p *Progress) GetPercentage() int {
 }
 
 // WithPercentage returns a copy of the progress at another percentage.
-//
-// A percentage outside the range takes the nearest end of it, because a progress
-// that reports more than everything reports nothing a reader can use. A progress
-// at 100 reports that the command finished.
 func (p *Progress) WithPercentage(percentage int) contract.ProgressContract {
 	percentage = min(max(percentage, lowestPercentage), highestPercentage)
 

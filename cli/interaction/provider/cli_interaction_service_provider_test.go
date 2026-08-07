@@ -21,7 +21,6 @@ import (
 )
 
 // quietConfigFixture is an application configuration that also states the
-// settings of every output.
 type quietConfigFixture struct {
 	*applicationdata.Config
 }

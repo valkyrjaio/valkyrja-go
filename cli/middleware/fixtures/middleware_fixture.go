@@ -16,10 +16,6 @@ import (
 )
 
 // RecordingMiddlewareFixture is a middleware of every stage. It records that it
-// ran, and it passes the run to the handler that it receives.
-//
-// One fixture serves each stage, because a test asserts the same two things at
-// every stage: the middleware ran, and the handler continued.
 type RecordingMiddlewareFixture struct {
 	Name   string
 	Record *[]string

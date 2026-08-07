@@ -25,10 +25,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/throwable/exception"
 )
 
-// NullClient reaches no server, and returns an empty response to every request.
-//
-// An application that must not reach the network sends through this client, and
-// a test that must not reach it does the same.
 type NullClient struct{}
 
 // NewNullClient builds the client.
@@ -41,10 +37,6 @@ func (c *NullClient) SendRequest(_ contract.RequestContract) (contract.ResponseC
 	return response.NewEmptyResponse(nil), nil
 }
 
-// LogClient records each request and reaches no server.
-//
-// A developer sends through this client to read what an application would have
-// sent, without sending it.
 type LogClient struct {
 	logger logcontract.LoggerContract
 }
@@ -64,7 +56,6 @@ func (c *LogClient) SendRequest(request contract.RequestContract) (contract.Resp
 	return response.NewEmptyResponse(nil), nil
 }
 
-// Client sends a request over the network with Go's own HTTP client.
 type Client struct {
 	client *http.Client
 }
@@ -80,9 +71,6 @@ func NewClient(built *http.Client) *Client {
 }
 
 // SendRequest sends the request and returns what the server answered.
-//
-// It reports a failure where the client cannot reach the server, and where the
-// request or the answer is not one that a message carries.
 func (c *Client) SendRequest(request contract.RequestContract) (contract.ResponseContract, error) {
 	sent, err := c.newRequest(request)
 	if err != nil {
@@ -144,9 +132,6 @@ func newResponse(received *http.Response) (contract.ResponseContract, error) {
 }
 
 // newHeaders builds the header collection from what the server answered.
-//
-// A header that the framework does not accept is dropped rather than fatal,
-// because a server that answers with one has still answered.
 func newHeaders(received http.Header) contract.HeaderCollectionContract {
 	built := contract.HeaderCollectionContract(header.NewHeaderCollection())
 

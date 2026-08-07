@@ -19,10 +19,6 @@ import (
 // headerIndent opens each line that the header draws inside its frame.
 const headerIndent = "│   "
 
-// Header is the block that a command prints above its own output.
-//
-// It names the application, the framework, the toolchain, and the command that
-// the caller ran.
 type Header struct {
 	appName    string
 	appVersion string
@@ -37,10 +33,6 @@ type Header struct {
 }
 
 // NewHeader builds the header for the application and the command.
-//
-// The header takes its description and its command name from the command, and it
-// takes the framework version and the toolchain version from the framework
-// itself. A caller states another value with the `With` methods.
 func NewHeader(appName string, appVersion string, projectRoot string, route contract.RouteContract) *Header {
 	built := &Header{
 		appName:           appName,
@@ -160,9 +152,6 @@ func (h *Header) GetFormattedText() string {
 }
 
 // WithText returns a message that carries the text.
-//
-// A header draws itself from the values that it holds, so a caller that states
-// another text gets a plain message rather than a header.
 func (h *Header) WithText(text string) contract.MessageContract {
 	return NewMessage(text)
 }

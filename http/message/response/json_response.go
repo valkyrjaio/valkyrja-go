@@ -15,10 +15,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// JsonResponse is a response that carries JSON.
-//
-// A callback makes the response JSONP: the body then carries a call that wraps
-// the JSON, and the content type states JavaScript rather than JSON.
 type JsonResponse struct {
 	Response
 
@@ -63,10 +59,6 @@ func (r *JsonResponse) CreateFromData(
 }
 
 // GetBodyAsJson returns the body of the response as JSON.
-//
-// The other ports decode the body, because a caller there replaces the body of a
-// response. Go's response is closed over the data that built it, so the body
-// always carries that data, and no decode can disagree with it.
 func (r *JsonResponse) GetBodyAsJson() map[string]any {
 	return maps.Clone(r.data)
 }

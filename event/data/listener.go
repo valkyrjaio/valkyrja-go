@@ -13,10 +13,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/event/contract"
 )
 
-// Listener is one listener for one event.
-//
-// Each `With` method returns a copy and leaves the receiver unchanged, so a
-// listener that the collection holds cannot change under it.
 type Listener struct {
 	eventID string
 	name    string

@@ -9,7 +9,6 @@
 // Package contract holds every contract of the validation component.
 package contract
 
-// RuleContract is one rule that a subject either passes or fails.
 type RuleContract interface {
 	// GetSubject returns what the rule validates.
 	GetSubject() any
@@ -24,7 +23,6 @@ type RuleContract interface {
 	Validate() error
 }
 
-// ValidatorContract runs a set of rules over a set of subjects.
 type ValidatorContract interface {
 	// ValidateRules reports whether every subject passes every rule of its
 	// own.

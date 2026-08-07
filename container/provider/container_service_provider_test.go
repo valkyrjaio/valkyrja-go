@@ -123,10 +123,9 @@ func TestTheContainerProviderNamesNoOtherProvider(t *testing.T) {
 }
 
 // providedID is the binding key that providerFixture defers.
-const providedID = "Valkyrja.Tests.Container.ProvidedID"
+const providedID = "valkyrja.tests.container.ProvidedID"
 
 // providerFixture is a service provider that defers one binding key. It stands
-// in for a component's own provider, which the publisher registers.
 type providerFixture struct{}
 
 // Publishers returns a publisher for the binding key that the provider defers.

@@ -17,14 +17,8 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 )
 
-// SourceFunc returns the parameters of a request that a struct reads.
-//
-// The other ports declare an abstract `RequestStruct` and override the two
-// methods that read a request. Go has no abstract type and no method override,
-// so a struct holds the function that names the collection to read.
 type SourceFunc func(request contract.ServerRequestContract) contract.ParamCollectionContract
 
-// RequestStructure reads the fields that it names out of a request.
 type RequestStructure struct {
 	name   string
 	value  any

@@ -16,11 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/event/data"
 )
 
-// ListenerCollection records which listener listens for which event.
-//
-// The collection files a listener under its own name, so a second listener with
-// the same name replaces the first one. That is what the other ports do, because
-// each one keys the listener by its name.
 type ListenerCollection struct {
 	events    map[string][]string
 	listeners map[string]contract.ListenerFactory

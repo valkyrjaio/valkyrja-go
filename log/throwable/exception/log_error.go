@@ -13,7 +13,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// LogRuntimeError is the log component's base runtime error.
 type LogRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -30,7 +29,6 @@ func (e *LogRuntimeError) IsLogThrowable() bool {
 	return true
 }
 
-// LogInvalidArgumentError is the log component's base invalid-argument error.
 type LogInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }
@@ -48,8 +46,6 @@ func (e *LogInvalidArgumentError) IsLogThrowable() bool {
 	return true
 }
 
-// LogInvalidLogLevelError reports that a caller named a severity that the
-// framework does not report.
 type LogInvalidLogLevelError struct {
 	LogInvalidArgumentError
 }

@@ -19,10 +19,8 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/validation/throwable/exception"
 )
 
-// CheckFunc reports whether the subject passes a rule.
 type CheckFunc func(subject any) bool
 
-// Rule is one rule that a subject either passes or fails.
 type Rule struct {
 	subject      any
 	errorMessage string

@@ -23,10 +23,10 @@ import (
 )
 
 const (
-	firstID   = "Valkyrja.Tests.Cli.FirstMiddleware"
-	secondID  = "Valkyrja.Tests.Cli.SecondMiddleware"
-	endingID  = "Valkyrja.Tests.Cli.EndingMiddleware"
-	missingID = "Valkyrja.Tests.Cli.MissingMiddleware"
+	firstID   = "valkyrja.tests.cli.FirstMiddleware"
+	secondID  = "valkyrja.tests.cli.SecondMiddleware"
+	endingID  = "valkyrja.tests.cli.EndingMiddleware"
+	missingID = "valkyrja.tests.cli.MissingMiddleware"
 )
 
 // newContainer builds a container that resolves a recording middleware under

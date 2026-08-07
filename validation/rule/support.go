@@ -15,10 +15,6 @@ import (
 )
 
 // isEmpty reports whether the subject carries no value.
-//
-// The other ports read PHP's `empty`, which is false for an empty string, a
-// zero, a false, an empty list, and a null. Go has no such rule, so this states
-// the same one for the types that a subject carries.
 func isEmpty(subject any) bool {
 	switch held := subject.(type) {
 	case nil:
@@ -58,10 +54,6 @@ func isNumeric(subject any) bool {
 }
 
 // isEmail reports whether the text is an email address.
-//
-// Go's `net/mail` reads an address with a display name, such as
-// `Melech <melech@example.com>`, and a subject that carries one is not an
-// address on its own. The parsed address must therefore match the text.
 func isEmail(text string) bool {
 	parsed, err := mail.ParseAddress(text)
 

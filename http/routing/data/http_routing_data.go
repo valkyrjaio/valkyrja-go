@@ -15,11 +15,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// HttpRoutingData is the HTTP routing component's state. `sindri` generates one
-// for the whole application, and the route collection loads it at boot.
-//
-// Each getter returns a copy, so a holder of the data cannot change the
-// collection behind its back.
 type HttpRoutingData struct {
 	routes  map[string]contract.RouteContract
 	paths   map[constant.RequestMethod]map[string]string

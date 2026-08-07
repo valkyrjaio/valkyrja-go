@@ -20,11 +20,6 @@ import (
 // that it failed.
 const messageSeparator = ": "
 
-// Validator runs a set of rules over a set of subjects.
-//
-// A subject reports one message: the first rule that it fails. A later rule that
-// the same subject fails does not replace it, because a person reads one message
-// per field.
 type Validator struct {
 	rules         map[string][]contract.RuleContract
 	subjectOrder  []string
@@ -54,10 +49,6 @@ func (v *Validator) ValidateRules() bool {
 
 // SetRules replaces the rules, keyed by the name of the subject that each set
 // applies to.
-//
-// Go's map has no order, and the first message that a caller reads must be the
-// same on every run. The validator therefore walks its subjects in the order of
-// their names.
 func (v *Validator) SetRules(rules map[string][]contract.RuleContract) {
 	v.rules = maps.Clone(rules)
 

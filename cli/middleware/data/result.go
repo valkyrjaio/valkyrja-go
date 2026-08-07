@@ -16,7 +16,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 )
 
-// InputReceivedResult is what an input-received middleware returns.
 type InputReceivedResult struct {
 	input  contract.InputContract
 	output contract.OutputContract
@@ -48,7 +47,6 @@ func (r *InputReceivedResult) IsOutput() bool {
 	return r.output != nil
 }
 
-// RouteMatchedResult is what a route-matched middleware returns.
 type RouteMatchedResult struct {
 	route  contract.RouteContract
 	output contract.OutputContract

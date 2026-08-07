@@ -19,10 +19,6 @@ const DefaultApplicationName = "Valkyrja"
 // DefaultCommandName is the command that runs where the caller names none.
 const DefaultCommandName = "list"
 
-// CliConfig is the configuration that a CLI application adds.
-//
-// Each middleware list holds a binding key, which is the framework's own class
-// reference in every port that has no class token.
 type CliConfig struct {
 	Config
 

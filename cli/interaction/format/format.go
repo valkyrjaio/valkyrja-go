@@ -26,7 +26,6 @@ const escapeEnd = "m"
 // codeSeparator separates one terminal code from the next.
 const codeSeparator = ";"
 
-// Format is one pair of terminal codes that wrap a piece of text.
 type Format struct {
 	setCode   string
 	unsetCode string
@@ -82,7 +81,6 @@ func (f *Format) WithUnsetCode(unsetCode string) contract.FormatContract {
 	return &copied
 }
 
-// Formatter applies each of its formats to a piece of text.
 type Formatter struct {
 	formats []contract.FormatContract
 }
@@ -141,9 +139,6 @@ func (f *Formatter) WithFormats(formats ...contract.FormatContract) contract.For
 }
 
 // FormatText returns the text, wrapped in each format.
-//
-// A formatter that holds no format returns the text as it received it, so a
-// terminal that reads no escape sequence receives none.
 func (f *Formatter) FormatText(text string) string {
 	if len(f.formats) == 0 {
 		return text

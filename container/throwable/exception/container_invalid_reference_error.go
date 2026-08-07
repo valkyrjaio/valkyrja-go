@@ -12,8 +12,6 @@ import (
 	"fmt"
 )
 
-// ContainerInvalidReferenceError reports a binding key that the container
-// resolves nothing for.
 type ContainerInvalidReferenceError struct {
 	ContainerInvalidArgumentError
 

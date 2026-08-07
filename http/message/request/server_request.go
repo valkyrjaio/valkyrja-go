@@ -21,8 +21,6 @@ import (
 // header, which is how a server tells a script's request from a browser's.
 const xmlHttpRequestValue = "XMLHttpRequest"
 
-// ServerRequest is an HTTP request that a server received, with everything that
-// the server read from the connection.
 type ServerRequest struct {
 	Request
 
@@ -55,16 +53,6 @@ func NewServerRequest(
 }
 
 // NewJsonServerRequest builds a server request that parses its body as JSON.
-//
-// The other ports declare a `JsonServerRequest` that extends `ServerRequest`. A
-// `With` method promoted from an embedded struct copies only that struct, so an
-// inherited `With` would return a plain server request and drop the parsed JSON.
-// One struct carries both shapes here, and this constructor is what parses.
-//
-// The body is parsed as the request is built, where the content type states
-// JSON. A body that no decoder reads leaves the parsed JSON empty, because a
-// request has no return to carry the failure — whatever reads the body reports
-// what is missing instead.
 func NewJsonServerRequest(
 	requestUri contract.UriContract,
 	method constant.RequestMethod,
@@ -78,9 +66,6 @@ func NewJsonServerRequest(
 }
 
 // parseJsonBody returns the body of the request as parsed JSON.
-//
-// It returns nothing where the content type does not state JSON, where the body
-// is empty, and where no decoder reads the body.
 func parseJsonBody(request *ServerRequest) map[string]any {
 	contentType := request.GetHeaders().GetHeaderLine(constant.HeaderNameContentType)
 	if !strings.Contains(contentType, constant.ContentTypeValueApplicationJson) {

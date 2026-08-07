@@ -20,10 +20,6 @@ import (
 // noPort is the port of a URI that names none.
 const noPort = 0
 
-// Uri is the URI of a request.
-//
-// Each part is filtered as the URI takes it, so a part that a caller reads back
-// is the part that a request carries.
 type Uri struct {
 	scheme   constant.Scheme
 	username string
@@ -38,8 +34,6 @@ type Uri struct {
 
 // NewUri builds a URI from each of its parts. It reports a failure where the
 // port, the path, or the query string is not one that a URI carries.
-//
-// A port of zero takes the standard port of the scheme.
 func NewUri(
 	scheme constant.Scheme,
 	username string,
@@ -230,10 +224,6 @@ func (u *Uri) WithHost(host string) contract.UriContract {
 
 // WithPort returns a copy of the URI for another port. It keeps the port of the
 // receiver where the new one is outside the range that a URI carries.
-//
-// The other ports throw here. A `With` method returns the contract in every
-// port, so there is no return to carry a failure; a caller that needs it builds
-// the URI with `NewUri`.
 func (u *Uri) WithPort(port int) contract.UriContract {
 	if !constant.IsValidPort(port) {
 		return u
@@ -332,9 +322,6 @@ func filterUserInfo(userInfo string) string {
 
 // filterHost lower-cases the host and encodes each character that it does not
 // carry.
-//
-// An IP literal sits in brackets and carries characters that a registered name
-// does not, so this leaves one as it is.
 func filterHost(host string) string {
 	host = strings.ToLower(host)
 

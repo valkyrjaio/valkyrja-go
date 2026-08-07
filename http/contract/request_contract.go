@@ -12,7 +12,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// RequestContract is an HTTP request.
 type RequestContract interface {
 	MessageContract
 
@@ -36,9 +35,6 @@ type RequestContract interface {
 	WithUri(uri UriContract, preserveHost bool) RequestContract
 }
 
-// ServerRequestContract is an HTTP request that a server received, with
-// everything the server read from the connection.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ServerRequestContract interface {
 	RequestContract
@@ -95,11 +91,4 @@ type ServerRequestContract interface {
 	WithParsedJson(params ParsedJsonParamCollectionContract) JsonServerRequestContract
 }
 
-// JsonServerRequestContract is a server request that carries a JSON body.
-//
-// The contract is an alias, because every server request of this port carries
-// the parsed JSON. The other ports declare a `JsonServerRequest` that extends
-// `ServerRequest`, and a promoted `With` would drop the parsed JSON, so one
-// struct carries both shapes here and the contract follows it. The name is kept,
-// because it states what a caller reads.
 type JsonServerRequestContract = ServerRequestContract

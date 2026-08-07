@@ -18,14 +18,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/container/throwable/exception"
 )
 
-// containerInternal is the container plus the three lookups that a child
-// container replaces.
-//
-// The other ports declare those three protected, and a child overrides them.
-// Go embeds rather than inherits, so a method on the embedded container calls
-// the embedded container's own method and never the child's. Each container
-// therefore holds a `self` of this type, which the constructor sets to the
-// outermost value, and every internal call goes through it.
 type containerInternal interface {
 	contract.ContainerContract
 
@@ -34,7 +26,6 @@ type containerInternal interface {
 	getAliasedWithoutChecks(id string, arguments []any) (any, bool, error)
 }
 
-// Container is the framework's service container.
 type Container struct {
 	self              containerInternal
 	aliases           map[string]string
@@ -154,11 +145,6 @@ func (c *Container) IsSingletonInstance(id string) bool {
 }
 
 // Get resolves the binding key.
-//
-// The mode is unused in this port. The PHP port builds an instance by
-// reflection over the class name where it resolves nothing, and Go cannot
-// construct a type from a string. The parameter stays, because an application
-// selects the mode by name across the ports.
 func (c *Container) Get(id string, arguments []any, mode constant.InvalidReferenceMode) (any, error) {
 	c.publishUnpublishedProvided(id)
 

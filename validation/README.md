@@ -125,7 +125,7 @@ caller reuses reports the run that it just made.
 
 | Binding key                                       | Holds                    |
 | :------------------------------------------------ | :----------------------- |
-| `Valkyrja.Validation.Validator.ValidatorContract` | A validator with no rule |
+| `valkyrja.validation.validator.ValidatorContract` | A validator with no rule |
 
 A caller states the rules of one validation, so the validator is bound with none.
 The caller sets them with `SetRules` before it validates.

@@ -28,9 +28,6 @@ const (
 )
 
 // IsValidName reports whether the name is one that RFC 7230 allows for a header.
-//
-// The other ports test the name with a regular expression. Go reads each byte
-// instead, which needs no `regexp` and states the rule where a reader sees it.
 func IsValidName(name string) bool {
 	if name == "" {
 		return false
@@ -69,9 +66,6 @@ func ValidateName(name string) error {
 
 // IsValidValue reports whether the value is one that RFC 7230 allows for a
 // header.
-//
-// A bare carriage return, a bare line feed, and a line fold that no whitespace
-// follows are each a header injection, so the value carries none of them.
 func IsValidValue(value string) bool {
 	characters := []byte(value)
 

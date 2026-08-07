@@ -38,11 +38,6 @@ const (
 	MetadataKeyMode = "mode"
 )
 
-// Stream is the body of a message, held in memory.
-//
-// The other ports hold the content in a buffer of bytes, and so does this one. A
-// stream over a file or a network connection is an adapter that this package
-// gains later.
 type Stream struct {
 	buffer   []byte
 	position int
@@ -51,9 +46,6 @@ type Stream struct {
 }
 
 // NewStream builds a stream over the content, in the mode.
-//
-// A stream that a writer writes and no reader reads starts at the end of the
-// content, so a write appends rather than overwrites.
 func NewStream(content string, mode constant.Mode) *Stream {
 	built := &Stream{
 		buffer: []byte(content),
@@ -69,9 +61,6 @@ func NewStream(content string, mode constant.Mode) *Stream {
 
 // String returns the whole stream as a string, and an empty string where no
 // reader reads it.
-//
-// The other ports rewind the stream and read it whole. A failure here has no
-// return to carry it, so the string is empty instead.
 func (s *Stream) String() string {
 	if !s.IsReadable() {
 		return ""

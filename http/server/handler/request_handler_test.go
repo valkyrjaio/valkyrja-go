@@ -296,7 +296,6 @@ func TestSendWritesNoBodyWhereNoReaderReadsIt(t *testing.T) {
 }
 
 // endingRequestReceivedFixture is a request-received middleware that ends the
-// run with the response it holds.
 type endingRequestReceivedFixture struct {
 	response contract.ResponseContract
 }
@@ -315,7 +314,7 @@ func TestHandleEndsWhereTheRequestReceivedMiddlewareReturnsAResponse(t *testing.
 	container := manager.NewContainer(nil)
 	ending := response.NewResponseFromContent("ended", constant.StatusCodeAccepted, nil)
 
-	container.Bind("Valkyrja.Tests.Http.EndingMiddleware",
+	container.Bind("valkyrja.tests.http.EndingMiddleware",
 		func(_ containercontract.ContainerContract, _ []any) any {
 			return &endingRequestReceivedFixture{response: ending}
 		})
@@ -323,7 +322,7 @@ func TestHandleEndsWhereTheRequestReceivedMiddlewareReturnsAResponse(t *testing.
 	built := handler.NewRequestHandler(
 		container,
 		&routerFixture{panicWith: errors.New("the router must not run")},
-		middlewarehandler.NewRequestReceivedHandler(container, "Valkyrja.Tests.Http.EndingMiddleware"),
+		middlewarehandler.NewRequestReceivedHandler(container, "valkyrja.tests.http.EndingMiddleware"),
 		middlewarehandler.NewThrowableCaughtHandler(container),
 		middlewarehandler.NewSendingResponseHandler(container),
 		middlewarehandler.NewResponseSentHandler(container),

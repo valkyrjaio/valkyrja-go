@@ -26,7 +26,6 @@ const (
 // errReadFailed is what a failing reader reports.
 var errReadFailed = errors.New("the reader failed")
 
-// errReader is a reader that reports a failure rather than a line.
 type errReader struct{}
 
 // Read reports the failure.
@@ -34,8 +33,6 @@ func (r *errReader) Read(_ []byte) (int, error) {
 	return 0, errReadFailed
 }
 
-// partialReader is a reader that writes a line with no break, then reports a
-// failure rather than the end of the input.
 type partialReader struct {
 	written bool
 }

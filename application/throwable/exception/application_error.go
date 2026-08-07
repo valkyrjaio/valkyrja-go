@@ -16,7 +16,6 @@ import (
 	throwableexception "github.com/valkyrjaio/valkyrja-go/v26/throwable/exception"
 )
 
-// ApplicationRuntimeError is the application component's base runtime error.
 type ApplicationRuntimeError struct {
 	throwableexception.ValkyrjaRuntimeError
 }
@@ -26,8 +25,6 @@ func (e *ApplicationRuntimeError) IsApplicationThrowable() bool {
 	return true
 }
 
-// ApplicationInvalidArgumentError is the application component's base
-// invalid-argument error.
 type ApplicationInvalidArgumentError struct {
 	throwableexception.ValkyrjaInvalidArgumentError
 }

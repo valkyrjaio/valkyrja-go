@@ -12,20 +12,10 @@ import (
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
-// ListenerHandlerFunc runs one listener. The dispatcher passes the container and
-// the arguments, and it files the return value on an event that collects it.
 type ListenerHandlerFunc func(container containercontract.ContainerContract, arguments map[string]any) any
 
-// ListenerFactory returns a listener. The collection holds one for each
-// listener, so the generated cache states how to build a listener rather than
-// holding the listener itself.
 type ListenerFactory func() ListenerContract
 
-// ListenerContract is one listener for one event.
-//
-// Each `With` method returns a copy and leaves the receiver unchanged. The other
-// ports return `static`; Go has no such return type, so each one returns this
-// contract.
 type ListenerContract interface {
 	// GetEventID returns the identifier of the event that the listener listens
 	// for.
@@ -48,13 +38,6 @@ type ListenerContract interface {
 	WithHandler(handler ListenerHandlerFunc) ListenerContract
 }
 
-// EventDataContract is the event component's state, as a value that the
-// framework stores and reloads.
-//
-// The contract names an interface rather than the concrete `EventData` for the
-// reason that `ContainerDataContract` does: the data holds a `ListenerFactory`,
-// and a `ListenerFactory` returns a `ListenerContract`, so a concrete type here
-// is an import cycle.
 type EventDataContract interface {
 	// GetEvents returns each event identifier with the names of its listeners,
 	// in the order that the collection recorded them.
@@ -65,11 +48,6 @@ type EventDataContract interface {
 	GetListeners() map[string]ListenerFactory
 }
 
-// ListenerCollectionContract records which listener listens for which event.
-//
-// The PHP port takes `getListenersForEvent` from PSR-14. Go has no PSR, so the
-// framework declares the whole contract.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ListenerCollectionContract interface {
 	// GetData returns the collection's state.
@@ -133,7 +111,6 @@ type ListenerCollectionContract interface {
 	GetEventsWithListeners() map[string][]ListenerContract
 }
 
-// EventDispatcherContract runs the listeners for an event.
 type EventDispatcherContract interface {
 	// Dispatch runs each listener for the event and returns the event.
 	Dispatch(event EventContract) EventContract
@@ -160,13 +137,6 @@ type EventDispatcherContract interface {
 	DispatchListener(event EventContract, listener ListenerContract) EventContract
 }
 
-// ListenerProviderContract registers the listeners of one component.
-//
-// A provider returns a literal slice, and never a computed one, because `sindri`
-// reads the slice from the source rather than by running it.
-//
-// The other ports also read a listener from an annotation. Go has no annotation,
-// so a listener is always registered here.
 type ListenerProviderContract interface {
 	// GetListeners returns each listener that the component registers.
 	GetListeners() []ListenerContract

@@ -13,20 +13,10 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 )
 
-// CastFunc converts the value that a path filled into a parameter, into the type
-// that the parameter names.
-//
-// The other ports carry a `Cast` from the Type component, and read the type from
-// it. Go has no Type component in this port, so a cast is the function that
-// converts the value, and it reports a failure the way Go does. The CLI
-// component spells its own cast the same way.
 type CastFunc func(value string) (any, error)
 
-// HttpHandlerFunc runs one route. The router passes the container and the route
-// that matched.
 type HttpHandlerFunc func(container containercontract.ContainerContract, route RouteContract) ResponseContract
 
-// StructContract names one field of a request or a response.
 type StructContract interface {
 	// GetName returns the name of the field.
 	GetName() string
@@ -35,7 +25,6 @@ type StructContract interface {
 	GetValue() any
 }
 
-// RequestStructContract reads the fields of a request.
 type RequestStructContract interface {
 	StructContract
 
@@ -48,7 +37,6 @@ type RequestStructContract interface {
 	DetermineIfRequestContainsExtraData(request ServerRequestContract) bool
 }
 
-// ResponseStructContract shapes the data of a response.
 type ResponseStructContract interface {
 	StructContract
 
@@ -57,8 +45,6 @@ type ResponseStructContract interface {
 	GetStructuredData(data map[string]any, includeAll bool) map[string]any
 }
 
-// ParameterContract is one dynamic segment of a route path.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ParameterContract interface {
 	// GetName returns the name of the parameter.
@@ -117,17 +103,6 @@ type ParameterContract interface {
 	WithValue(value any) ParameterContract
 }
 
-// RouteContract is one route of the HTTP router.
-//
-// Each middleware is named by its binding key. The other ports pass a class
-// reference — PHP a `class-string`, Java a `Class<?>`, TypeScript a constructor
-// reference — and Go has none of those, so it passes the same string constant
-// that it binds the middleware under.
-//
-// Warning: a route appends each middleware and never dedupes. A middleware that
-// is registered twice runs twice. That is the developer's error, and neither the
-// route nor `sindri` corrects it.
-//
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type RouteContract interface {
 	// GetPath returns the path that the route matches.
@@ -251,7 +226,6 @@ type RouteContract interface {
 	WithResponseStruct(responseStruct ResponseStructContract) RouteContract
 }
 
-// DynamicRouteContract is a route whose path carries a parameter.
 type DynamicRouteContract interface {
 	RouteContract
 
@@ -272,14 +246,6 @@ type DynamicRouteContract interface {
 	WithAddedParameters(parameters ...ParameterContract) DynamicRouteContract
 }
 
-// HttpRouteProviderContract registers the HTTP routes of one component.
-//
-// A provider returns a literal slice, and never a computed one, because `sindri`
-// reads the slice from the source rather than by running it.
-//
-// The other ports also read a route from an annotation, and declare
-// `getControllerClasses` for the scanner to read. Go has no annotation, so that
-// method is absent and a route is always registered here.
 type HttpRouteProviderContract interface {
 	// GetRoutes returns each route that the component registers.
 	GetRoutes() []RouteContract

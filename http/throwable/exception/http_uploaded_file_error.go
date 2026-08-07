@@ -25,19 +25,14 @@ var uploadErrorMessages = map[constant.UploadError]string{
 	constant.UploadErrorExtension: "A PHP extension stopped the file upload",
 }
 
-// HttpUploadedFileRuntimeError is the uploaded file sub-component's base runtime
-// error.
 type HttpUploadedFileRuntimeError struct {
 	HttpRuntimeError
 }
 
-// HttpUploadedFileInvalidArgumentError is the uploaded file sub-component's base
-// invalid-argument error.
 type HttpUploadedFileInvalidArgumentError struct {
 	HttpInvalidArgumentError
 }
 
-// HttpUploadedFileUploadError reports an upload that went wrong.
 type HttpUploadedFileUploadError struct {
 	HttpUploadedFileRuntimeError
 
@@ -64,7 +59,6 @@ func (e *HttpUploadedFileUploadError) GetUploadError() constant.UploadError {
 	return e.uploadError
 }
 
-// HttpUploadedFileAlreadyMovedError reports a file that moved already.
 type HttpUploadedFileAlreadyMovedError struct {
 	HttpUploadedFileRuntimeError
 }
@@ -78,8 +72,6 @@ func NewHttpUploadedFileAlreadyMovedError() *HttpUploadedFileAlreadyMovedError {
 	}
 }
 
-// HttpUploadedFileInvalidDirectoryError reports a target path that names no
-// directory.
 type HttpUploadedFileInvalidDirectoryError struct {
 	HttpUploadedFileInvalidArgumentError
 
@@ -104,7 +96,6 @@ func (e *HttpUploadedFileInvalidDirectoryError) GetTargetPath() string {
 	return e.targetPath
 }
 
-// HttpUploadedFileMoveFailureError reports a move that the file system refused.
 type HttpUploadedFileMoveFailureError struct {
 	HttpUploadedFileRuntimeError
 

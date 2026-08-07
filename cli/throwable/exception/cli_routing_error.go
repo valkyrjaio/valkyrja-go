@@ -8,8 +8,6 @@
 
 package exception
 
-// CliRoutingInvalidArgumentError is the CLI routing sub-component's base
-// invalid-argument error.
 type CliRoutingInvalidArgumentError struct {
 	CliInvalidArgumentError
 }
@@ -28,8 +26,6 @@ func (e *CliRoutingInvalidArgumentError) IsCliRoutingThrowable() bool {
 	return true
 }
 
-// CliRoutingArgumentValuesValidationError reports that an argument holds a value
-// that the command does not accept.
 type CliRoutingArgumentValuesValidationError struct {
 	CliRoutingInvalidArgumentError
 }
@@ -42,8 +38,6 @@ func NewCliRoutingArgumentValuesValidationError(name string) *CliRoutingArgument
 	}
 }
 
-// CliRoutingOptionValuesValidationError reports that an option holds a value
-// that the command does not accept.
 type CliRoutingOptionValuesValidationError struct {
 	CliRoutingInvalidArgumentError
 }
@@ -56,8 +50,6 @@ func NewCliRoutingOptionValuesValidationError(name string) *CliRoutingOptionValu
 	}
 }
 
-// CliRoutingInvalidOptionWithValueError reports that the caller gave a value to
-// an option that takes none.
 type CliRoutingInvalidOptionWithValueError struct {
 	CliRoutingInvalidArgumentError
 }
@@ -70,8 +62,6 @@ func NewCliRoutingInvalidOptionWithValueError(name string) *CliRoutingInvalidOpt
 	}
 }
 
-// CliRoutingRouteNotFoundError reports that the collection holds no command
-// under the name.
 type CliRoutingRouteNotFoundError struct {
 	CliRoutingInvalidArgumentError
 }

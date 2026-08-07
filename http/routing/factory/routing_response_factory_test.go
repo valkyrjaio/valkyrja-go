@@ -18,7 +18,6 @@ import (
 )
 
 // urlFixture returns the URL that the test states, whatever route it is asked
-// for.
 type urlFixture struct {
 	url string
 }

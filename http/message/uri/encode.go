@@ -61,12 +61,6 @@ const (
 const hexDigits = "0123456789ABCDEF"
 
 // encode percent-encodes each byte that the part does not carry.
-//
-// A byte that is part of a valid triplet already keeps its meaning, and its
-// hexadecimal digits become upper case. A percent sign that starts no valid
-// triplet is a literal percent sign, so this encodes it.
-//
-// See https://tools.ietf.org/html/rfc3986#section-2.1
 func encode(value string, allowed string) string {
 	encoded := &strings.Builder{}
 

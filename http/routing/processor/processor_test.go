@@ -258,8 +258,6 @@ func TestAnOptionalParameterNeedsItsPathToLeaveOutTheSeparator(t *testing.T) {
 }
 
 // staticOnlyRouteFixture is a route from outside the routing package: it carries
-// a parameter in its path and satisfies no dynamic contract, so the processor
-// returns it as it received it.
 type staticOnlyRouteFixture struct {
 	contract.RouteContract
 
