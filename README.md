@@ -25,14 +25,28 @@ does the heavy lifting so you can focus on your application.
 Port Status
 -----------
 
-The Go port is in progress, and this repository holds the scaffolding for it.
-PHP is the reference implementation, and each component lands here in the order
-the architecture sets: container, dispatch, event, application, CLI, HTTP, then
-bin.
+The Go port is in progress. PHP is the reference implementation, and each
+component lands here in the order the architecture sets.
 
-The section below describes the framework that every port implements. A
-component is not in this repository until its own package exists. Read
-[`PORTS.md`][ports url] for the state of each port.
+These components are in the repository:
+
+| Component     | Holds                                                          |
+| :------------ | :------------------------------------------------------------- |
+| `throwable`   | The root error contract and the two base errors                |
+| `container`   | Binding, resolving, and service providers                      |
+| `event`       | Events, listeners, and the dispatcher                          |
+| `application` | The kernel, the configuration, and the provider tree           |
+| `http`        | Messages, routing, middleware, and the server                  |
+| `cli`         | Interaction, routing, middleware, the server, and its commands |
+| `log`         | The eight severities of RFC 5424, and two loggers              |
+| `validation`  | Rules and the validator                                        |
+
+The Dispatch component is dropped framework-wide. It is left over from when PHP
+called handlers dynamically, which the language parity work removed.
+
+`sindri` and the starter application follow, and neither one is in a state to
+use yet. The section below describes the framework that every port implements.
+Read [`PORTS.md`][ports url] for the state of each port.
 
 What's Included
 ---------------
@@ -44,7 +58,10 @@ What's Included
 - **Routing** — route registration with middleware pipelines for both HTTP and
   CLI
 - **Event dispatcher** — decoupled event handling with typed listeners
-- **Type system** — primitive wrappers, identifiers, models, and collections
+- **Validation** — composable rules and a validator that collects one message
+  per subject
+- **Logging** — the eight severities of RFC 5424, with a stream logger and a
+  null logger
 - **Errors as values** — a failure returns an `error`, and each error type
   carries the `*Error` suffix rather than the `*Exception` name the other ports
   use
@@ -77,11 +94,21 @@ Documentation
 -------------
 
 Documentation is baked into the repository so you can browse it offline. Each
-component carries its own `README.md`, and that document arrives with the
-component. The areas are `http`, `cli`, `container`, and `event`.
+component carries its own `README.md`, which describes its contracts, its
+configuration, and the binding keys that it publishes:
 
-Until then, read [`valkyrja-php`][php url]. It is the reference implementation,
-and every port mirrors its structure and its naming.
+- [`throwable`](throwable/README.md)
+- [`container`](container/README.md)
+- [`event`](event/README.md)
+- [`application`](application/README.md)
+- [`http`](http/README.md)
+- [`cli`](cli/README.md)
+- [`log`](log/README.md)
+- [`validation`](validation/README.md)
+
+For anything a component document does not cover, read
+[`valkyrja-php`][php url]. It is the reference implementation, and every port
+mirrors its structure and its naming.
 
 Ecosystem
 ---------
