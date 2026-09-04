@@ -12,6 +12,8 @@ import (
 	"testing"
 
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/argument"
+	interactionconstant "github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/data"
@@ -247,5 +249,80 @@ func TestEachGlobalOptionIsBuiltWithNoValue(t *testing.T) {
 		if len(option.GetShortNames()) != 1 {
 			t.Errorf("the global option %q must carry one short name, but carried: %v", name, option.GetShortNames())
 		}
+	}
+}
+
+func TestARouteReportsWhatTheCallerProvided(t *testing.T) {
+	t.Parallel()
+
+	declared := data.NewOptionParameter("namespace", parameterDescription)
+
+	provided, err := declared.WithOptions(
+		argument.NewOption("namespace", interactionconstant.OptionTypeLong).WithValue("db:"),
+	)
+	if err != nil {
+		t.Fatalf("WithOptions must accept one value for a default option, but returned: %v", err)
+	}
+
+	withDefault := data.NewOptionParameter("namespace", parameterDescription).WithDefaultValue("app:")
+
+	bare := newTestRoute()
+	all := "all"
+
+	if bare.HasProvidedOption("namespace") || bare.GetOptionValue("namespace", &all) != "all" {
+		t.Error("a route that declares no option must report nothing provided, but did not")
+	}
+
+	if bare.GetOptionValue("namespace", nil) != "" {
+		t.Error("a route that declares no option and takes no default must give an empty string, but did not")
+	}
+
+	onlyDeclared := newTestRoute().WithOptions(declared)
+
+	if onlyDeclared.HasProvidedOption("namespace") {
+		t.Error("an option the caller left out must not report itself provided, but did")
+	}
+
+	filled := newTestRoute().WithOptions(provided)
+
+	if !filled.HasProvidedOption("namespace") || filled.GetOptionValue("namespace", nil) != "db:" {
+		t.Error("an option the caller gave must report its value, but did not")
+	}
+
+	declaring := newTestRoute().WithOptions(withDefault)
+
+	if declaring.GetOptionValue("namespace", nil) != "app:" {
+		t.Error("a nil default must reach the option's declared default value, but did not")
+	}
+
+	empty := ""
+
+	if declaring.GetOptionValue("namespace", &empty) != "" {
+		t.Error("an empty default given at the call site must win, but did not")
+	}
+}
+
+func TestARouteReportsWhatTheCallerProvidedForAnArgument(t *testing.T) {
+	t.Parallel()
+
+	declared := data.NewArgumentParameter("namespace", parameterDescription)
+	provided := declared.WithArguments(argument.NewArgument("db:"))
+
+	bare := newTestRoute()
+
+	if bare.HasProvidedArgument("namespace") || bare.GetArgumentValue("namespace", "all") != "all" {
+		t.Error("a route that declares no argument must report nothing provided, but did not")
+	}
+
+	onlyDeclared := newTestRoute().WithArguments(declared)
+
+	if onlyDeclared.HasProvidedArgument("namespace") || onlyDeclared.GetArgumentValue("namespace", "all") != "all" {
+		t.Error("an argument the caller left out must not report itself provided, but did")
+	}
+
+	filled := newTestRoute().WithArguments(provided)
+
+	if !filled.HasProvidedArgument("namespace") || filled.GetArgumentValue("namespace", "all") != "db:" {
+		t.Error("an argument the caller gave must report its value, but did not")
 	}
 }
