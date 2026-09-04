@@ -231,15 +231,22 @@ func (p *OptionParameter) GetCastValues() ([]any, error) {
 	return getCastValues(p.cast, p.getValues())
 }
 
-// HasFirstValue reports whether the caller gave the option a value.
-func (p *OptionParameter) HasFirstValue() bool {
+// IsProvided reports whether the caller gave the option, with or without a
+// value.
+func (p *OptionParameter) IsProvided() bool {
 	return len(p.options) > 0
+}
+
+// HasFirstValue reports whether the caller gave the parameter a first value
+// that is not empty.
+func (p *OptionParameter) HasFirstValue() bool {
+	return p.GetFirstValue() != ""
 }
 
 // GetFirstValue returns the first value that the caller gave, and an empty
 // string where the caller gave none.
 func (p *OptionParameter) GetFirstValue() string {
-	if !p.HasFirstValue() {
+	if !p.IsProvided() {
 		return ""
 	}
 

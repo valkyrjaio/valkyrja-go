@@ -124,6 +124,25 @@ func (r *Route) GetArgument(name string) contract.ArgumentParameterContract {
 	return nil
 }
 
+// HasProvidedArgument reports whether the caller gave an argument that the
+// route declares.
+func (r *Route) HasProvidedArgument(name string) bool {
+	argument := r.GetArgument(name)
+
+	return argument != nil && argument.IsProvided()
+}
+
+// GetArgumentValue returns the first value the caller gave an argument, and the
+// default where that value is empty.
+func (r *Route) GetArgumentValue(name string, defaultValue string) string {
+	argument := r.GetArgument(name)
+	if argument == nil || !argument.HasFirstValue() {
+		return defaultValue
+	}
+
+	return argument.GetFirstValue()
+}
+
 // WithArguments returns a copy of the route with other arguments.
 func (r *Route) WithArguments(arguments ...contract.ArgumentParameterContract) contract.RouteContract {
 	copied := *r
@@ -169,6 +188,35 @@ func (r *Route) GetOption(name string) contract.OptionParameterContract {
 	}
 
 	return nil
+}
+
+// HasProvidedOption reports whether the caller gave an option that the route
+// declares.
+func (r *Route) HasProvidedOption(name string) bool {
+	option := r.GetOption(name)
+
+	return option != nil && option.IsProvided()
+}
+
+// GetOptionValue returns the first value the caller gave an option. It returns
+// the default where the call gives one, then the option's own declared default
+// value, and then an empty string.
+func (r *Route) GetOptionValue(name string, defaultValue *string) string {
+	option := r.GetOption(name)
+
+	if option != nil && option.HasFirstValue() {
+		return option.GetFirstValue()
+	}
+
+	if defaultValue != nil {
+		return *defaultValue
+	}
+
+	if option == nil {
+		return ""
+	}
+
+	return option.GetDefaultValue()
 }
 
 // WithOptions returns a copy of the route with other options.
