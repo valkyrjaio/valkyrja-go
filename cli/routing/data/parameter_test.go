@@ -329,3 +329,29 @@ func TestAnOptionParameterAppendsAValidValueOnlyOnce(t *testing.T) {
 		t.Error("WithAddedValidValues must leave the receiver unchanged, but did not")
 	}
 }
+
+func TestAParameterSeparatesTheValueFromThePresence(t *testing.T) {
+	t.Parallel()
+
+	built := data.NewArgumentParameter(parameterName, parameterDescription)
+
+	if built.IsProvided() || built.HasFirstValue() {
+		t.Error("a parameter the caller left out must report neither, but reported one")
+	}
+
+	empty := built.WithArguments(argument.NewArgument(""))
+
+	if !empty.IsProvided() {
+		t.Error("a parameter the caller gave must report itself provided, but did not")
+	}
+
+	if empty.HasFirstValue() {
+		t.Error("a parameter the caller gave no value must report no first value, but reported one")
+	}
+
+	filled := built.WithArguments(argument.NewArgument("first"))
+
+	if !filled.IsProvided() || !filled.HasFirstValue() {
+		t.Error("a parameter the caller gave a value must report both, but did not")
+	}
+}

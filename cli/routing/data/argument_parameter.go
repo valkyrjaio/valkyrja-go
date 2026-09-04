@@ -126,15 +126,22 @@ func (p *ArgumentParameter) GetCastValues() ([]any, error) {
 	return getCastValues(p.cast, p.getValues())
 }
 
-// HasFirstValue reports whether the caller gave the argument a value.
-func (p *ArgumentParameter) HasFirstValue() bool {
+// IsProvided reports whether the caller gave the argument, with or without a
+// value.
+func (p *ArgumentParameter) IsProvided() bool {
 	return len(p.arguments) > 0
+}
+
+// HasFirstValue reports whether the caller gave the parameter a first value
+// that is not empty.
+func (p *ArgumentParameter) HasFirstValue() bool {
+	return p.GetFirstValue() != ""
 }
 
 // GetFirstValue returns the first value that the caller gave, and an empty
 // string where the caller gave none.
 func (p *ArgumentParameter) GetFirstValue() string {
-	if !p.HasFirstValue() {
+	if !p.IsProvided() {
 		return ""
 	}
 

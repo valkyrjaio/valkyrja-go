@@ -16,6 +16,7 @@ import (
 )
 
 // RecordingMiddlewareFixture is a middleware of every stage. It records that it
+// ran, and it passes the run on.
 type RecordingMiddlewareFixture struct {
 	Name   string
 	Record *[]string
