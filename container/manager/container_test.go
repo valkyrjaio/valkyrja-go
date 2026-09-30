@@ -12,7 +12,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/data"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/fixtures"
@@ -254,7 +253,7 @@ func TestGetResolvesAService(t *testing.T) {
 	container := manager.NewContainer(nil)
 	container.Bind(serviceID, fixtures.MakeServiceFixture)
 
-	resolved, err := container.Get(serviceID, []any{"first"}, constant.NewInstanceOrThrowException)
+	resolved, err := container.Get(serviceID, []any{"first"})
 	if err != nil {
 		t.Fatalf("Get must resolve the service, but reported: %v", err)
 	}
@@ -279,8 +278,8 @@ func TestGetCallsTheFactoryForEachResolution(t *testing.T) {
 	container := manager.NewContainer(nil)
 	container.Bind(serviceID, fixtures.MakeServiceFixture)
 
-	first, _ := container.Get(serviceID, nil, constant.NewInstanceOrThrowException)
-	second, _ := container.Get(serviceID, nil, constant.NewInstanceOrThrowException)
+	first, _ := container.Get(serviceID, nil)
+	second, _ := container.Get(serviceID, nil)
 
 	if first == second {
 		t.Error("Get must call the factory for each resolution, but returned one instance")
@@ -293,12 +292,12 @@ func TestGetResolvesASingletonOnce(t *testing.T) {
 	container := manager.NewContainer(nil)
 	container.BindSingleton(singletonID, fixtures.MakeSingletonFixture)
 
-	first, err := container.Get(singletonID, nil, constant.NewInstanceOrThrowException)
+	first, err := container.Get(singletonID, nil)
 	if err != nil {
 		t.Fatalf("Get must resolve the singleton, but reported: %v", err)
 	}
 
-	second, _ := container.Get(singletonID, nil, constant.NewInstanceOrThrowException)
+	second, _ := container.Get(singletonID, nil)
 
 	if first != second {
 		t.Error("Get must return one instance for a singleton, but returned two")
@@ -316,7 +315,7 @@ func TestGetResolvesAnAlias(t *testing.T) {
 	container.Bind(serviceID, fixtures.MakeServiceFixture)
 	container.BindAlias(aliasID, serviceID)
 
-	resolved, err := container.Get(aliasID, nil, constant.NewInstanceOrThrowException)
+	resolved, err := container.Get(aliasID, nil)
 	if err != nil {
 		t.Fatalf("Get must resolve the alias, but reported: %v", err)
 	}
@@ -331,7 +330,7 @@ func TestGetReportsAnUnknownBindingKey(t *testing.T) {
 
 	container := manager.NewContainer(nil)
 
-	_, err := container.Get(missingID, nil, constant.NewInstanceOrThrowException)
+	_, err := container.Get(missingID, nil)
 
 	assertInvalidReference(t, err, missingID)
 }
@@ -342,29 +341,31 @@ func TestGetReportsAnAliasThatPointsAtNothing(t *testing.T) {
 	container := manager.NewContainer(nil)
 	container.BindAlias(aliasID, missingID)
 
-	_, err := container.Get(aliasID, nil, constant.NewInstanceOrThrowException)
+	_, err := container.Get(aliasID, nil)
 
 	assertInvalidReference(t, err, missingID)
 }
 
-func TestGetReportsAnUnknownBindingKeyInEachMode(t *testing.T) {
+func TestGetAliasedIDReturnsTheBindingKeyOfTheAlias(t *testing.T) {
 	t.Parallel()
 
-	modes := map[string]constant.InvalidReferenceMode{
-		"NewInstanceOrThrowException": constant.NewInstanceOrThrowException,
-		"ThrowException":              constant.ThrowException,
+	container := manager.NewContainer(nil)
+	container.BindAlias(aliasID, serviceID)
+
+	id, found := container.GetAliasedID(aliasID)
+	if !found || id != serviceID {
+		t.Errorf("GetAliasedID must return %q and true, but returns %q and %t", serviceID, id, found)
 	}
+}
 
-	for name, mode := range modes {
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
+func TestGetAliasedIDReportsAnUnknownAlias(t *testing.T) {
+	t.Parallel()
 
-			container := manager.NewContainer(nil)
+	container := manager.NewContainer(nil)
 
-			_, err := container.Get(missingID, nil, mode)
-
-			assertInvalidReference(t, err, missingID)
-		})
+	id, found := container.GetAliasedID(missingID)
+	if found || id != "" {
+		t.Errorf("GetAliasedID must return an empty key and false, but returns %q and %t", id, found)
 	}
 }
 
@@ -556,7 +557,7 @@ func TestGetPublishesADeferredBindingKey(t *testing.T) {
 		t.Fatalf("Register must record each publisher, but reported: %v", registerErr)
 	}
 
-	resolved, err := container.Get(fixtures.ProvidedID, nil, constant.NewInstanceOrThrowException)
+	resolved, err := container.Get(fixtures.ProvidedID, nil)
 	if err != nil {
 		t.Fatalf("Get must publish and resolve the binding key, but reported: %v", err)
 	}
@@ -581,14 +582,14 @@ func TestGetPublishesADeferredBindingKeyOnlyOnce(t *testing.T) {
 		t.Fatalf("Register must record each publisher, but reported: %v", registerErr)
 	}
 
-	_, err := container.Get(fixtures.ProvidedID, nil, constant.NewInstanceOrThrowException)
+	_, err := container.Get(fixtures.ProvidedID, nil)
 	if err != nil {
 		t.Fatalf("Get must publish and resolve the binding key, but reported: %v", err)
 	}
 
 	provider.PublishCalled = false
 
-	_, secondErr := container.Get(fixtures.ProvidedID, nil, constant.NewInstanceOrThrowException)
+	_, secondErr := container.Get(fixtures.ProvidedID, nil)
 	if secondErr != nil {
 		t.Fatalf("Get must resolve the published binding key, but reported: %v", secondErr)
 	}

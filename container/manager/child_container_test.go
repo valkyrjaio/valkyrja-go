@@ -12,7 +12,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/data"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/fixtures"
@@ -130,7 +129,7 @@ func TestTheChildPrefersItsOwnBinding(t *testing.T) {
 	child := manager.NewChildContainer(parent, nil)
 	child.Bind(serviceID, fixtures.MakeServiceFixture)
 
-	resolved, err := child.Get(serviceID, nil, constant.NewInstanceOrThrowException)
+	resolved, err := child.Get(serviceID, nil)
 	if err != nil {
 		t.Fatalf("Get must resolve the child's factory, but reported: %v", err)
 	}
@@ -148,7 +147,7 @@ func TestTheChildResolvesTheParentService(t *testing.T) {
 
 	child := manager.NewChildContainer(parent, nil)
 
-	resolved, err := child.Get(serviceID, nil, constant.NewInstanceOrThrowException)
+	resolved, err := child.Get(serviceID, nil)
 	if err != nil {
 		t.Fatalf("Get must resolve the parent's factory, but reported: %v", err)
 	}
@@ -216,6 +215,35 @@ func TestTheChildResolvesTheParentAlias(t *testing.T) {
 	}
 }
 
+func TestTheChildReadsTheAliasedIDOfTheParent(t *testing.T) {
+	t.Parallel()
+
+	parent := manager.NewContainer(nil)
+	parent.BindAlias(aliasID, serviceID)
+
+	child := manager.NewChildContainer(parent, nil)
+
+	id, found := child.GetAliasedID(aliasID)
+	if !found || id != serviceID {
+		t.Errorf("GetAliasedID must return the parent's %q and true, but returns %q and %t", serviceID, id, found)
+	}
+}
+
+func TestTheChildPrefersItsOwnAliasedID(t *testing.T) {
+	t.Parallel()
+
+	parent := manager.NewContainer(nil)
+	parent.BindAlias(aliasID, serviceID)
+
+	child := manager.NewChildContainer(parent, nil)
+	child.BindAlias(aliasID, "ChildServiceID")
+
+	id, found := child.GetAliasedID(aliasID)
+	if !found || id != "ChildServiceID" {
+		t.Errorf("GetAliasedID must return the child's key and true, but returns %q and %t", id, found)
+	}
+}
+
 func TestTheChildPrefersItsOwnAlias(t *testing.T) {
 	t.Parallel()
 
@@ -271,7 +299,7 @@ func TestTheChildReportsAnUnknownBindingKey(t *testing.T) {
 
 	child := manager.NewChildContainer(manager.NewContainer(nil), nil)
 
-	_, err := child.Get(missingID, nil, constant.NewInstanceOrThrowException)
+	_, err := child.Get(missingID, nil)
 
 	assertInvalidReference(t, err, missingID)
 }
@@ -296,7 +324,7 @@ func TestTheChildCarriesEachParentFailure(t *testing.T) {
 			return err
 		},
 		"Get": func(child *manager.ChildContainer) error {
-			_, err := child.Get(missingID, nil, constant.NewInstanceOrThrowException)
+			_, err := child.Get(missingID, nil)
 
 			return err
 		},
@@ -322,7 +350,7 @@ func TestTheChildCarriesTheParentServiceFailureFromGet(t *testing.T) {
 
 	child := manager.NewChildContainer(fixtures.NewFailingServiceContainerFixture(), nil)
 
-	_, err := child.Get(missingID, nil, constant.NewInstanceOrThrowException)
+	_, err := child.Get(missingID, nil)
 
 	if !errors.Is(err, fixtures.ErrFailingContainerFixture) {
 		t.Errorf("Get must carry the parent's factory failure, but reported: %v", err)
