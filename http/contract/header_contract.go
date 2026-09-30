@@ -10,7 +10,6 @@ package contract
 
 import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
-	throwablecontract "github.com/valkyrjaio/valkyrja-go/v26/throwable/contract"
 )
 
 type ComponentContract interface {
@@ -140,6 +139,7 @@ type HeaderContract interface {
 	String() string
 }
 
+//nolint:interfacebloat // Parity with the PHP reference implementation.
 type HeaderCollectionContract interface {
 	// Has reports whether the collection holds a header under the name.
 	Has(name string) bool
@@ -176,13 +176,7 @@ type HeaderCollectionContract interface {
 	// WithAddedHeaders returns a copy of the collection with the headers added
 	// to the ones it holds.
 	WithAddedHeaders(headers ...HeaderContract) HeaderCollectionContract
-}
 
-type HttpThrowable interface {
-	throwablecontract.ValkyrjaThrowable
-
-	// IsHttpThrowable marks the error as one that the HTTP component raised.
-	// The mark is what separates this contract from the root contract, which Go
-	// otherwise treats as the same type.
-	IsHttpThrowable() bool
+	// WithoutHeaders returns a copy of the collection without the headers.
+	WithoutHeaders(names ...string) HeaderCollectionContract
 }

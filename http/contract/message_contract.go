@@ -8,10 +8,7 @@
 
 // Package contract holds every contract of the HTTP component.
 //
-// The component keeps one `contract` package, for the reason that the container
-// component keeps one: Go resolves an import cycle at the package level. HTTP is
-// the case that forces it — `RouteContract` names each middleware contract, and
-// each middleware contract names `RouteContract` back.
+// The component keeps one `contract` package, as the container component does.
 //
 // Each `With` method returns a copy and leaves the receiver unchanged. The other
 // ports return `this` or `static`; Go has no such return type, so each one
@@ -55,10 +52,10 @@ type StreamContract interface {
 	Detach() []byte
 
 	// GetSize returns the size of the stream in bytes.
-	GetSize() int
+	GetSize() int64
 
 	// Tell returns the position of the read and write pointer.
-	Tell() (int, error)
+	Tell() (int64, error)
 
 	// IsEof reports whether the pointer is at the end of the stream.
 	IsEof() bool
@@ -66,8 +63,9 @@ type StreamContract interface {
 	// IsSeekable reports whether a caller seeks in the stream.
 	IsSeekable() bool
 
-	// Seek moves the pointer to the offset, from the point that whence names.
-	Seek(offset int, whence int) error
+	// Seek moves the pointer to the offset, from the point that whence names,
+	// and returns the new position.
+	Seek(offset int64, whence int) (int64, error)
 
 	// Rewind moves the pointer to the start of the stream.
 	Rewind() error

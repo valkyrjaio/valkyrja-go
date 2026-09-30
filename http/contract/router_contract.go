@@ -16,7 +16,7 @@ import (
 
 type HttpRoutingDataContract interface {
 	// GetRoutes returns each route, keyed by its own name.
-	GetRoutes() map[string]RouteContract
+	GetRoutes() map[string]RouteFactory
 
 	// GetPaths returns the name of the route at each static path, keyed by
 	// request method and then by path.
