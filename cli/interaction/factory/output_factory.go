@@ -19,10 +19,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/output"
 )
 
-// filePermissions is what a new output file is created with. The owner reads and
-// writes the file, and every other user reads it.
-const filePermissions = 0o644
-
 type OutputFactory struct {
 	config contract.CliInteractionConfigContract
 	writer io.Writer
@@ -74,21 +70,16 @@ func (f *OutputFactory) CreatePlainOutput(
 }
 
 // CreateFileOutput builds an output that writes to the file.
+//
+// The writer opens the file for each message, so a path that no process can
+// open reports the failure when the output writes rather than when the factory
+// builds it.
 func (f *OutputFactory) CreateFileOutput(
 	filepath string,
 	exitCode constant.ExitCode,
 	messages ...contract.MessageContract,
 ) contract.FileOutputContract {
-	// The caller names the file, the same way it does in every other port. An
-	// application that takes the name from a caller validates it before it
-	// reaches here.
-	//nolint:gosec // The path is the application's own, not a client's.
-	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, filePermissions)
-	if err != nil {
-		return f.CreateEmptyOutput(exitCode, messages...)
-	}
-
-	return f.CreateStreamOutput(file, exitCode, messages...)
+	return f.build([]contract.WriterContract{output.NewFileWriter(filepath)}, exitCode, messages)
 }
 
 // CreateStreamOutput builds an output that writes to the writer.

@@ -9,14 +9,19 @@
 package output_test
 
 import (
+	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/fixtures"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/format"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/output"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/throwable/exception"
 )
 
 const (
@@ -61,8 +66,11 @@ func TestWriteMessagesWritesEachMessageInOrder(t *testing.T) {
 
 	written := &strings.Builder{}
 
-	built := newOutput(written, message.NewMessage(firstText), message.NewMessage(secondText)).
+	built, err := newOutput(written, message.NewMessage(firstText), message.NewMessage(secondText)).
 		WriteMessages()
+	if err != nil {
+		t.Fatalf("the output must write every message, but reported: %v", err)
+	}
 
 	if written.String() != firstText+"\n"+secondText+"\n" {
 		t.Errorf("WriteMessages must write each message in order, but wrote: %q", written.String())
@@ -82,7 +90,10 @@ func TestWriteMessageRecordsTheMessage(t *testing.T) {
 
 	written := &strings.Builder{}
 
-	built := newOutput(written).WriteMessage(message.NewMessage(firstText))
+	built, err := newOutput(written).WriteMessage(message.NewMessage(firstText))
+	if err != nil {
+		t.Fatalf("the output must write the message, but reported: %v", err)
+	}
 
 	if !built.HasWrittenMessage() {
 		t.Error("WriteMessage must record the message, but did not")
@@ -98,9 +109,12 @@ func TestASilentOutputWritesNothing(t *testing.T) {
 
 	written := &strings.Builder{}
 
-	built := newOutput(written, message.NewMessage(firstText)).
+	built, err := newOutput(written, message.NewMessage(firstText)).
 		WithIsSilent(true).
 		WriteMessages()
+	if err != nil {
+		t.Fatalf("a silent output must report no failure, but reported: %v", err)
+	}
 
 	if written.String() != "" {
 		t.Errorf("a silent output must write nothing, but wrote: %q", written.String())
@@ -262,8 +276,8 @@ func (w *skippingWriterFixture) ShouldWriteMessage(_ contract.MessageContract) b
 func (w *skippingWriterFixture) Write(
 	output contract.OutputContract,
 	_ contract.MessageContract,
-) contract.OutputContract {
-	return output
+) (contract.OutputContract, error) {
+	return output, nil
 }
 
 func TestTheOutputSatisfiesItsContract(t *testing.T) {
@@ -275,5 +289,143 @@ func TestTheOutputSatisfiesItsContract(t *testing.T) {
 
 	if built.GetExitCode() != constant.ExitCodeSuccess {
 		t.Error("the contract must read the exit code, but did not")
+	}
+}
+
+func TestAStreamThatReportsAFailureReachesTheCaller(t *testing.T) {
+	t.Parallel()
+
+	built, err := output.NewOutput(
+		[]contract.WriterContract{output.NewStreamWriter(&fixtures.FailingWriterFixture{})},
+		message.NewMessage(firstText),
+	).WriteMessages()
+
+	failure, isFailure := errors.AsType[*exception.CliInteractionStreamWriteError](err)
+	if !isFailure {
+		t.Fatalf("a stream that reports a failure must reach the caller, but reported: %v", err)
+	}
+
+	if !errors.Is(err, fixtures.ErrWriteFailed) {
+		t.Error("the failure must unwrap to what the stream reported, but did not")
+	}
+
+	if failure.GetWritten() != 0 || failure.GetLength() != len(firstText)+1 {
+		t.Errorf("the failure must name how much the stream took, but named: %d of %d",
+			failure.GetWritten(), failure.GetLength())
+	}
+
+	if built == nil {
+		t.Error("the output must reach the caller with the failure, but did not")
+	}
+}
+
+func TestAStreamThatTakesPartOfAMessageReachesTheCaller(t *testing.T) {
+	t.Parallel()
+
+	_, err := output.NewOutput(
+		[]contract.WriterContract{output.NewStreamWriter(&fixtures.ShortWriterFixture{})},
+		message.NewMessage(firstText),
+	).WriteMessages()
+
+	failure, isFailure := errors.AsType[*exception.CliInteractionStreamWriteError](err)
+	if !isFailure {
+		t.Fatalf("a short write must reach the caller, but reported: %v", err)
+	}
+
+	if failure.GetWritten() != 1 {
+		t.Errorf("the failure must name how much the stream took, but named: %d", failure.GetWritten())
+	}
+}
+
+func TestAPlainWriterReportsAStreamThatTakesNothing(t *testing.T) {
+	t.Parallel()
+
+	_, err := output.NewOutput(
+		[]contract.WriterContract{output.NewPlainWriter(&fixtures.FailingWriterFixture{})},
+		message.NewMessage(firstText),
+	).WriteMessages()
+
+	if _, isFailure := errors.AsType[*exception.CliInteractionStreamWriteError](err); !isFailure {
+		t.Fatalf("a plain writer must report the failure, but reported: %v", err)
+	}
+}
+
+func TestAWriterThatHoldsNoStreamReportsIt(t *testing.T) {
+	t.Parallel()
+
+	writers := map[string]contract.WriterContract{
+		"a stream writer": output.NewStreamWriter(nil),
+		"a plain writer":  output.NewPlainWriter(nil),
+	}
+
+	for name, writer := range writers {
+		_, err := output.NewOutput(
+			[]contract.WriterContract{writer},
+			message.NewMessage(firstText),
+		).WriteMessages()
+
+		if _, isFailure := errors.AsType[*exception.CliInteractionUnwritableStreamError](err); !isFailure {
+			t.Errorf("%s that holds no stream must report it, but reported: %v", name, err)
+		}
+	}
+}
+
+func TestWriteMessagesStopsAtTheFirstFailure(t *testing.T) {
+	t.Parallel()
+
+	built, err := output.NewOutput(
+		[]contract.WriterContract{output.NewStreamWriter(&fixtures.FailingWriterFixture{})},
+		message.NewMessage(firstText),
+		message.NewMessage(secondText),
+	).WriteMessages()
+
+	if err == nil {
+		t.Fatal("a failed write must reach the caller, but reported nothing")
+	}
+
+	// The first message is recorded as written, and the second never reaches a
+	// writer, so the output still holds it.
+	if len(built.GetUnwrittenMessages()) != 2 {
+		t.Errorf("the output must keep the messages that no writer took, but kept: %d",
+			len(built.GetUnwrittenMessages()))
+	}
+}
+
+func TestAFileWriterAppendsEachMessage(t *testing.T) {
+	t.Parallel()
+
+	path := filepath.Join(t.TempDir(), "output.log")
+
+	_, err := output.NewOutput(
+		[]contract.WriterContract{output.NewFileWriter(path)},
+		message.NewMessage(firstText),
+		message.NewMessage(secondText),
+	).WriteMessages()
+	if err != nil {
+		t.Fatalf("the writer must write to the file, but reported: %v", err)
+	}
+
+	contents, readErr := os.ReadFile(path)
+	if readErr != nil {
+		t.Fatalf("the writer must create the file, but reported: %v", readErr)
+	}
+
+	if string(contents) != firstText+"\n"+secondText+"\n" {
+		t.Errorf("the writer must append each message, but wrote: %q", contents)
+	}
+}
+
+func TestAFileWriterReportsAPathThatNoProcessCanOpen(t *testing.T) {
+	t.Parallel()
+
+	path := filepath.Join(t.TempDir(), "missing", "output.log")
+
+	_, err := output.NewOutput(
+		[]contract.WriterContract{output.NewFileWriter(path)},
+		message.NewMessage(firstText),
+	).WriteMessages()
+
+	if _, isFailure := errors.AsType[*exception.CliInteractionFileWriteError](err); !isFailure {
+		t.Fatalf("a path that no process can open must reach the caller, but reported: %v", err)
 	}
 }
