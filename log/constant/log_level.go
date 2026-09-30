@@ -29,10 +29,3 @@ const (
 
 	LogLevelEmergency LogLevel = "emergency"
 )
-
-// The binding key of each service that the log component publishes.
-const (
-	LogConfigContractServiceID = "valkyrja.log.data.LogConfigContract"
-
-	LoggerContractServiceID = "valkyrja.log.logger.LoggerContract"
-)

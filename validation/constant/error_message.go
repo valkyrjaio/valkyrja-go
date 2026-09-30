@@ -10,9 +10,6 @@
 package constant
 
 // The message that each rule reports where a subject fails it.
-//
-// A rule takes its own message from a caller, and these are the messages that
-// the framework's own rules take.
 const (
 	ErrorMessageRequired = "This field is required."
 
@@ -58,6 +55,3 @@ const (
 
 	ErrorMessageStringUppercase = "This field must be uppercase."
 )
-
-// ValidatorContractServiceID is the binding key for the validator.
-const ValidatorContractServiceID = "valkyrja.validation.validator.ValidatorContract"

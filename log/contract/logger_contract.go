@@ -9,9 +9,17 @@
 // Package contract holds every contract of the log component.
 package contract
 
+import (
+	"github.com/valkyrjaio/valkyrja-go/v26/log/constant"
+)
+
 type LoggerContract interface {
+	// Log writes a message at the severity. It reports a failure where the
+	// severity is not one that the framework knows.
+	Log(level constant.LogLevel, message string, context map[string]any) error
+
 	// Throwable writes a failure and the message that goes with it.
-	Throwable(throwable error, message string)
+	Throwable(throwable error, message string, context map[string]any)
 
 	// Debug writes a message that a developer reads while it debugs.
 	Debug(message string, context map[string]any)
