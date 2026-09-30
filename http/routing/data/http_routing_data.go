@@ -16,7 +16,7 @@ import (
 )
 
 type HttpRoutingData struct {
-	routes  map[string]contract.RouteContract
+	routes  map[string]contract.RouteFactory
 	paths   map[constant.RequestMethod]map[string]string
 	regexes map[constant.RequestMethod]map[string]string
 }
@@ -24,7 +24,7 @@ type HttpRoutingData struct {
 // NewHttpRoutingData builds the state from each map. It copies every map, and it
 // accepts nil for a map that carries nothing.
 func NewHttpRoutingData(
-	routes map[string]contract.RouteContract,
+	routes map[string]contract.RouteFactory,
 	paths map[constant.RequestMethod]map[string]string,
 	regexes map[constant.RequestMethod]map[string]string,
 ) *HttpRoutingData {
@@ -35,9 +35,10 @@ func NewHttpRoutingData(
 	}
 }
 
-// GetRoutes returns a copy of each route, keyed by its own name.
-func (d *HttpRoutingData) GetRoutes() map[string]contract.RouteContract {
-	routes := make(map[string]contract.RouteContract, len(d.routes))
+// GetRoutes returns a copy of a factory for each route, keyed by the route's own
+// name.
+func (d *HttpRoutingData) GetRoutes() map[string]contract.RouteFactory {
+	routes := make(map[string]contract.RouteFactory, len(d.routes))
 
 	maps.Copy(routes, d.routes)
 

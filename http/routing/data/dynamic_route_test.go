@@ -9,12 +9,14 @@
 package data_test
 
 import (
+	"errors"
 	"strconv"
 	"testing"
 
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/http/message/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/http/routing/data"
+	"github.com/valkyrjaio/valkyrja-go/v26/http/throwable/exception"
 )
 
 const (
@@ -155,6 +157,62 @@ func TestEachDynamicRouteWithMethodReturnsACopy(t *testing.T) {
 
 	if route.GetRegex() != dynamicRegex || len(route.GetParameters()) != 1 {
 		t.Error("each With method must leave the receiver unchanged, but did not")
+	}
+}
+
+func TestGetParameterReturnsTheParameterUnderTheName(t *testing.T) {
+	t.Parallel()
+
+	route := data.NewDynamicRoute(
+		data.NewRoute("/users/{id}", routeName, newHandler()),
+		dynamicRegex,
+		data.NewParameter(parameterName, parameterRegex),
+	)
+
+	parameter, err := route.GetParameter(parameterName)
+	if err != nil {
+		t.Fatalf("GetParameter must return the parameter, but reported: %v", err)
+	}
+
+	if parameter.GetName() != parameterName {
+		t.Errorf("GetParameter must return the parameter under the name, but returned: %q", parameter.GetName())
+	}
+}
+
+func TestGetParameterReportsANameThatTheRouteDoesNotHold(t *testing.T) {
+	t.Parallel()
+
+	route := data.NewDynamicRoute(
+		data.NewRoute("/users/{id}", routeName, newHandler()),
+		dynamicRegex,
+	)
+
+	parameter, err := route.GetParameter("slug")
+
+	if parameter != nil {
+		t.Error("GetParameter must return no parameter for an unknown name, but returned one")
+	}
+
+	if _, found := errors.AsType[*exception.HttpRoutingInvalidRouteParameterError](err); !found {
+		t.Errorf("GetParameter must report an unknown name, but reported: %v", err)
+	}
+}
+
+func TestHasParameterReportsWhetherTheRouteHoldsTheName(t *testing.T) {
+	t.Parallel()
+
+	route := data.NewDynamicRoute(
+		data.NewRoute("/users/{id}", routeName, newHandler()),
+		dynamicRegex,
+		data.NewParameter(parameterName, parameterRegex),
+	)
+
+	if !route.HasParameter(parameterName) {
+		t.Error("HasParameter must be true for a parameter that the route holds, but is false")
+	}
+
+	if route.HasParameter("slug") {
+		t.Error("HasParameter must be false for a parameter that the route does not hold, but is true")
 	}
 }
 

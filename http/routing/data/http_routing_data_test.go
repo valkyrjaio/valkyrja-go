@@ -16,10 +16,15 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/routing/data"
 )
 
+// newRouteFactory returns the static route that the routing data holds.
+func newRouteFactory() contract.RouteContract {
+	return newRoute()
+}
+
 // newRoutingData builds routing data that holds one static route.
 func newRoutingData() *data.HttpRoutingData {
 	return data.NewHttpRoutingData(
-		map[string]contract.RouteContract{routeName: newRoute()},
+		map[string]contract.RouteFactory{routeName: newRouteFactory},
 		map[constant.RequestMethod]map[string]string{
 			constant.RequestMethodGet: {routePath: routeName},
 		},

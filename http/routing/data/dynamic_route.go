@@ -10,6 +10,7 @@ package data
 
 import (
 	"github.com/valkyrjaio/valkyrja-go/v26/http/contract"
+	"github.com/valkyrjaio/valkyrja-go/v26/http/throwable/exception"
 )
 
 type Parameter struct {
@@ -168,6 +169,29 @@ func (r *Route) WithParameters(parameters ...contract.ParameterContract) contrac
 	copied.parameters = parameters
 
 	return &copied
+}
+
+// GetParameter returns the parameter under the name. It reports a failure where
+// the route has no parameter under the name.
+func (r *Route) GetParameter(name string) (contract.ParameterContract, error) {
+	for _, parameter := range r.parameters {
+		if parameter.GetName() == name {
+			return parameter, nil
+		}
+	}
+
+	return nil, exception.NewHttpRoutingInvalidRouteParameterError(name)
+}
+
+// HasParameter reports whether the route has a parameter under the name.
+func (r *Route) HasParameter(name string) bool {
+	for _, parameter := range r.parameters {
+		if parameter.GetName() == name {
+			return true
+		}
+	}
+
+	return false
 }
 
 // WithAddedParameters returns a copy of the route with the parameters appended.
