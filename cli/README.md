@@ -48,6 +48,28 @@ Warning: a silent output writes nothing at all, and a quiet output writes nothin
 while the exit code reports success. A command that must always reach the caller
 reports a failure instead of writing.
 
+`WriteMessages` and `WriteMessage` report a failure that a writer raises, and
+they stop at the first one. A destination that takes part of a message, or none
+of it, is a failure. The three failures are
+`CliInteractionStreamWriteError`, `CliInteractionFileWriteError`, and
+`CliInteractionUnwritableStreamError`.
+
+```go
+written, err := built.WriteMessages()
+if err != nil {
+	return err
+}
+```
+
+A file output opens the file for each message, so a path that no process can
+open reports the failure when the output writes. The output appends, because it
+writes one message at a time and a write that truncates keeps only the last
+message.
+
+Warning: a caller that discards the error loses the output and reads a success.
+The server's `InputHandler` reports the failure through the throwable-caught
+middleware, and it falls back to an output that the factory builds.
+
 ### Messages and Formats
 
 A message carries text and an optional formatter. A formatter wraps the text in
