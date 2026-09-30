@@ -13,19 +13,20 @@ import (
 )
 
 type CliRoutingData struct {
-	routes map[string]contract.RouteContract
+	routes map[string]contract.RouteFactory
 }
 
-// NewCliRoutingData builds the state from the commands, keyed by name.
-func NewCliRoutingData(routes map[string]contract.RouteContract) *CliRoutingData {
+// NewCliRoutingData builds the state from a factory for each command, keyed by
+// name.
+func NewCliRoutingData(routes map[string]contract.RouteFactory) *CliRoutingData {
 	if routes == nil {
-		routes = map[string]contract.RouteContract{}
+		routes = map[string]contract.RouteFactory{}
 	}
 
 	return &CliRoutingData{routes: routes}
 }
 
-// GetRoutes returns each route, keyed by its own name.
-func (d *CliRoutingData) GetRoutes() map[string]contract.RouteContract {
+// GetRoutes returns a factory for each route, keyed by the route's own name.
+func (d *CliRoutingData) GetRoutes() map[string]contract.RouteFactory {
 	return d.routes
 }

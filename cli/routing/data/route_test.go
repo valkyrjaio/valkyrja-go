@@ -24,6 +24,7 @@ const (
 	routeName        = "cache:clear"
 	routeDescription = "Clear the cache"
 	middlewareKey    = "valkyrja.test.Middleware"
+	fallbackValue    = "all"
 )
 
 // noopHandler is a handler that a route test gives a route.
@@ -215,7 +216,7 @@ func TestEachRouteMiddlewareStageHoldsItsOwnMiddleware(t *testing.T) {
 func TestTheRoutingDataHoldsEachRoute(t *testing.T) {
 	t.Parallel()
 
-	built := data.NewCliRoutingData(map[string]contract.RouteContract{routeName: newTestRoute()})
+	built := data.NewCliRoutingData(map[string]contract.RouteFactory{routeName: newTestRoute})
 
 	if len(built.GetRoutes()) != 1 {
 		t.Errorf("the routing data must hold each route, but held: %d", len(built.GetRoutes()))
@@ -267,9 +268,9 @@ func TestARouteReportsWhatTheCallerProvided(t *testing.T) {
 	withDefault := data.NewOptionParameter("namespace", parameterDescription).WithDefaultValue("app:")
 
 	bare := newTestRoute()
-	all := "all"
+	all := fallbackValue
 
-	if bare.HasProvidedOption("namespace") || bare.GetOptionValue("namespace", &all) != "all" {
+	if bare.HasProvidedOption("namespace") || bare.GetOptionValue("namespace", &all) != fallbackValue {
 		t.Error("a route that declares no option must report nothing provided, but did not")
 	}
 
@@ -310,19 +311,19 @@ func TestARouteReportsWhatTheCallerProvidedForAnArgument(t *testing.T) {
 
 	bare := newTestRoute()
 
-	if bare.HasProvidedArgument("namespace") || bare.GetArgumentValue("namespace", "all") != "all" {
+	if bare.HasProvidedArgument("namespace") || bare.GetArgumentValue("namespace", fallbackValue) != fallbackValue {
 		t.Error("a route that declares no argument must report nothing provided, but did not")
 	}
 
 	onlyDeclared := newTestRoute().WithArguments(declared)
 
-	if onlyDeclared.HasProvidedArgument("namespace") || onlyDeclared.GetArgumentValue("namespace", "all") != "all" {
+	if onlyDeclared.HasProvidedArgument("namespace") || onlyDeclared.GetArgumentValue("namespace", fallbackValue) != fallbackValue {
 		t.Error("an argument the caller left out must not report itself provided, but did")
 	}
 
 	filled := newTestRoute().WithArguments(provided)
 
-	if !filled.HasProvidedArgument("namespace") || filled.GetArgumentValue("namespace", "all") != "db:" {
+	if !filled.HasProvidedArgument("namespace") || filled.GetArgumentValue("namespace", fallbackValue) != "db:" {
 		t.Error("an argument the caller gave must report its value, but did not")
 	}
 }
