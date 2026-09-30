@@ -9,6 +9,7 @@
 package factory_test
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +19,7 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/data"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/factory"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/throwable/exception"
 )
 
 const outputText = "Something happened."
@@ -108,9 +110,12 @@ func TestAFileOutputWritesToTheFile(t *testing.T) {
 
 	path := filepath.Join(t.TempDir(), "output.log")
 
-	factory.NewOutputFactory(nil).
+	_, writeErr := factory.NewOutputFactory(nil).
 		CreateFileOutput(path, constant.ExitCodeSuccess, message.NewMessage(outputText)).
 		WriteMessages()
+	if writeErr != nil {
+		t.Fatalf("the output must write to the file, but reported: %v", writeErr)
+	}
 
 	contents, err := os.ReadFile(path)
 	if err != nil {
@@ -122,18 +127,22 @@ func TestAFileOutputWritesToTheFile(t *testing.T) {
 	}
 }
 
-func TestAFileOutputThatCannotOpenTheFileWritesNothing(t *testing.T) {
+func TestAFileOutputReportsAPathThatNoProcessCanOpen(t *testing.T) {
 	t.Parallel()
 
 	path := filepath.Join(t.TempDir(), "missing", "output.log")
 
-	created := factory.NewOutputFactory(nil).CreateFileOutput(path, constant.ExitCodeError)
+	created := factory.NewOutputFactory(nil).
+		CreateFileOutput(path, constant.ExitCodeError, message.NewMessage(outputText))
 
-	if len(created.GetWriters()) != 0 {
-		t.Error("an output that cannot open its file must write through no writer, but wrote through one")
+	_, err := created.WriteMessages()
+
+	failure, isFailure := errors.AsType[*exception.CliInteractionFileWriteError](err)
+	if !isFailure {
+		t.Fatalf("a path that no process can open must report a failure, but reported: %v", err)
 	}
 
-	if created.GetExitCode() != constant.ExitCodeError {
-		t.Error("an output that cannot open its file must keep its exit code, but did not")
+	if failure.GetFilepath() != path {
+		t.Errorf("the failure must name the file, but named: %q", failure.GetFilepath())
 	}
 }
