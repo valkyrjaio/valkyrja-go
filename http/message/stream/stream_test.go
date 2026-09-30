@@ -30,7 +30,7 @@ func TestNewStreamHoldsTheContent(t *testing.T) {
 
 	built := newReadWriteStream()
 
-	if built.GetSize() != len(content) {
+	if built.GetSize() != int64(len(content)) {
 		t.Errorf("GetSize must be the size of the content, but is: %d", built.GetSize())
 	}
 
@@ -49,7 +49,7 @@ func TestAWriteOnlyStreamStartsAtTheEnd(t *testing.T) {
 		t.Fatalf("Tell must return the position, but reported: %v", err)
 	}
 
-	if position != len(content) {
+	if position != int64(len(content)) {
 		t.Errorf("a write-only stream must start at the end, but is at: %d", position)
 	}
 }
@@ -161,7 +161,7 @@ func TestWriteAppendsPastTheEnd(t *testing.T) {
 
 	built := newReadWriteStream()
 
-	err := built.Seek(0, 2)
+	_, err := built.Seek(0, 2)
 	if err != nil {
 		t.Fatalf("Seek must move the pointer, but reported: %v", err)
 	}
@@ -190,13 +190,13 @@ func TestSeekMeasuresFromEachPoint(t *testing.T) {
 	t.Parallel()
 
 	tests := map[string]struct {
-		offset   int
+		offset   int64
 		whence   int
-		expected int
+		expected int64
 	}{
 		"from the start":   {3, stream.WhenceStart, 3},
 		"from the pointer": {2, stream.WhenceCurrent, 2},
-		"from the end":     {-2, stream.WhenceEnd, len(content) - 2},
+		"from the end":     {-2, stream.WhenceEnd, int64(len(content)) - 2},
 	}
 
 	for name, test := range tests {
@@ -205,7 +205,7 @@ func TestSeekMeasuresFromEachPoint(t *testing.T) {
 
 			built := newReadWriteStream()
 
-			err := built.Seek(test.offset, test.whence)
+			_, err := built.Seek(test.offset, test.whence)
 			if err != nil {
 				t.Fatalf("Seek must move the pointer, but reported: %v", err)
 			}
@@ -222,10 +222,10 @@ func TestSeekMeasuresFromEachPoint(t *testing.T) {
 func TestSeekReportsAPositionOutsideTheStream(t *testing.T) {
 	t.Parallel()
 
-	offsets := []int{-1, len(content) + 1}
+	offsets := []int64{-1, int64(len(content)) + 1}
 
 	for _, offset := range offsets {
-		err := newReadWriteStream().Seek(offset, stream.WhenceStart)
+		_, err := newReadWriteStream().Seek(offset, stream.WhenceStart)
 
 		if _, found := errors.AsType[*exception.HttpStreamStreamSeekError](err); !found {
 			t.Errorf("Seek to %d must report a failure, but reported: %v", offset, err)
@@ -324,7 +324,7 @@ func TestSeekReportsAClosedStream(t *testing.T) {
 		t.Fatalf("Close must close the stream, but reported: %v", err)
 	}
 
-	err = built.Seek(0, stream.WhenceStart)
+	_, err = built.Seek(0, stream.WhenceStart)
 
 	if _, found := errors.AsType[*exception.HttpStreamUnseekableStreamError](err); !found {
 		t.Errorf("Seek must report a closed stream, but reported: %v", err)
@@ -397,7 +397,7 @@ func TestTheStreamSatisfiesItsContract(t *testing.T) {
 
 	var built contract.StreamContract = newReadWriteStream()
 
-	if built.GetSize() != len(content) {
+	if built.GetSize() != int64(len(content)) {
 		t.Errorf("the contract must report the size, but reported: %d", built.GetSize())
 	}
 }

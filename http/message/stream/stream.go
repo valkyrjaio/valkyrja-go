@@ -102,18 +102,18 @@ func (s *Stream) Detach() []byte {
 }
 
 // GetSize returns the size of the stream in bytes.
-func (s *Stream) GetSize() int {
-	return len(s.buffer)
+func (s *Stream) GetSize() int64 {
+	return int64(len(s.buffer))
 }
 
 // Tell returns the position of the pointer. It reports a failure where the
 // stream is closed.
-func (s *Stream) Tell() (int, error) {
+func (s *Stream) Tell() (int64, error) {
 	if s.closed {
 		return 0, exception.NewHttpStreamStreamTellError()
 	}
 
-	return s.position, nil
+	return int64(s.position), nil
 }
 
 // IsEof reports whether the pointer is at the end of the stream.
@@ -126,27 +126,30 @@ func (s *Stream) IsSeekable() bool {
 	return !s.closed
 }
 
-// Seek moves the pointer to the offset, from the point that whence names. It
-// reports a failure where the position falls outside the stream.
-func (s *Stream) Seek(offset int, whence int) error {
+// Seek moves the pointer to the offset, from the point that whence names, and
+// returns the new position. It reports a failure where the position falls
+// outside the stream.
+func (s *Stream) Seek(offset int64, whence int) (int64, error) {
 	if !s.IsSeekable() {
-		return exception.NewHttpStreamUnseekableStreamError()
+		return 0, exception.NewHttpStreamUnseekableStreamError()
 	}
 
 	position := s.getPositionFrom(offset, whence)
 
-	if position < 0 || position > len(s.buffer) {
-		return exception.NewHttpStreamStreamSeekError()
+	if position < 0 || position > int64(len(s.buffer)) {
+		return 0, exception.NewHttpStreamStreamSeekError()
 	}
 
-	s.position = position
+	s.position = int(position)
 
-	return nil
+	return position, nil
 }
 
 // Rewind moves the pointer to the start of the stream.
 func (s *Stream) Rewind() error {
-	return s.Seek(0, WhenceStart)
+	_, err := s.Seek(0, WhenceStart)
+
+	return err
 }
 
 // IsWritable reports whether a writer writes to the stream.
@@ -235,13 +238,13 @@ func (s *Stream) GetMetadataItem(key string) any {
 // getPositionFrom returns the position that the offset names, measured from the
 // point that whence names. An unknown whence measures from the end, which is
 // what the other ports do.
-func (s *Stream) getPositionFrom(offset int, whence int) int {
+func (s *Stream) getPositionFrom(offset int64, whence int) int64 {
 	switch whence {
 	case WhenceStart:
 		return offset
 	case WhenceCurrent:
-		return s.position + offset
+		return int64(s.position) + offset
 	default:
-		return len(s.buffer) + offset
+		return int64(len(s.buffer)) + offset
 	}
 }
