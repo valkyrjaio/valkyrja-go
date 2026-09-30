@@ -11,7 +11,6 @@ package provider_test
 import (
 	"testing"
 
-	containerconstant "github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/manager"
 	"github.com/valkyrjaio/valkyrja-go/v26/validation/constant"
@@ -75,11 +74,7 @@ func resolveValidator(
 ) contract.ValidatorContract {
 	t.Helper()
 
-	resolved, err := container.Get(
-		constant.ValidatorContractServiceID,
-		nil,
-		containerconstant.NewInstanceOrThrowException,
-	)
+	resolved, err := container.Get(constant.ValidatorContractServiceID, nil)
 	if err != nil {
 		t.Fatalf("the provider must bind the validator, but reported: %v", err)
 	}
