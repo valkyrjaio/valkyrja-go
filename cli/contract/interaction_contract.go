@@ -201,8 +201,9 @@ type WriterContract interface {
 	// ShouldWriteMessage reports whether this writer writes the message.
 	ShouldWriteMessage(message MessageContract) bool
 
-	// Write writes the message and returns the output that holds the result.
-	Write(output OutputContract, message MessageContract) OutputContract
+	// Write writes the message, and reports a failure where the destination
+	// does not take the whole message.
+	Write(output OutputContract, message MessageContract) (OutputContract, error)
 }
 
 //nolint:interfacebloat // Parity with the PHP reference implementation.
@@ -286,11 +287,13 @@ type OutputContract interface {
 	// WithAddedMessage returns a copy of the output with the message appended.
 	WithAddedMessage(message MessageContract) OutputContract
 
-	// WriteMessages writes every message that is waiting.
-	WriteMessages() OutputContract
+	// WriteMessages writes every message that is waiting, and reports the
+	// first failure that a writer raises.
+	WriteMessages() (OutputContract, error)
 
-	// WriteMessage writes one message.
-	WriteMessage(message MessageContract) OutputContract
+	// WriteMessage writes one message, and reports a failure where a writer
+	// does not take it.
+	WriteMessage(message MessageContract) (OutputContract, error)
 
 	// GetWriters returns each writer that the output writes through.
 	GetWriters() []WriterContract
