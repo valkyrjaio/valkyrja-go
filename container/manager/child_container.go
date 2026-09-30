@@ -46,6 +46,16 @@ func (c *ChildContainer) IsAlias(id string) bool {
 	return c.Container.IsAlias(id) || c.parent.IsAlias(id)
 }
 
+// GetAliasedID returns the binding key that the child's alias points to, and
+// the parent's where the child holds no such alias.
+func (c *ChildContainer) GetAliasedID(alias string) (string, bool) {
+	if id, found := c.Container.GetAliasedID(alias); found {
+		return id, true
+	}
+
+	return c.parent.GetAliasedID(alias)
+}
+
 // IsService reports whether the child or the parent holds the factory.
 func (c *ChildContainer) IsService(id string) bool {
 	return c.Container.IsService(id) || c.parent.IsService(id)
