@@ -6,8 +6,7 @@
  * Released under the MIT License. See LICENSE.md for details.
  */
 
-// Package constant holds the container component's binding keys and its
-// enumerations.
+// Package constant holds the container component's binding keys.
 package constant
 
 // The container component's binding keys.

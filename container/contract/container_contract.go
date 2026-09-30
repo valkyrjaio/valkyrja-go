@@ -15,10 +15,6 @@
 // package per component is therefore the Go spelling of the same taxonomy.
 package contract
 
-import (
-	"github.com/valkyrjaio/valkyrja-go/v26/container/constant"
-)
-
 type ServiceFactory func(container ContainerContract, arguments []any) any
 
 type PublishFunc func(container ContainerContract)
@@ -102,7 +98,11 @@ type ContainerContract interface {
 
 	// Get resolves the binding key. It reports a failure where the container
 	// resolves nothing.
-	Get(id string, arguments []any, mode constant.InvalidReferenceMode) (any, error)
+	Get(id string, arguments []any) (any, error)
+
+	// GetAliasedID returns the binding key that the alias points to, and
+	// reports whether the container holds the alias.
+	GetAliasedID(alias string) (string, bool)
 
 	// GetAliased resolves the binding key as an alias. It reports a failure
 	// where the key is no alias.
