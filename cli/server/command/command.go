@@ -23,7 +23,6 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/factory"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
 	routingconstant "github.com/valkyrjaio/valkyrja-go/v26/cli/routing/constant"
-	containerconstant "github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
@@ -32,7 +31,7 @@ import (
 func resolve[T any](container containercontract.ContainerContract, id string) T {
 	var empty T
 
-	resolved, err := container.Get(id, nil, containerconstant.NewInstanceOrThrowException)
+	resolved, err := container.Get(id, nil)
 	if err != nil {
 		return empty
 	}
