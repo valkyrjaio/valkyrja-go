@@ -68,7 +68,10 @@ func (h *InputHandler) Exit(input contract.InputContract, output contract.Output
 
 // Run handles the input, writes what the command reported, and exits.
 func (h *InputHandler) Run(input contract.InputContract) {
-	output := h.Handle(input).WriteMessages()
+	output, err := h.Handle(input).WriteMessages()
+	if err != nil {
+		output = h.writeFailure(input, err)
+	}
 
 	h.Exit(input, output)
 
@@ -77,6 +80,35 @@ func (h *InputHandler) Run(input contract.InputContract) {
 	}
 
 	h.exiter(int(output.GetExitCode()))
+}
+
+// writeFailure reports a failed write through the throwable-caught middleware,
+// and returns the output that carries the report.
+//
+// Warning: a middleware returns an output of its own, and that output can name
+// the destination that just failed. A second failure therefore falls back to an
+// output that the factory builds, and the exit code is the last diagnostic left
+// where even that write fails.
+func (h *InputHandler) writeFailure(input contract.InputContract, failure error) contract.OutputContract {
+	reported := h.throwableCaughtHandler.ThrowableCaught(
+		input,
+		h.createOutputFromThrowable(input, failure),
+		failure,
+	)
+
+	written, err := reported.WriteMessages()
+	if err == nil {
+		return written
+	}
+
+	fallback := h.createOutputFromThrowable(input, err)
+
+	written, err = fallback.WriteMessages()
+	if err != nil {
+		return fallback
+	}
+
+	return written
 }
 
 // dispatch runs the input through the router, and turns a failure into an

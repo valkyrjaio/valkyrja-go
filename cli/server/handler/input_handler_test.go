@@ -15,8 +15,10 @@ import (
 
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
 	interactionconstant "github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
-	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/factory"
+	interactionfactory "github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/factory"
+	interactionfixtures "github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/fixtures"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/input"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
 	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/output"
 	middlewarefixtures "github.com/valkyrjaio/valkyrja-go/v26/cli/middleware/fixtures"
 	middlewarehandler "github.com/valkyrjaio/valkyrja-go/v26/cli/middleware/handler"
@@ -54,7 +56,7 @@ func newHandler(
 	routing := dispatcher.NewRouter(
 		container,
 		built,
-		factory.NewOutputFactory(nil),
+		interactionfactory.NewOutputFactory(nil),
 		middlewarehandler.NewRouteMatchedHandler(container),
 		middlewarehandler.NewRouteNotMatchedHandler(container),
 		middlewarehandler.NewRouteDispatchedHandler(container),
@@ -68,7 +70,7 @@ func newHandler(
 		middlewarehandler.NewInputReceivedHandler(container, inputReceived...),
 		middlewarehandler.NewThrowableCaughtHandler(container),
 		middlewarehandler.NewProcessExitingHandler(container),
-		factory.NewOutputFactory(nil),
+		interactionfactory.NewOutputFactory(nil),
 		exiter,
 	), container
 }
@@ -198,4 +200,153 @@ func textOf(built contract.OutputContract) string {
 	}
 
 	return text.String()
+}
+
+func TestRunReportsAFailedWriteThroughTheFactoryOutput(t *testing.T) {
+	t.Parallel()
+
+	// The command writes to a stream that takes nothing, so the run reports the
+	// failure through an output that the factory builds instead.
+	reported := &strings.Builder{}
+	exited := []int{}
+
+	container := manager.NewContainer(nil)
+	failing := interactionfactory.NewOutputFactoryForWriter(nil, &interactionfixtures.FailingWriterFixture{})
+
+	built := collection.NewCollection()
+	built.Add(data.NewRoute(routeName, "Clear the cache", writesToAFailingStream(failing)))
+
+	routing := dispatcher.NewRouter(
+		container, built, failing,
+		middlewarehandler.NewRouteMatchedHandler(container),
+		middlewarehandler.NewRouteNotMatchedHandler(container),
+		middlewarehandler.NewRouteDispatchedHandler(container),
+		middlewarehandler.NewThrowableCaughtHandler(container),
+		middlewarehandler.NewProcessExitingHandler(container),
+	)
+
+	handler.NewInputHandler(
+		container,
+		routing,
+		middlewarehandler.NewInputReceivedHandler(container),
+		middlewarehandler.NewThrowableCaughtHandler(container),
+		middlewarehandler.NewProcessExitingHandler(container),
+		interactionfactory.NewOutputFactoryForWriter(nil, reported),
+		func(code int) { exited = append(exited, code) },
+	).Run(input.NewInput("", routeName))
+
+	if !strings.Contains(reported.String(), "Cli Server Error:") {
+		t.Errorf("a failed write must reach the caller, but the report is: %q", reported.String())
+	}
+
+	if len(exited) != 1 || exited[0] != int(interactionconstant.ExitCodeError) {
+		t.Errorf("a failed write must exit with a failure, but exited with: %v", exited)
+	}
+}
+
+func TestRunExitsWithAFailureWhereEveryDestinationRefusesTheWrite(t *testing.T) {
+	t.Parallel()
+
+	// Nothing can be written anywhere, so the exit code is the last diagnostic.
+	exited := []int{}
+
+	container := manager.NewContainer(nil)
+	failing := interactionfactory.NewOutputFactoryForWriter(nil, &interactionfixtures.FailingWriterFixture{})
+
+	built := collection.NewCollection()
+	built.Add(data.NewRoute(routeName, "Clear the cache", writesToAFailingStream(failing)))
+
+	routing := dispatcher.NewRouter(
+		container, built, failing,
+		middlewarehandler.NewRouteMatchedHandler(container),
+		middlewarehandler.NewRouteNotMatchedHandler(container),
+		middlewarehandler.NewRouteDispatchedHandler(container),
+		middlewarehandler.NewThrowableCaughtHandler(container),
+		middlewarehandler.NewProcessExitingHandler(container),
+	)
+
+	handler.NewInputHandler(
+		container, routing,
+		middlewarehandler.NewInputReceivedHandler(container),
+		middlewarehandler.NewThrowableCaughtHandler(container),
+		middlewarehandler.NewProcessExitingHandler(container),
+		failing,
+		func(code int) { exited = append(exited, code) },
+	).Run(input.NewInput("", routeName))
+
+	if len(exited) != 1 || exited[0] != int(interactionconstant.ExitCodeError) {
+		t.Errorf("the exit code must report the failure, but exited with: %v", exited)
+	}
+}
+
+// writesToAFailingStream returns a command that reports through the factory, so
+// the run reaches the write that the factory's stream refuses.
+func writesToAFailingStream(built contract.OutputFactoryContract) contract.CliHandlerFunc {
+	return func(_ containercontract.ContainerContract, _ contract.RouteContract) contract.OutputContract {
+		return built.CreateOutput(interactionconstant.ExitCodeSuccess, message.NewMessage("the command ran"))
+	}
+}
+
+func TestRunFallsBackWhereAMiddlewareReturnsAFailingOutput(t *testing.T) {
+	t.Parallel()
+
+	// The throwable-caught middleware answers with an output whose destination
+	// is the one that just failed, so the run falls back to the factory.
+	reported := &strings.Builder{}
+	exited := []int{}
+
+	container := manager.NewContainer(nil)
+	failing := interactionfactory.NewOutputFactoryForWriter(nil, &interactionfixtures.FailingWriterFixture{})
+	good := interactionfactory.NewOutputFactoryForWriter(nil, reported)
+
+	container.SetSingleton(replacingMiddlewareID, &replacingThrowableCaughtMiddlewareFixture{
+		output: failing.CreateOutput(interactionconstant.ExitCodeError, message.NewMessage("unreachable")),
+	})
+
+	built := collection.NewCollection()
+	built.Add(data.NewRoute(routeName, "Clear the cache", writesToAFailingStream(failing)))
+
+	routing := dispatcher.NewRouter(
+		container, built, good,
+		middlewarehandler.NewRouteMatchedHandler(container),
+		middlewarehandler.NewRouteNotMatchedHandler(container),
+		middlewarehandler.NewRouteDispatchedHandler(container),
+		middlewarehandler.NewThrowableCaughtHandler(container),
+		middlewarehandler.NewProcessExitingHandler(container),
+	)
+
+	handler.NewInputHandler(
+		container, routing,
+		middlewarehandler.NewInputReceivedHandler(container),
+		middlewarehandler.NewThrowableCaughtHandler(container, replacingMiddlewareID),
+		middlewarehandler.NewProcessExitingHandler(container),
+		good,
+		func(code int) { exited = append(exited, code) },
+	).Run(input.NewInput("", routeName))
+
+	if !strings.Contains(reported.String(), "Cli Server Error:") {
+		t.Errorf("the fallback must reach the caller, but the report is: %q", reported.String())
+	}
+
+	if len(exited) != 1 || exited[0] != int(interactionconstant.ExitCodeError) {
+		t.Errorf("the run must exit with a failure, but exited with: %v", exited)
+	}
+}
+
+// replacingMiddlewareID is the binding key of the middleware below.
+const replacingMiddlewareID = "valkyrja.tests.cli.ReplacingThrowableCaughtMiddleware"
+
+// replacingThrowableCaughtMiddlewareFixture answers with an output of its own.
+type replacingThrowableCaughtMiddlewareFixture struct {
+	output contract.OutputContract
+}
+
+// ThrowableCaught returns the output that the fixture holds.
+func (m *replacingThrowableCaughtMiddlewareFixture) ThrowableCaught(
+	_ contract.InputContract,
+	_ contract.OutputContract,
+	_ error,
+	_ contract.ThrowableCaughtHandlerContract,
+) contract.OutputContract {
+	return m.output
 }
