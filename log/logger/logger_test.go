@@ -72,12 +72,29 @@ func TestTheStreamLoggerWritesAnEmptyContextForDataThatNoEncoderRenders(t *testi
 	}
 }
 
+func TestTheStreamLoggerWritesTheContextOfAFailure(t *testing.T) {
+	t.Parallel()
+
+	written := &strings.Builder{}
+	context := map[string]any{"request": "GET /"}
+
+	logger.NewStreamLogger(written).Throwable(errors.New("the failure"), logMessage, context)
+
+	if !strings.Contains(written.String(), `"request":"GET /"`) {
+		t.Errorf("the logger must write the context of the failure, but wrote: %q", written.String())
+	}
+
+	if len(context) != 1 {
+		t.Errorf("the logger must leave the caller's context unchanged, but it holds: %v", context)
+	}
+}
+
 func TestTheStreamLoggerWritesAFailureAtTheErrorSeverity(t *testing.T) {
 	t.Parallel()
 
 	written := &strings.Builder{}
 
-	logger.NewStreamLogger(written).Throwable(errors.New("the failure"), logMessage)
+	logger.NewStreamLogger(written).Throwable(errors.New("the failure"), logMessage, nil)
 
 	if !strings.HasPrefix(written.String(), "ERROR: "+logMessage) {
 		t.Errorf("the logger must write the failure at the error severity, but wrote: %q", written.String())
@@ -124,7 +141,7 @@ func TestTheNullLoggerWritesNothing(t *testing.T) {
 
 	built := logger.NewNullLogger()
 
-	built.Throwable(errors.New("the failure"), logMessage)
+	built.Throwable(errors.New("the failure"), logMessage, nil)
 	built.Debug(logMessage, nil)
 	built.Info(logMessage, nil)
 	built.Notice(logMessage, nil)

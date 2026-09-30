@@ -11,6 +11,7 @@ package logger
 import (
 	"encoding/json"
 	"io"
+	"maps"
 	"slices"
 	"strings"
 
@@ -34,9 +35,16 @@ func NewStreamLogger(writer io.Writer) *StreamLogger {
 	return &StreamLogger{writer: writer}
 }
 
-// Throwable writes a failure and the message that goes with it.
-func (l *StreamLogger) Throwable(throwable error, message string) {
-	l.Error(message, map[string]any{"throwable": throwable.Error()})
+// Throwable writes a failure and the message that goes with it, with the
+// context.
+func (l *StreamLogger) Throwable(throwable error, message string, context map[string]any) {
+	withThrowable := make(map[string]any, len(context)+1)
+
+	maps.Copy(withThrowable, context)
+
+	withThrowable["throwable"] = throwable.Error()
+
+	l.Error(message, withThrowable)
 }
 
 // Debug writes a message that a developer reads while it debugs.
