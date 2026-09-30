@@ -22,7 +22,7 @@ func NewNullLogger() *NullLogger {
 }
 
 // Throwable writes nothing.
-func (l *NullLogger) Throwable(_ error, _ string) {}
+func (l *NullLogger) Throwable(_ error, _ string, _ map[string]any) {}
 
 // Debug writes nothing.
 func (l *NullLogger) Debug(_ string, _ map[string]any) {}
