@@ -68,7 +68,7 @@ func TestNewMessageHoldsWhatItReceives(t *testing.T) {
 		t.Error("the headers must be the ones given, but were not")
 	}
 
-	if built.GetBody().GetSize() != len("the body") {
+	if built.GetBody().GetSize() != int64(len("the body")) {
 		t.Error("the body must be the one given, but was not")
 	}
 }
@@ -93,7 +93,7 @@ func TestEachSetterReplacesWhatTheMessageHolds(t *testing.T) {
 		t.Error("SetHeaders must replace the headers, but did not")
 	}
 
-	if built.GetBody().GetSize() != len("the body") {
+	if built.GetBody().GetSize() != int64(len("the body")) {
 		t.Error("SetBody must replace the body, but did not")
 	}
 }

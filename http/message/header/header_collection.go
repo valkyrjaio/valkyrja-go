@@ -122,6 +122,17 @@ func (c *HeaderCollection) WithAddedHeaders(headers ...contract.HeaderContract) 
 	return copied
 }
 
+// WithoutHeaders returns a copy of the collection without the headers.
+func (c *HeaderCollection) WithoutHeaders(names ...string) contract.HeaderCollectionContract {
+	copied := c.clone()
+
+	for _, name := range names {
+		delete(copied.headers, strings.ToLower(name))
+	}
+
+	return copied
+}
+
 // filterByName returns the headers whose normalized name is in the names, where
 // keep is true, and the headers whose name is not, where keep is false.
 func (c *HeaderCollection) filterByName(names []string, keep bool) map[string]contract.HeaderContract {

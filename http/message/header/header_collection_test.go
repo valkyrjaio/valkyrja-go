@@ -181,3 +181,22 @@ func TestWithAddedHeadersHoldsAHeaderOfAnotherName(t *testing.T) {
 		t.Error("WithAddedHeaders must leave the receiver unchanged, but did not")
 	}
 }
+
+func TestWithoutHeadersRemovesEachHeader(t *testing.T) {
+	t.Parallel()
+
+	collection := header.NewHeaderCollection(
+		newHeader(t, acceptName),
+		newHeader(t, constant.HeaderNameContentType),
+	)
+
+	reduced := collection.WithoutHeaders("ACCEPT", constant.HeaderNameContentType)
+
+	if reduced.Has(acceptName) || reduced.Has(constant.HeaderNameContentType) {
+		t.Error("WithoutHeaders must remove each header, but did not")
+	}
+
+	if !collection.Has(acceptName) {
+		t.Error("WithoutHeaders must leave the receiver unchanged, but did not")
+	}
+}
