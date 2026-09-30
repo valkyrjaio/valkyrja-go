@@ -283,3 +283,18 @@ func (s StatusCode) IsValid() bool {
 
 	return found
 }
+
+// Code returns the status code as an integer.
+func (s StatusCode) Code() int {
+	return int(s)
+}
+
+// IsRedirect reports whether the status code is a redirect.
+func (s StatusCode) IsRedirect() bool {
+	return s >= StatusCodeMultipleChoices && s < StatusCodeBadRequest
+}
+
+// IsError reports whether the status code is a server error.
+func (s StatusCode) IsError() bool {
+	return s >= StatusCodeInternalServerError
+}

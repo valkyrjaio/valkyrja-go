@@ -56,8 +56,52 @@ const (
 	RegexUuid = uuidPart + `{8}-` + uuidPart + `{4}-` + uuidPart + `{4}-` +
 		uuidPart + `{4}-` + uuidPart + `{12}`
 
+	// RegexUuidV1 matches a version 1 UUID.
+	RegexUuidV1 = uuidPart + `{8}-` + uuidPart + `{4}-[1]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
+	// RegexUuidV3 matches a version 3 UUID.
+	RegexUuidV3 = uuidPart + `{8}-` + uuidPart + `{4}-[3]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
+	// RegexUuidV4 matches a version 4 UUID.
+	RegexUuidV4 = uuidPart + `{8}-` + uuidPart + `{4}-[4]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
+	// RegexUuidV5 matches a version 5 UUID.
+	RegexUuidV5 = uuidPart + `{8}-` + uuidPart + `{4}-[5]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
+	// RegexUuidV6 matches a version 6 UUID.
+	RegexUuidV6 = uuidPart + `{8}-` + uuidPart + `{4}-[6]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
+	// RegexUuidV7 matches a version 7 UUID.
+	RegexUuidV7 = uuidPart + `{8}-` + uuidPart + `{4}-[7]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
+	// RegexUuidV8 matches a version 8 UUID.
+	RegexUuidV8 = uuidPart + `{8}-` + uuidPart + `{4}-[8]` + uuidPart + `{3}-` +
+		uuidPart + `{4}-` + uuidPart + `{12}`
+
 	// RegexUlid matches a ULID.
 	RegexUlid = `[0-7][` + ulidVlidChars + `]{25}`
+
+	// RegexVlid matches a VLID of any version.
+	RegexVlid = `[0-7][` + ulidVlidChars + `]{12}[1-4][` + ulidVlidChars + `]{4}` +
+		`([` + ulidVlidChars + `]{4})?([` + ulidVlidChars + `]{4})?([` + ulidVlidChars + `]{4})?`
+
+	// RegexVlidV1 matches a version 1 VLID.
+	RegexVlidV1 = `[0-7][` + ulidVlidChars + `]{12}[1][` + ulidVlidChars + `]{12}`
+
+	// RegexVlidV2 matches a version 2 VLID.
+	RegexVlidV2 = `[0-7][` + ulidVlidChars + `]{12}[2][` + ulidVlidChars + `]{16}`
+
+	// RegexVlidV3 matches a version 3 VLID.
+	RegexVlidV3 = `[0-7][` + ulidVlidChars + `]{12}[3][` + ulidVlidChars + `]{8}`
+
+	// RegexVlidV4 matches a version 4 VLID.
+	RegexVlidV4 = `[0-7][` + ulidVlidChars + `]{12}[4][` + ulidVlidChars + `]{4}`
 )
 
 // The parts that the processor builds a route's regular expression from.
@@ -104,33 +148,3 @@ const (
 	// RegexEndCaptureGroupName ends the name of a capture group.
 	RegexEndCaptureGroupName = `>`
 )
-
-// The HTTP routing component's binding keys.
-const (
-	// RouterContractServiceID is the binding key for the router.
-	RouterContractServiceID = "valkyrja.http.routing.dispatcher.RouterContract"
-
-	// RouteCollectionContractServiceID is the binding key for the route
-	// collection.
-	RouteCollectionContractServiceID = "valkyrja.http.routing.collection.RouteCollectionContract"
-
-	// RouteContractServiceID is the binding key for the route that matched. The
-	// router binds it before it runs the handler, so a handler reads the route.
-	RouteContractServiceID = "valkyrja.http.routing.data.RouteContract"
-
-	// HttpRoutingDataServiceID is the binding key for the routing data.
-	HttpRoutingDataServiceID = "valkyrja.http.routing.data.HttpRoutingData"
-
-	// MatcherContractServiceID is the binding key for the matcher.
-	MatcherContractServiceID = "valkyrja.http.routing.matcher.MatcherContract"
-
-	// ProcessorContractServiceID is the binding key for the processor.
-	ProcessorContractServiceID = "valkyrja.http.routing.processor.ProcessorContract"
-
-	// UrlContractServiceID is the binding key for the URL generator.
-	UrlContractServiceID = "valkyrja.http.routing.url.UrlContract"
-)
-
-// RoutingResponseFactoryContractServiceID is the binding key for what builds a
-// response that sends the client to a named route.
-const RoutingResponseFactoryContractServiceID = "valkyrja.http.routing.factory.RoutingResponseFactoryContract"

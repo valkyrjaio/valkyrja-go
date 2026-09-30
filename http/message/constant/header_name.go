@@ -65,10 +65,3 @@ const (
 const (
 	HeaderValueBearer = "Bearer"
 )
-
-// The binding key of each service that the HTTP message sub-component publishes.
-const (
-	ResponseFactoryContractServiceID = "valkyrja.http.message.factory.ResponseFactoryContract"
-
-	ServerRequestContractServiceID = "valkyrja.http.message.request.ServerRequestContract"
-)

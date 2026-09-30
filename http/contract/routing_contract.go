@@ -17,6 +17,8 @@ type CastFunc func(value string) (any, error)
 
 type HttpHandlerFunc func(container containercontract.ContainerContract, route RouteContract) ResponseContract
 
+type RouteFactory func() RouteContract
+
 type StructContract interface {
 	// GetName returns the name of the field.
 	GetName() string
@@ -244,6 +246,13 @@ type DynamicRouteContract interface {
 	// WithAddedParameters returns a copy of the route with the parameters
 	// appended.
 	WithAddedParameters(parameters ...ParameterContract) DynamicRouteContract
+
+	// GetParameter returns the parameter under the name. It reports a failure
+	// where the route has no parameter under the name.
+	GetParameter(name string) (ParameterContract, error)
+
+	// HasParameter reports whether the route has a parameter under the name.
+	HasParameter(name string) bool
 }
 
 type HttpRouteProviderContract interface {

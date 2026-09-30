@@ -53,6 +53,48 @@ func TestIsValidReportsWhetherTheFrameworkKnowsTheStatusCode(t *testing.T) {
 	}
 }
 
+func TestCodeReturnsTheStatusCodeAsAnInteger(t *testing.T) {
+	t.Parallel()
+
+	if constant.StatusCodeNotFound.Code() != 404 {
+		t.Errorf("Code must be 404, but is %d", constant.StatusCodeNotFound.Code())
+	}
+}
+
+func TestIsRedirectReportsEachRedirectStatusCode(t *testing.T) {
+	t.Parallel()
+
+	tests := map[constant.StatusCode]bool{
+		constant.StatusCodeOk:                false,
+		constant.StatusCodeMultipleChoices:   true,
+		constant.StatusCodeFound:             true,
+		constant.StatusCodePermanentRedirect: true,
+		constant.StatusCodeBadRequest:        false,
+	}
+
+	for code, expected := range tests {
+		if code.IsRedirect() != expected {
+			t.Errorf("IsRedirect for %d must be %t, but is %t", code, expected, code.IsRedirect())
+		}
+	}
+}
+
+func TestIsErrorReportsEachServerErrorStatusCode(t *testing.T) {
+	t.Parallel()
+
+	tests := map[constant.StatusCode]bool{
+		constant.StatusCodeNotFound:            false,
+		constant.StatusCodeInternalServerError: true,
+		constant.StatusCodeServiceUnavailable:  true,
+	}
+
+	for code, expected := range tests {
+		if code.IsError() != expected {
+			t.Errorf("IsError for %d must be %t, but is %t", code, expected, code.IsError())
+		}
+	}
+}
+
 func TestGetAllRequestMethodsLeavesOutTheAnyMethod(t *testing.T) {
 	t.Parallel()
 
