@@ -15,9 +15,8 @@ package constant
 
 type ExitCode int
 
-// The exit codes that the framework uses. The values from 64 to 78 are the
-// `sysexits.h` codes, which every port keeps so a command reports the same
-// failure in each one.
+// The exit codes that the framework uses. Every port keeps the same values, so
+// a command reports the same failure in each one.
 const (
 	ExitCodeSuccess ExitCode = 0
 	ExitCodeError   ExitCode = 1

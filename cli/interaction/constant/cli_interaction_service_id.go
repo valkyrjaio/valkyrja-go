@@ -15,7 +15,7 @@ const (
 
 	OutputContractServiceID = "valkyrja.cli.interaction.output.OutputContract"
 
-	OutputFactoryContractServiceID = "valkyrja.cli.interaction.factory.OutputFactoryContract"
+	OutputFactoryContractServiceID = "valkyrja.cli.interaction.output.factory.OutputFactoryContract"
 
 	CliInteractionConfigContractServiceID = "valkyrja.cli.interaction.data.CliInteractionConfigContract"
 )

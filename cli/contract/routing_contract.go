@@ -15,6 +15,8 @@ import (
 
 type CliHandlerFunc func(container containercontract.ContainerContract, route RouteContract) OutputContract
 
+type RouteFactory func() RouteContract
+
 type CastFunc func(value string) (any, error)
 
 type HelpTextFunc func() MessageContract
@@ -51,7 +53,12 @@ type ParameterContract interface {
 	// names, and reports a failure where a value does not convert.
 	GetCastValues() ([]any, error)
 
-	// HasFirstValue reports whether the caller gave the parameter a value.
+	// IsProvided reports whether the caller gave the parameter, with or
+	// without a value.
+	IsProvided() bool
+
+	// HasFirstValue reports whether the caller gave the parameter a first
+	// value that is not empty.
 	HasFirstValue() bool
 
 	// GetFirstValue returns the first value that the caller gave.
@@ -204,6 +211,14 @@ type RouteContract interface {
 	// GetArgument returns the argument under the name.
 	GetArgument(name string) ArgumentParameterContract
 
+	// HasProvidedArgument reports whether the caller gave an argument that the
+	// route declares.
+	HasProvidedArgument(name string) bool
+
+	// GetArgumentValue returns the first value the caller gave an argument, and
+	// the default where that value is empty.
+	GetArgumentValue(name string, defaultValue string) string
+
 	// WithArguments returns a copy of the route with other arguments.
 	WithArguments(arguments ...ArgumentParameterContract) RouteContract
 
@@ -222,6 +237,15 @@ type RouteContract interface {
 
 	// GetOption returns the option under the name.
 	GetOption(name string) OptionParameterContract
+
+	// HasProvidedOption reports whether the caller gave an option that the
+	// route declares.
+	HasProvidedOption(name string) bool
+
+	// GetOptionValue returns the first value the caller gave an option. It
+	// returns the default where the call gives one, then the option's own
+	// declared default value, and then an empty string.
+	GetOptionValue(name string, defaultValue *string) string
 
 	// WithOptions returns a copy of the route with other options.
 	WithOptions(options ...OptionParameterContract) RouteContract
@@ -286,7 +310,7 @@ type RouteContract interface {
 
 type CliRoutingDataContract interface {
 	// GetRoutes returns each route, keyed by its own name.
-	GetRoutes() map[string]RouteContract
+	GetRoutes() map[string]RouteFactory
 }
 
 type RouteCollectionContract interface {
