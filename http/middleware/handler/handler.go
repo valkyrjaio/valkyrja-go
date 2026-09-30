@@ -14,7 +14,6 @@
 package handler
 
 import (
-	containerconstant "github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 )
 
@@ -52,7 +51,7 @@ func (h *Handler) getNext() any {
 	id := h.middleware[h.index]
 	h.index++
 
-	resolved, err := h.container.Get(id, nil, containerconstant.NewInstanceOrThrowException)
+	resolved, err := h.container.Get(id, nil)
 	if err != nil {
 		return nil
 	}

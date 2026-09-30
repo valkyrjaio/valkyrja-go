@@ -19,7 +19,7 @@ import (
 )
 
 type RouteCollection struct {
-	routes  map[string]contract.RouteContract
+	routes  map[string]contract.RouteFactory
 	paths   map[constant.RequestMethod]map[string]string
 	regexes map[constant.RequestMethod]map[string]string
 }
@@ -27,7 +27,7 @@ type RouteCollection struct {
 // NewRouteCollection builds an empty collection.
 func NewRouteCollection() *RouteCollection {
 	return &RouteCollection{
-		routes:  map[string]contract.RouteContract{},
+		routes:  map[string]contract.RouteFactory{},
 		paths:   map[constant.RequestMethod]map[string]string{},
 		regexes: map[constant.RequestMethod]map[string]string{},
 	}
@@ -48,7 +48,7 @@ func (c *RouteCollection) SetFromData(routingData contract.HttpRoutingDataContra
 // Add files the route under its own name, and under its path or its regular
 // expression, for each request method that it matches.
 func (c *RouteCollection) Add(route contract.RouteContract) {
-	c.routes[route.GetName()] = route
+	c.routes[route.GetName()] = factoryOf(route)
 
 	dynamic, isDynamic := route.(contract.DynamicRouteContract)
 
@@ -73,7 +73,7 @@ func (c *RouteCollection) HasPath(path string, method constant.RequestMethod) bo
 
 // GetByPath returns the route at the static path, and nil where none matches.
 func (c *RouteCollection) GetByPath(path string, method constant.RequestMethod) contract.RouteContract {
-	return c.routes[c.paths[method][path]]
+	return c.get(c.paths[method][path])
 }
 
 // HasRegex reports whether a route matches the regular expression and the
@@ -90,7 +90,7 @@ func (c *RouteCollection) GetByRegex(
 	regex string,
 	method constant.RequestMethod,
 ) contract.DynamicRouteContract {
-	route, isDynamic := c.routes[c.regexes[method][regex]].(contract.DynamicRouteContract)
+	route, isDynamic := c.get(c.regexes[method][regex]).(contract.DynamicRouteContract)
 	if !isDynamic || route.GetRegex() == "" {
 		return nil
 	}
@@ -118,7 +118,7 @@ func (c *RouteCollection) HasName(name string) bool {
 // GetByName returns the route under the name, and nil where the collection holds
 // none.
 func (c *RouteCollection) GetByName(name string) contract.RouteContract {
-	return c.routes[name]
+	return c.get(name)
 }
 
 // GetAll returns every route that matches the request method, keyed by its own
@@ -127,11 +127,11 @@ func (c *RouteCollection) GetAll(method constant.RequestMethod) map[string]contr
 	all := map[string]contract.RouteContract{}
 
 	for _, name := range c.paths[method] {
-		all[name] = c.routes[name]
+		all[name] = c.get(name)
 	}
 
 	for _, name := range c.regexes[method] {
-		all[name] = c.routes[name]
+		all[name] = c.get(name)
 	}
 
 	return all
@@ -159,4 +159,31 @@ func (c *RouteCollection) fileUnder(
 	}
 
 	target[method][key] = name
+}
+
+// get returns the route under the name, and nil where the collection holds none.
+func (c *RouteCollection) get(name string) contract.RouteContract {
+	factory, found := c.routes[name]
+	if !found {
+		return nil
+	}
+
+	return c.resolve(name, factory)
+}
+
+// resolve builds the route from its factory, and keeps the route, so a later
+// read returns the same one without building it again.
+func (c *RouteCollection) resolve(name string, factory contract.RouteFactory) contract.RouteContract {
+	route := factory()
+
+	c.routes[name] = factoryOf(route)
+
+	return route
+}
+
+// factoryOf returns a factory that returns the route.
+func factoryOf(route contract.RouteContract) contract.RouteFactory {
+	return func() contract.RouteContract {
+		return route
+	}
 }
