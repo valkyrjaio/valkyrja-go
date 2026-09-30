@@ -8,10 +8,7 @@
 
 // Package contract holds every contract of the CLI component.
 //
-// The component keeps one `contract` package, for the reason that the container
-// component keeps one: Go resolves an import cycle at the package level, and the
-// contracts here name each other — a route names its middleware, and each
-// middleware names the route back.
+// The component keeps one `contract` package, as the container component does.
 //
 // Each `With` method returns a copy and leaves the receiver unchanged. The other
 // ports return `this` or `static`; Go has no such return type, so each one

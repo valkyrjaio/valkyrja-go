@@ -19,8 +19,3 @@ const (
 
 	CommandNameVersion = "version"
 )
-
-// The binding key of each service that the CLI server publishes.
-const (
-	InputHandlerContractServiceID = "valkyrja.cli.server.handler.InputHandlerContract"
-)
