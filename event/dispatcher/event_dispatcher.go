@@ -10,7 +10,6 @@
 package dispatcher
 
 import (
-	containerconstant "github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/event/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/event/contract"
@@ -117,7 +116,7 @@ func (d *EventDispatcher) DispatchListener(
 
 // getEventFromID builds the event that the binding key names.
 func (d *EventDispatcher) getEventFromID(eventID string, arguments []any) (contract.EventContract, error) {
-	resolved, err := d.container.Get(eventID, arguments, containerconstant.NewInstanceOrThrowException)
+	resolved, err := d.container.Get(eventID, arguments)
 	if err != nil {
 		return nil, err
 	}
