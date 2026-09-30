@@ -12,7 +12,6 @@ package manager
 import (
 	"maps"
 
-	"github.com/valkyrjaio/valkyrja-go/v26/container/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/contract"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/data"
 	"github.com/valkyrjaio/valkyrja-go/v26/container/throwable/exception"
@@ -145,7 +144,7 @@ func (c *Container) IsSingletonInstance(id string) bool {
 }
 
 // Get resolves the binding key.
-func (c *Container) Get(id string, arguments []any, mode constant.InvalidReferenceMode) (any, error) {
+func (c *Container) Get(id string, arguments []any) (any, error) {
 	c.publishUnpublishedProvided(id)
 
 	singleton, found, err := c.self.getSingletonWithoutChecks(id)
@@ -176,6 +175,14 @@ func (c *Container) Get(id string, arguments []any, mode constant.InvalidReferen
 	}
 
 	return nil, exception.NewContainerInvalidReferenceError(id)
+}
+
+// GetAliasedID returns the binding key that the alias points to, and reports
+// whether the container holds the alias.
+func (c *Container) GetAliasedID(alias string) (string, bool) {
+	id, found := c.aliases[alias]
+
+	return id, found
 }
 
 // GetAliased resolves the binding key as an alias.
@@ -307,7 +314,7 @@ func (c *Container) getAliasedWithoutChecks(id string, arguments []any) (any, bo
 		return nil, false, nil
 	}
 
-	resolved, err := c.self.Get(aliased, arguments, constant.NewInstanceOrThrowException)
+	resolved, err := c.self.Get(aliased, arguments)
 	if err != nil {
 		return nil, false, err
 	}
