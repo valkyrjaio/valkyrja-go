@@ -92,6 +92,10 @@ The dispatcher resolves each listener from the container and runs it in order. A
 stoppable event that stops propagation ends the run, and a collectable event
 holds what each listener returned.
 
+A dispatch by binding key needs a binding. `DispatchByID` resolves the event from
+the container, so a key that nothing binds reports
+`ContainerInvalidReferenceError`.
+
 Resolving from the container rather than by reflection is what lets the component
 work with no cache at all.
 
