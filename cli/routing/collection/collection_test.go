@@ -96,3 +96,30 @@ func TestTheReturnedMapIsACopy(t *testing.T) {
 		t.Error("All must return a copy, so a change to it must not reach the collection, but it did")
 	}
 }
+
+func TestTheCollectionBuildsACommandFromItsFactoryOnce(t *testing.T) {
+	t.Parallel()
+
+	builds := 0
+	route := newRoute(routeName)
+
+	collected := collection.NewCollection()
+	collected.SetFromData(data.NewCliRoutingData(map[string]contract.RouteFactory{
+		routeName: func() contract.RouteContract {
+			builds++
+
+			return route
+		},
+	}))
+
+	first := collected.Get(routeName)
+	second := collected.Get(routeName)
+
+	if builds != 1 {
+		t.Errorf("the collection must build the command once, but built it %d times", builds)
+	}
+
+	if first != second {
+		t.Error("the collection must keep the command that it built, but built another")
+	}
+}
