@@ -1,0 +1,165 @@
+/*
+ * This file is part of the Valkyrja Framework package.
+ *
+ * Copyright (c) 2016-present Melech Mizrachi
+ *
+ * Released under the MIT License. See LICENSE.md for details.
+ */
+
+// Package handler is the server's entry point for one input.
+package handler
+
+import (
+	"fmt"
+
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
+	interactionconstant "github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
+	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
+)
+
+type InputHandler struct {
+	container containercontract.ContainerContract
+	router    contract.RouterContract
+
+	inputReceivedHandler   contract.InputReceivedHandlerContract
+	throwableCaughtHandler contract.ThrowableCaughtHandlerContract
+	processExitingHandler  contract.ProcessExitingHandlerContract
+
+	outputFactory contract.OutputFactoryContract
+	exiter        func(code int)
+}
+
+// NewInputHandler builds the handler over a container, a router, the middleware
+// handler of each stage, and an output factory.
+func NewInputHandler(
+	container containercontract.ContainerContract,
+	router contract.RouterContract,
+	inputReceivedHandler contract.InputReceivedHandlerContract,
+	throwableCaughtHandler contract.ThrowableCaughtHandlerContract,
+	processExitingHandler contract.ProcessExitingHandlerContract,
+	outputFactory contract.OutputFactoryContract,
+	exiter func(code int),
+) *InputHandler {
+	return &InputHandler{
+		container:              container,
+		router:                 router,
+		inputReceivedHandler:   inputReceivedHandler,
+		throwableCaughtHandler: throwableCaughtHandler,
+		processExitingHandler:  processExitingHandler,
+		outputFactory:          outputFactory,
+		exiter:                 exiter,
+	}
+}
+
+// Handle returns the output for the input.
+func (h *InputHandler) Handle(input contract.InputContract) contract.OutputContract {
+	output := h.dispatch(input)
+
+	h.container.SetSingleton(interactionconstant.OutputContractServiceID, output)
+
+	return output
+}
+
+// Exit runs what is left before the process ends.
+func (h *InputHandler) Exit(input contract.InputContract, output contract.OutputContract) {
+	h.processExitingHandler.ProcessExiting(input, output)
+}
+
+// Run handles the input, writes what the command reported, and exits.
+func (h *InputHandler) Run(input contract.InputContract) {
+	output, err := h.Handle(input).WriteMessages()
+	if err != nil {
+		output = h.writeFailure(input, err)
+	}
+
+	h.Exit(input, output)
+
+	if h.exiter == nil {
+		return
+	}
+
+	h.exiter(int(output.GetExitCode()))
+}
+
+// writeFailure reports a failed write through the throwable-caught middleware,
+// and returns the output that carries the report.
+//
+// Warning: a middleware returns an output of its own, and that output can name
+// the destination that just failed. A second failure therefore falls back to an
+// output that the factory builds, and the exit code is the last diagnostic left
+// where even that write fails.
+func (h *InputHandler) writeFailure(input contract.InputContract, failure error) contract.OutputContract {
+	reported := h.throwableCaughtHandler.ThrowableCaught(
+		input,
+		h.createOutputFromThrowable(input, failure),
+		failure,
+	)
+
+	written, err := reported.WriteMessages()
+	if err == nil {
+		return written
+	}
+
+	fallback := h.createOutputFromThrowable(input, err)
+
+	written, err = fallback.WriteMessages()
+	if err != nil {
+		return fallback
+	}
+
+	return written
+}
+
+// dispatch runs the input through the router, and turns a failure into an
+// output.
+func (h *InputHandler) dispatch(input contract.InputContract) (output contract.OutputContract) {
+	defer func() {
+		recovered := recover()
+		if recovered == nil {
+			return
+		}
+
+		throwable, isError := recovered.(error)
+		if !isError {
+			throwable = fmt.Errorf("%v", recovered)
+		}
+
+		output = h.throwableCaughtHandler.ThrowableCaught(
+			input,
+			h.createOutputFromThrowable(input, throwable),
+			throwable,
+		)
+	}()
+
+	h.container.SetSingleton(interactionconstant.InputContractServiceID, input)
+
+	result := h.inputReceivedHandler.InputReceived(input)
+	if result.IsOutput() {
+		return result.GetOutput()
+	}
+
+	received := result.GetInput()
+
+	h.container.SetSingleton(interactionconstant.InputContractServiceID, received)
+
+	return h.router.Dispatch(received)
+}
+
+// createOutputFromThrowable builds the output that reports what went wrong.
+func (h *InputHandler) createOutputFromThrowable(
+	input contract.InputContract,
+	throwable error,
+) contract.OutputContract {
+	return h.outputFactory.CreateOutput(
+		interactionconstant.ExitCodeError,
+		message.NewBanner(message.NewErrorMessage("Cli Server Error:")),
+		message.NewNewLine(),
+		message.NewErrorMessage("Command:"),
+		message.NewMessage(" "+input.GetCommandName()),
+		message.NewNewLine(),
+		message.NewNewLine(),
+		message.NewErrorMessage("Message:"),
+		message.NewMessage(" "+throwable.Error()),
+	)
+}
