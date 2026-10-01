@@ -72,7 +72,7 @@ func TestWriteMessagesWritesEachMessageInOrder(t *testing.T) {
 		t.Fatalf("the output must write every message, but reported: %v", err)
 	}
 
-	if written.String() != firstText+"\n"+secondText+"\n" {
+	if written.String() != firstText+secondText {
 		t.Errorf("WriteMessages must write each message in order, but wrote: %q", written.String())
 	}
 
@@ -99,7 +99,7 @@ func TestWriteMessageRecordsTheMessage(t *testing.T) {
 		t.Error("WriteMessage must record the message, but did not")
 	}
 
-	if written.String() != firstText+"\n" {
+	if written.String() != firstText {
 		t.Errorf("WriteMessage must write the message, but wrote: %q", written.String())
 	}
 }
@@ -149,7 +149,7 @@ func TestAQuietOutputWritesWhereItReportsAFailure(t *testing.T) {
 		WithExitCode(constant.ExitCodeError).
 		WriteMessages()
 
-	if written.String() != firstText+"\n" {
+	if written.String() != firstText {
 		t.Errorf("a quiet output must write where it reports a failure, but wrote: %q", written.String())
 	}
 }
@@ -222,7 +222,7 @@ func TestWithWritersReturnsACopy(t *testing.T) {
 		format.NewFormatter(format.NewTextColorFormat(constant.TextColorRed)),
 	))
 
-	if other.String() != firstText+"\n" {
+	if other.String() != firstText {
 		t.Errorf("the plain writer must write the text with no format, but wrote: %q", other.String())
 	}
 
@@ -245,7 +245,7 @@ func TestTheStreamWriterWritesTheFormattedText(t *testing.T) {
 		format.NewFormatter(format.NewTextColorFormat(constant.TextColorRed)),
 	))
 
-	if written.String() != "\x1b[31mthe first\x1b[39m\n" {
+	if written.String() != "\x1b[31mthe first\x1b[39m" {
 		t.Errorf("the stream writer must write the formatted text, but wrote: %q", written.String())
 	}
 }
@@ -309,7 +309,7 @@ func TestAStreamThatReportsAFailureReachesTheCaller(t *testing.T) {
 		t.Error("the failure must unwrap to what the stream reported, but did not")
 	}
 
-	if failure.GetWritten() != 0 || failure.GetLength() != len(firstText)+1 {
+	if failure.GetWritten() != 0 || failure.GetLength() != len(firstText) {
 		t.Errorf("the failure must name how much the stream took, but named: %d of %d",
 			failure.GetWritten(), failure.GetLength())
 	}
@@ -410,7 +410,7 @@ func TestAFileWriterAppendsEachMessage(t *testing.T) {
 		t.Fatalf("the writer must create the file, but reported: %v", readErr)
 	}
 
-	if string(contents) != firstText+"\n"+secondText+"\n" {
+	if string(contents) != firstText+secondText {
 		t.Errorf("the writer must append each message, but wrote: %q", contents)
 	}
 }
