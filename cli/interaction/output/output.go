@@ -223,7 +223,7 @@ func (w *StreamWriter) ShouldWriteMessage(_ contract.MessageContract) bool {
 	return true
 }
 
-// Write writes the formatted text of the message, followed by a line break.
+// Write writes the formatted text of the message.
 func (w *StreamWriter) Write(
 	output contract.OutputContract,
 	message contract.MessageContract,
@@ -232,7 +232,7 @@ func (w *StreamWriter) Write(
 		return output, exception.NewCliInteractionUnwritableStreamError()
 	}
 
-	return output, writeText(w.writer, message.GetFormattedText()+"\n")
+	return output, writeText(w.writer, message.GetFormattedText())
 }
 
 type PlainWriter struct {
@@ -249,8 +249,7 @@ func (w *PlainWriter) ShouldWriteMessage(_ contract.MessageContract) bool {
 	return true
 }
 
-// Write writes the text of the message, with no format, followed by a line
-// break.
+// Write writes the text of the message, with no format.
 func (w *PlainWriter) Write(
 	output contract.OutputContract,
 	message contract.MessageContract,
@@ -259,7 +258,7 @@ func (w *PlainWriter) Write(
 		return output, exception.NewCliInteractionUnwritableStreamError()
 	}
 
-	return output, writeText(w.writer, message.GetText()+"\n")
+	return output, writeText(w.writer, message.GetText())
 }
 
 // filePermissions is what a new output file is created with. The owner reads and
@@ -296,8 +295,7 @@ func (w *FileWriter) ShouldWriteMessage(_ contract.MessageContract) bool {
 	return true
 }
 
-// Write appends the formatted text of the message to the file, followed by a
-// line break.
+// Write appends the formatted text of the message to the file.
 //
 // The writer opens the file for each message, because an output writes one
 // message at a time and a write that truncates keeps only the last one.
@@ -310,7 +308,7 @@ func (w *FileWriter) Write(
 		return output, exception.NewCliInteractionFileWriteError(w.filepath, err)
 	}
 
-	writeErr := writeText(file, message.GetFormattedText()+"\n")
+	writeErr := writeText(file, message.GetFormattedText())
 
 	closeErr := file.Close()
 	if writeErr == nil && closeErr != nil {

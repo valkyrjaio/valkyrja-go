@@ -100,7 +100,7 @@ func TestAPlainOutputAppliesNoFormat(t *testing.T) {
 		CreatePlainOutput(constant.ExitCodeSuccess, message.NewErrorMessage(outputText)).
 		WriteMessages()
 
-	if written.String() != outputText+"\n" {
+	if written.String() != outputText {
 		t.Errorf("a plain output must apply no format, but wrote: %q", written.String())
 	}
 }
