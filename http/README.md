@@ -291,18 +291,18 @@ middleware that each stage runs, by binding key, and carries the debug mode.
 
 ## Service Registration
 
-| Binding key                                                    | Holds                       |
-| :------------------------------------------------------------- | :-------------------------- |
-| `valkyrja.http.message.factory.ResponseFactoryContract`        | The response factory        |
-| `valkyrja.http.message.response.ResponseContract`              | The response of the request |
-| `valkyrja.http.routing.processor.ProcessorContract`            | The route processor         |
-| `valkyrja.http.routing.collection.RouteCollectionContract`     | Every route                 |
-| `valkyrja.http.routing.matcher.MatcherContract`                | The matcher                 |
-| `valkyrja.http.routing.url.UrlContract`                        | The URL generator           |
-| `valkyrja.http.routing.factory.RoutingResponseFactoryContract` | The route redirect factory  |
-| `valkyrja.http.routing.dispatcher.RouterContract`              | The router                  |
-| `valkyrja.http.routing.data.RouteContract`                     | The route that matched      |
-| `valkyrja.http.server.handler.RequestHandlerContract`          | The entry point             |
+| Binding key                                                      | Holds                       |
+| :--------------------------------------------------------------- | :-------------------------- |
+| `valkyrja.http.message.response.factory.ResponseFactoryContract` | The response factory        |
+| `valkyrja.http.message.response.ResponseContract`                | The response of the request |
+| `valkyrja.http.routing.processor.ProcessorContract`              | The route processor         |
+| `valkyrja.http.routing.collection.RouteCollectionContract`       | Every route                 |
+| `valkyrja.http.routing.matcher.MatcherContract`                  | The matcher                 |
+| `valkyrja.http.routing.url.UrlContract`                          | The URL generator           |
+| `valkyrja.http.routing.factory.RoutingResponseFactoryContract`   | The route redirect factory  |
+| `valkyrja.http.routing.dispatcher.RouterContract`                | The router                  |
+| `valkyrja.http.routing.data.RouteContract`                       | The route that matched      |
+| `valkyrja.http.server.handler.RequestHandlerContract`            | The entry point             |
 
 The processor reads each route before the collection files it, because the
 matcher reads the regular expression that the processor builds.
