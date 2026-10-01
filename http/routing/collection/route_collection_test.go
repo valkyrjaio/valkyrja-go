@@ -227,3 +227,36 @@ func TestTheCollectionSatisfiesItsContract(t *testing.T) {
 		t.Error("the contract must file the route, but did not")
 	}
 }
+
+func TestTheCollectionBuildsARouteFromItsFactoryOnce(t *testing.T) {
+	t.Parallel()
+
+	builds := 0
+	route := newStaticRoute(constant.RequestMethodGet)
+
+	collected := collection.NewRouteCollection()
+	collected.SetFromData(data.NewHttpRoutingData(
+		map[string]contract.RouteFactory{
+			routeName: func() contract.RouteContract {
+				builds++
+
+				return route
+			},
+		},
+		map[constant.RequestMethod]map[string]string{
+			constant.RequestMethodGet: {routePath: routeName},
+		},
+		nil,
+	))
+
+	first := collected.GetByName(routeName)
+	second := collected.GetByName(routeName)
+
+	if builds != 1 {
+		t.Errorf("the collection must build the route once, but built it %d times", builds)
+	}
+
+	if first != second {
+		t.Error("the collection must keep the route that it built, but built another")
+	}
+}
