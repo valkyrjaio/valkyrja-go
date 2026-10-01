@@ -41,23 +41,24 @@ container.Bind(constant.RouterContractServiceID, func(
 
 ## Resolving a Service
 
-`Get` takes the binding key, the arguments that a factory reads, and what to do
-with a key that the container does not hold:
+`Get` takes the binding key and the arguments that a factory reads:
 
 ```go
-resolved, err := container.Get(id, nil, constant.NewInstanceOrThrowException)
+resolved, err := container.Get(id, nil)
 if err != nil {
 	return err
 }
 ```
 
-| Mode                          | Where the container holds no such key |
-| :---------------------------- | :------------------------------------ |
-| `NewInstanceOrThrowException` | Reports a failure                     |
-| `NewInstanceOrNull`           | Returns nil                           |
+Every service needs a binding. `Get` reports
+`ContainerInvalidReferenceError` for a key that nothing binds, rather than
+building a service that no binding describes.
 
 Go reports a failure with a returned error rather than a throw, so every resolve
 carries an error alongside the value.
+
+`GetAliasedID` returns the key that an alias points at, and reports whether the
+container holds the alias at all.
 
 ## Service Providers
 
