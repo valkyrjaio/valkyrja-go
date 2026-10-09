@@ -73,6 +73,8 @@ func (h *InputHandler) Run(input contract.InputContract) {
 		output = h.writeFailure(input, err)
 	}
 
+	h.container.SetSingleton(interactionconstant.OutputContractServiceID, output)
+
 	h.Exit(input, output)
 
 	if h.exiter == nil {

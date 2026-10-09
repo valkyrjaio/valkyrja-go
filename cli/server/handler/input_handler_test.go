@@ -342,6 +342,23 @@ func TestRunFallsBackWhereAMiddlewareReturnsAFailingOutput(t *testing.T) {
 			reported.String())
 	}
 
+	// The command reported success, so a bound output that still reads as success
+	// is the one from before the write rather than the report.
+	resolved, resolveErr := container.GetSingleton(interactionconstant.OutputContractServiceID)
+	if resolveErr != nil {
+		t.Fatalf("the run must bind the output it wrote, but reported: %v", resolveErr)
+	}
+
+	bound, isOutput := resolved.(contract.OutputContract)
+	if !isOutput {
+		t.Fatal("the run must bind an output, but bound another type")
+	}
+
+	if bound.GetExitCode() != interactionconstant.ExitCodeError {
+		t.Errorf("the run must bind the output that carries the report, but bound one with: %v",
+			bound.GetExitCode())
+	}
+
 	if len(exited) != 1 || exited[0] != int(interactionconstant.ExitCodeError) {
 		t.Errorf("the run must exit with a failure, but exited with: %v", exited)
 	}
