@@ -299,8 +299,12 @@ func TestRunFallsBackWhereAMiddlewareReturnsAFailingOutput(t *testing.T) {
 	failing := interactionfactory.NewOutputFactoryForWriter(nil, &interactionfixtures.FailingWriterFixture{})
 	good := interactionfactory.NewOutputFactoryForWriter(nil, reported)
 
+	// The middleware's output fails for its own reason, so the report below names
+	// the write that failed first and the one that the report itself raised.
+	unwritable := interactionfactory.NewOutputFactoryForWriter(nil, nil)
+
 	container.SetSingleton(replacingMiddlewareID, &replacingThrowableCaughtMiddlewareFixture{
-		output: failing.CreateOutput(interactionconstant.ExitCodeError, message.NewMessage("unreachable")),
+		output: unwritable.CreateOutput(interactionconstant.ExitCodeError, message.NewMessage("unreachable")),
 	})
 
 	built := collection.NewCollection()
@@ -326,6 +330,16 @@ func TestRunFallsBackWhereAMiddlewareReturnsAFailingOutput(t *testing.T) {
 
 	if !strings.Contains(reported.String(), "Cli Server Error:") {
 		t.Errorf("the fallback must reach the caller, but the report is: %q", reported.String())
+	}
+
+	if !strings.Contains(reported.String(), "Unable to write the whole message to the stream") {
+		t.Errorf("the fallback must name the write that failed first, but the report is: %q", reported.String())
+	}
+
+	if !strings.Contains(reported.String(), "Recovery message:") ||
+		!strings.Contains(reported.String(), "The writer holds no stream to write to") {
+		t.Errorf("the fallback must name the failure that the report raised, but the report is: %q",
+			reported.String())
 	}
 
 	if len(exited) != 1 || exited[0] != int(interactionconstant.ExitCodeError) {

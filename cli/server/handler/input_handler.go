@@ -101,7 +101,7 @@ func (h *InputHandler) writeFailure(input contract.InputContract, failure error)
 		return written
 	}
 
-	fallback := h.createOutputFromThrowable(input, err)
+	fallback := h.createRecoveryOutput(input, failure, err)
 
 	written, err = fallback.WriteMessages()
 	if err != nil {
@@ -153,13 +153,41 @@ func (h *InputHandler) createOutputFromThrowable(
 ) contract.OutputContract {
 	return h.outputFactory.CreateOutput(
 		interactionconstant.ExitCodeError,
+		throwableMessages(input, throwable)...,
+	)
+}
+
+// createRecoveryOutput builds the output that reports the failure, and the
+// failure that the report of it raised.
+func (h *InputHandler) createRecoveryOutput(
+	input contract.InputContract,
+	throwable error,
+	recovery error,
+) contract.OutputContract {
+	messages := append(
+		throwableMessages(input, throwable),
+		message.NewNewLine(),
+		message.NewErrorMessage("Recovery message:"),
+		message.NewMessage(" "+recovery.Error()),
+		message.NewNewLine(),
+	)
+
+	return h.outputFactory.CreateOutput(interactionconstant.ExitCodeError, messages...)
+}
+
+// throwableMessages returns each message that reports the throwable.
+func throwableMessages(
+	input contract.InputContract,
+	throwable error,
+) []contract.MessageContract {
+	return []contract.MessageContract{
 		message.NewBanner(message.NewErrorMessage("Cli Server Error:")),
 		message.NewNewLine(),
 		message.NewErrorMessage("Command:"),
-		message.NewMessage(" "+input.GetCommandName()),
+		message.NewMessage(" " + input.GetCommandName()),
 		message.NewNewLine(),
 		message.NewNewLine(),
 		message.NewErrorMessage("Message:"),
-		message.NewMessage(" "+throwable.Error()),
-	)
+		message.NewMessage(" " + throwable.Error()),
+	}
 }
