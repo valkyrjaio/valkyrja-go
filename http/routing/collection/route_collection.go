@@ -19,17 +19,19 @@ import (
 )
 
 type RouteCollection struct {
-	routes  map[string]contract.RouteFactory
-	paths   map[constant.RequestMethod]map[string]string
-	regexes map[constant.RequestMethod]map[string]string
+	routes       map[string]contract.RouteFactory
+	paths        map[constant.RequestMethod]map[string]string
+	dynamicPaths map[constant.RequestMethod]map[string]string
+	regexes      map[constant.RequestMethod]map[string]string
 }
 
 // NewRouteCollection builds an empty collection.
 func NewRouteCollection() *RouteCollection {
 	return &RouteCollection{
-		routes:  map[string]contract.RouteFactory{},
-		paths:   map[constant.RequestMethod]map[string]string{},
-		regexes: map[constant.RequestMethod]map[string]string{},
+		routes:       map[string]contract.RouteFactory{},
+		paths:        map[constant.RequestMethod]map[string]string{},
+		dynamicPaths: map[constant.RequestMethod]map[string]string{},
+		regexes:      map[constant.RequestMethod]map[string]string{},
 	}
 }
 
@@ -43,6 +45,7 @@ func (c *RouteCollection) SetFromData(routingData contract.HttpRoutingDataContra
 	c.routes = routingData.GetRoutes()
 	c.paths = routingData.GetPaths()
 	c.regexes = routingData.GetRegexes()
+	c.dynamicPaths = map[constant.RequestMethod]map[string]string{}
 }
 
 // Add files the route under its own name, and under its path or its regular
@@ -54,6 +57,7 @@ func (c *RouteCollection) Add(route contract.RouteContract) {
 
 	for _, method := range c.getMethodsOf(route) {
 		if isDynamic && dynamic.GetRegex() != "" {
+			c.fileUnder(c.dynamicPaths, method, route.GetPath(), route.GetName())
 			c.fileUnder(c.regexes, method, dynamic.GetRegex(), route.GetName())
 
 			continue
@@ -66,14 +70,23 @@ func (c *RouteCollection) Add(route contract.RouteContract) {
 // HasPath reports whether a route matches the static path and the request
 // method.
 func (c *RouteCollection) HasPath(path string, method constant.RequestMethod) bool {
-	_, found := c.paths[method][path]
+	if _, found := c.paths[method][path]; found {
+		return true
+	}
+
+	_, found := c.dynamicPaths[method][path]
 
 	return found
 }
 
 // GetByPath returns the route at the static path, and nil where none matches.
 func (c *RouteCollection) GetByPath(path string, method constant.RequestMethod) contract.RouteContract {
-	return c.get(c.paths[method][path])
+	name, found := c.paths[method][path]
+	if !found {
+		name = c.dynamicPaths[method][path]
+	}
+
+	return c.get(name)
 }
 
 // HasRegex reports whether a route matches the regular expression and the

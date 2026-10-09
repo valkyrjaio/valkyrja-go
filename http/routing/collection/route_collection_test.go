@@ -23,6 +23,7 @@ const (
 	routeName    = "users.index"
 	routePath    = "/users"
 	dynamicName  = "users.show"
+	dynamicPath  = "/users/{id}"
 	dynamicRegex = `^/users/(?P<id>\d+)$`
 )
 
@@ -41,7 +42,7 @@ func newStaticRoute(methods ...constant.RequestMethod) *data.Route {
 // newDynamicRoute builds a dynamic route for the GET method.
 func newDynamicRoute() *data.Route {
 	return data.NewDynamicRoute(
-		data.NewRoute("/users/{id}", dynamicName, newHandler()),
+		data.NewRoute(dynamicPath, dynamicName, newHandler()),
 		dynamicRegex,
 		data.NewParameter("id", `(?P<id>\d+)`),
 	)
@@ -66,7 +67,7 @@ func TestAddFilesAStaticRouteUnderItsPath(t *testing.T) {
 	}
 }
 
-func TestAddFilesADynamicRouteUnderItsRegex(t *testing.T) {
+func TestAddFilesADynamicRouteUnderItsRegexAndItsPath(t *testing.T) {
 	t.Parallel()
 
 	built := collection.NewRouteCollection()
@@ -80,8 +81,16 @@ func TestAddFilesADynamicRouteUnderItsRegex(t *testing.T) {
 		t.Error("the collection must return the route at the regular expression, but did not")
 	}
 
-	if built.HasPath("/users/{id}", constant.RequestMethodGet) {
-		t.Error("a dynamic route must not file under its path, but did")
+	if !built.HasPath(dynamicPath, constant.RequestMethodGet) {
+		t.Error("the collection must file the route under its own path, but did not")
+	}
+
+	if built.GetByPath(dynamicPath, constant.RequestMethodGet) == nil {
+		t.Error("the collection must return the route at its own path, but did not")
+	}
+
+	if _, found := built.GetPaths(constant.RequestMethodGet)[dynamicPath]; found {
+		t.Error("the static paths must hold no dynamic route, but held one")
 	}
 }
 
