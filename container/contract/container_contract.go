@@ -24,9 +24,9 @@ type ContainerDataContract interface {
 	// key that it points to.
 	GetAliases() map[string]string
 
-	// GetDeferredCallbacks returns each deferred publisher, keyed by the
-	// binding key that it publishes.
-	GetDeferredCallbacks() map[string]PublishFunc
+	// GetCallbacks returns each deferred publisher, keyed by the binding key
+	// that it publishes.
+	GetCallbacks() map[string]PublishFunc
 
 	// GetServices returns each service factory, keyed by the binding key.
 	GetServices() map[string]ServiceFactory
