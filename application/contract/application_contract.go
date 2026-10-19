@@ -76,11 +76,6 @@ type ComponentProviderContract interface {
 	GetHttpProviders(app ApplicationContract) []httpcontract.HttpRouteProviderContract
 }
 
-type PublishableComponentProviderContract interface {
-	// Publish runs what the component needs at boot.
-	Publish(app ApplicationContract)
-}
-
 //nolint:interfacebloat // Parity with the PHP reference implementation.
 type ConfigContract interface {
 	// GetNamespace returns the namespace of the application.
