@@ -634,3 +634,45 @@ func TestPublishRunsEachPublisherThatTheProviderDefers(t *testing.T) {
 	}
 }
 
+// identifiedFixture is a service that a test tells apart by its name.
+type identifiedFixture struct {
+	name string
+}
+
+func TestASingletonKeepsTheInstanceThatTheFactoryRecorded(t *testing.T) {
+	t.Parallel()
+
+	container := manager.NewContainer(nil)
+	recorded := &identifiedFixture{name: "recorded"}
+
+	// A factory that records the instance itself wins, because the first
+	// instance is the one every later caller reads.
+	container.BindSingleton(singletonID, func(inner contract.ContainerContract, _ []any) any {
+		inner.SetSingleton(singletonID, recorded)
+
+		return &identifiedFixture{name: "returned"}
+	})
+
+	resolved, err := container.Get(singletonID, nil)
+	if err != nil {
+		t.Fatalf("Get must resolve the singleton, but reported: %v", err)
+	}
+
+	built, isFixture := resolved.(*identifiedFixture)
+	if !isFixture {
+		t.Fatalf("Get must resolve the fixture, but resolved: %T", resolved)
+	}
+
+	if built.name != "recorded" {
+		t.Errorf("the container must keep the instance that the factory recorded, but kept: %q", built.name)
+	}
+
+	again, err := container.Get(singletonID, nil)
+	if err != nil {
+		t.Fatalf("Get must resolve the singleton again, but reported: %v", err)
+	}
+
+	if again != resolved {
+		t.Error("a later read must return the instance that the first read returned, but returned another")
+	}
+}

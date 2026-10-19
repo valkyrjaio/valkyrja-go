@@ -291,6 +291,12 @@ func (c *Container) getSingletonWithoutChecks(id string) (any, bool, error) {
 		return nil, false, nil
 	}
 
+	// The factory can record the instance itself, and the first instance is the
+	// one every later caller reads.
+	if recorded, exists := c.instances[id]; exists {
+		return recorded, true, nil
+	}
+
 	c.instances[id] = singleton
 
 	return singleton, true, nil
