@@ -33,6 +33,7 @@ const (
 // gives it.
 type applicationFixture struct {
 	eventProviders []contract.ListenerProviderContract
+	debug          bool
 }
 
 func (a *applicationFixture) GetContainer() containercontract.ContainerContract { return nil }
@@ -57,7 +58,7 @@ func (a *applicationFixture) GetHttpProviders() []httpcontract.HttpRouteProvider
 	return nil
 }
 
-func (a *applicationFixture) GetDebugMode() bool { return false }
+func (a *applicationFixture) GetDebugMode() bool { return a.debug }
 
 func (a *applicationFixture) GetEnvironment() string { return "" }
 
@@ -107,6 +108,7 @@ func TestPublishListenerCollectionFilesEveryListenerThatAProviderRegisters(t *te
 	t.Parallel()
 
 	container := newContainerWithApplication(&applicationFixture{
+		debug: true,
 		eventProviders: []contract.ListenerProviderContract{
 			&fixtures.ListenerProviderFixture{Listeners: []contract.ListenerContract{newListener()}},
 		},
@@ -126,6 +128,57 @@ func TestPublishListenerCollectionFilesEveryListenerThatAProviderRegisters(t *te
 
 	if !collected.HasListenerByID(listenerName) {
 		t.Error("the provider must file the listener that the provider registers, but did not")
+	}
+}
+
+func TestPublishListenerCollectionReadsTheStateOutsideDebugMode(t *testing.T) {
+	t.Parallel()
+
+	// The state carries the listener, so the collection takes it without
+	// reading a provider.
+	container := newContainerWithApplication(&applicationFixture{})
+	container.SetSingleton(constant.EventDataServiceID, data.NewEventData(
+		map[string][]string{eventID: {listenerName}},
+		map[string]contract.ListenerFactory{listenerName: newListener},
+	))
+
+	provider.PublishListenerCollection(container)
+
+	resolved, err := container.GetSingleton(constant.ListenerCollectionContractServiceID)
+	if err != nil {
+		t.Fatalf("the provider must bind the collection, but reported: %v", err)
+	}
+
+	collected, isCollection := resolved.(contract.ListenerCollectionContract)
+	if !isCollection {
+		t.Fatal("the provider must bind a listener collection, but bound another type")
+	}
+
+	if !collected.HasListenerByID(listenerName) {
+		t.Error("the provider must take the listener from the state, but did not")
+	}
+}
+
+func TestPublishListenerCollectionBindsAnEmptyCollectionWhereTheStateIsAnotherType(t *testing.T) {
+	t.Parallel()
+
+	container := newContainerWithApplication(&applicationFixture{})
+	container.SetSingleton(constant.EventDataServiceID, &fixtures.NotAnEventFixture{})
+
+	provider.PublishListenerCollection(container)
+
+	resolved, err := container.GetSingleton(constant.ListenerCollectionContractServiceID)
+	if err != nil {
+		t.Fatalf("the provider must bind the collection, but reported: %v", err)
+	}
+
+	collected, isCollection := resolved.(contract.ListenerCollectionContract)
+	if !isCollection {
+		t.Fatal("the provider must bind a listener collection, but bound another type")
+	}
+
+	if collected.HasListenerByID(listenerName) {
+		t.Error("the provider must file no listener where the state is another type, but filed one")
 	}
 }
 
@@ -275,5 +328,27 @@ func TestTheProvidersSatisfyTheirContracts(t *testing.T) {
 
 	if component.GetContainerProviders(nil) == nil {
 		t.Error("the component provider must register a service provider, but registered none")
+	}
+}
+
+func TestPublishEventDataBindsAnEmptyStateWhereNoApplicationResolves(t *testing.T) {
+	t.Parallel()
+
+	container := manager.NewContainer(nil)
+
+	provider.PublishEventData(container)
+
+	resolved, err := container.GetSingleton(constant.EventDataServiceID)
+	if err != nil {
+		t.Fatalf("the provider must bind the data, but reported: %v", err)
+	}
+
+	eventData, isData := resolved.(contract.EventDataContract)
+	if !isData {
+		t.Fatal("the provider must bind the component's data, but bound another type")
+	}
+
+	if len(eventData.GetListeners()) != 0 {
+		t.Error("the data must hold no listener where no application resolves, but held one")
 	}
 }
