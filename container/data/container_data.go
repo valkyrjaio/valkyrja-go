@@ -17,25 +17,25 @@ import (
 )
 
 type ContainerData struct {
-	aliases           map[string]string
-	deferredCallbacks map[string]contract.PublishFunc
-	services          map[string]contract.ServiceFactory
-	singletons        map[string]string
+	aliases    map[string]string
+	callbacks  map[string]contract.PublishFunc
+	services   map[string]contract.ServiceFactory
+	singletons map[string]string
 }
 
 // NewContainerData builds the state from each map. It copies every map, and it
 // accepts nil for a map that carries nothing.
 func NewContainerData(
 	aliases map[string]string,
-	deferredCallbacks map[string]contract.PublishFunc,
+	callbacks map[string]contract.PublishFunc,
 	services map[string]contract.ServiceFactory,
 	singletons map[string]string,
 ) *ContainerData {
 	return &ContainerData{
-		aliases:           copyMap(aliases),
-		deferredCallbacks: copyMap(deferredCallbacks),
-		services:          copyMap(services),
-		singletons:        copyMap(singletons),
+		aliases:    copyMap(aliases),
+		callbacks:  copyMap(callbacks),
+		services:   copyMap(services),
+		singletons: copyMap(singletons),
 	}
 }
 
@@ -44,9 +44,9 @@ func (d *ContainerData) GetAliases() map[string]string {
 	return copyMap(d.aliases)
 }
 
-// GetDeferredCallbacks returns a copy of each deferred publisher.
-func (d *ContainerData) GetDeferredCallbacks() map[string]contract.PublishFunc {
-	return copyMap(d.deferredCallbacks)
+// GetCallbacks returns a copy of each deferred publisher.
+func (d *ContainerData) GetCallbacks() map[string]contract.PublishFunc {
+	return copyMap(d.callbacks)
 }
 
 // GetServices returns a copy of each service factory.
