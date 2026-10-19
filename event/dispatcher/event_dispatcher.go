@@ -126,6 +126,12 @@ func (d *EventDispatcher) getEventFromID(eventID string, arguments []any) (contr
 		return nil, exception.NewEventInvalidEventError(eventID)
 	}
 
+	// The binding can resolve any value, so the event states the identifier it
+	// answers for and the dispatcher reads it back.
+	if event.GetEventID() != eventID {
+		return nil, exception.NewEventInvalidEventError(eventID)
+	}
+
 	argumentsCapable, isArgumentsCapable := event.(contract.ArgumentsCapableEventContract)
 	if isArgumentsCapable {
 		return argumentsCapable.WithArguments(arguments), nil
