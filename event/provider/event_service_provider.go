@@ -16,6 +16,7 @@ import (
 	"github.com/valkyrjaio/valkyrja-go/v26/event/collection"
 	"github.com/valkyrjaio/valkyrja-go/v26/event/constant"
 	"github.com/valkyrjaio/valkyrja-go/v26/event/contract"
+	"github.com/valkyrjaio/valkyrja-go/v26/event/data"
 	"github.com/valkyrjaio/valkyrja-go/v26/event/dispatcher"
 )
 
@@ -30,18 +31,23 @@ func (p *EventServiceProvider) Publishers() map[string]containercontract.Publish
 	}
 }
 
-// PublishListenerCollection binds the collection, and files every listener that a
-// listener provider of the application registers.
+// PublishListenerCollection binds the collection, and fills it from the
+// component's state.
+//
+// An application that runs in debug mode reads each listener from its providers
+// instead, so a change to a provider reaches the run without a new state.
 func PublishListenerCollection(container containercontract.ContainerContract) {
 	built := collection.NewListenerCollection()
 
-	for _, listenerProvider := range getListenerProviders(container) {
-		for _, listener := range listenerProvider.GetListeners() {
-			built.AddListener(listener)
-		}
+	container.SetSingleton(constant.ListenerCollectionContractServiceID, built)
+
+	if isDebugMode(container) {
+		PublishEventData(container)
+
+		return
 	}
 
-	container.SetSingleton(constant.ListenerCollectionContractServiceID, built)
+	built.SetFromData(getEventData(container))
 }
 
 // PublishEventDispatcher binds the dispatcher that runs the listeners of an
@@ -53,16 +59,48 @@ func PublishEventDispatcher(container containercontract.ContainerContract) {
 	)
 }
 
-// PublishEventData binds the state of the collection, which `sindri` generates.
+// PublishEventData files every listener that a listener provider of the
+// application registers, and binds the state that holds them.
 func PublishEventData(container containercontract.ContainerContract) {
-	container.SetSingleton(constant.EventDataServiceID, getCollection(container).GetData())
+	built := getCollection(container)
+
+	for _, listenerProvider := range getListenerProviders(container) {
+		for _, listener := range listenerProvider.GetListeners() {
+			built.AddListener(listener)
+		}
+	}
+
+	container.SetSingleton(constant.EventDataServiceID, built.GetData())
 }
 
-// getListenerProviders returns each listener provider that the application
-// registers.
-func getListenerProviders(
+// isDebugMode reports whether the application runs in debug mode.
+func isDebugMode(container containercontract.ContainerContract) bool {
+	app := getApplication(container)
+
+	return app != nil && app.GetDebugMode()
+}
+
+// getEventData returns the component's state, and an empty state where the
+// container holds none.
+func getEventData(container containercontract.ContainerContract) contract.EventDataContract {
+	resolved, err := container.GetSingleton(constant.EventDataServiceID)
+	if err != nil {
+		return data.NewEventData(nil, nil)
+	}
+
+	eventData, isData := resolved.(contract.EventDataContract)
+	if !isData {
+		return data.NewEventData(nil, nil)
+	}
+
+	return eventData
+}
+
+// getApplication returns the application, and nil where the container holds
+// none.
+func getApplication(
 	container containercontract.ContainerContract,
-) []contract.ListenerProviderContract {
+) applicationcontract.ApplicationContract {
 	resolved, err := container.GetSingleton(applicationconstant.ApplicationContractServiceID)
 	if err != nil {
 		return nil
@@ -70,6 +108,19 @@ func getListenerProviders(
 
 	app, isApplication := resolved.(applicationcontract.ApplicationContract)
 	if !isApplication {
+		return nil
+	}
+
+	return app
+}
+
+// getListenerProviders returns each listener provider that the application
+// registers.
+func getListenerProviders(
+	container containercontract.ContainerContract,
+) []contract.ListenerProviderContract {
+	app := getApplication(container)
+	if app == nil {
 		return nil
 	}
 
