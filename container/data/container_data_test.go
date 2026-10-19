@@ -37,8 +37,8 @@ func TestNewContainerDataHoldsEachMap(t *testing.T) {
 		t.Errorf("GetAliases must hold the alias, but holds: %v", containerData.GetAliases())
 	}
 
-	if _, found := containerData.GetDeferredCallbacks()[deferredID]; !found {
-		t.Error("GetDeferredCallbacks must hold the publisher, but does not")
+	if _, found := containerData.GetCallbacks()[deferredID]; !found {
+		t.Error("GetCallbacks must hold the publisher, but does not")
 	}
 
 	if _, found := containerData.GetServices()[serviceID]; !found {
@@ -59,8 +59,8 @@ func TestNewContainerDataAcceptsNilForEachMap(t *testing.T) {
 		t.Errorf("GetAliases must be empty, but holds: %v", containerData.GetAliases())
 	}
 
-	if len(containerData.GetDeferredCallbacks()) != 0 {
-		t.Errorf("GetDeferredCallbacks must be empty, but holds: %v", containerData.GetDeferredCallbacks())
+	if len(containerData.GetCallbacks()) != 0 {
+		t.Errorf("GetCallbacks must be empty, but holds: %v", containerData.GetCallbacks())
 	}
 
 	if len(containerData.GetServices()) != 0 {
@@ -96,7 +96,7 @@ func TestEachGetterReturnsACopy(t *testing.T) {
 	)
 
 	delete(containerData.GetAliases(), aliasID)
-	delete(containerData.GetDeferredCallbacks(), deferredID)
+	delete(containerData.GetCallbacks(), deferredID)
 	delete(containerData.GetServices(), serviceID)
 	delete(containerData.GetSingletons(), singletonID)
 
@@ -104,8 +104,8 @@ func TestEachGetterReturnsACopy(t *testing.T) {
 		t.Error("GetAliases must return a copy, but the delete reached the data")
 	}
 
-	if len(containerData.GetDeferredCallbacks()) != 1 {
-		t.Error("GetDeferredCallbacks must return a copy, but the delete reached the data")
+	if len(containerData.GetCallbacks()) != 1 {
+		t.Error("GetCallbacks must return a copy, but the delete reached the data")
 	}
 
 	if len(containerData.GetServices()) != 1 {

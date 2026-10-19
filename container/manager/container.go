@@ -26,25 +26,25 @@ type containerInternal interface {
 }
 
 type Container struct {
-	self              containerInternal
-	aliases           map[string]string
-	instances         map[string]any
-	services          map[string]contract.ServiceFactory
-	singletons        map[string]string
-	deferredCallbacks map[string]contract.PublishFunc
-	published         map[string]bool
+	self       containerInternal
+	aliases    map[string]string
+	instances  map[string]any
+	services   map[string]contract.ServiceFactory
+	singletons map[string]string
+	callbacks  map[string]contract.PublishFunc
+	published  map[string]bool
 }
 
 // NewContainer builds a container and loads the state into it. It accepts nil
 // for an empty container.
 func NewContainer(containerData contract.ContainerDataContract) *Container {
 	container := &Container{
-		aliases:           map[string]string{},
-		instances:         map[string]any{},
-		services:          map[string]contract.ServiceFactory{},
-		singletons:        map[string]string{},
-		deferredCallbacks: map[string]contract.PublishFunc{},
-		published:         map[string]bool{},
+		aliases:    map[string]string{},
+		instances:  map[string]any{},
+		services:   map[string]contract.ServiceFactory{},
+		singletons: map[string]string{},
+		callbacks:  map[string]contract.PublishFunc{},
+		published:  map[string]bool{},
 	}
 
 	container.self = container
@@ -58,13 +58,13 @@ func NewContainer(containerData contract.ContainerDataContract) *Container {
 
 // GetData returns the container's state.
 func (c *Container) GetData() contract.ContainerDataContract {
-	return data.NewContainerData(c.aliases, c.deferredCallbacks, c.services, c.singletons)
+	return data.NewContainerData(c.aliases, c.callbacks, c.services, c.singletons)
 }
 
 // SetFromData merges the state into the container.
 func (c *Container) SetFromData(containerData contract.ContainerDataContract) {
 	maps.Copy(c.aliases, containerData.GetAliases())
-	maps.Copy(c.deferredCallbacks, containerData.GetDeferredCallbacks())
+	maps.Copy(c.callbacks, containerData.GetCallbacks())
 	maps.Copy(c.services, containerData.GetServices())
 	maps.Copy(c.singletons, containerData.GetSingletons())
 }
@@ -238,7 +238,7 @@ func (c *Container) Register(provider contract.ServiceProviderContract) error {
 			return exception.NewContainerInvalidPublishCallbackError(id)
 		}
 
-		c.deferredCallbacks[id] = publisher
+		c.callbacks[id] = publisher
 	}
 
 	return nil
@@ -246,7 +246,7 @@ func (c *Container) Register(provider contract.ServiceProviderContract) error {
 
 // IsDeferred reports whether a provider defers the binding key.
 func (c *Container) IsDeferred(id string) bool {
-	_, found := c.deferredCallbacks[id]
+	_, found := c.callbacks[id]
 
 	return found
 }
@@ -260,7 +260,7 @@ func (c *Container) IsPublished(id string) bool {
 
 // Publish runs the deferred publisher for the binding key.
 func (c *Container) Publish(id string) {
-	publisher, found := c.deferredCallbacks[id]
+	publisher, found := c.callbacks[id]
 	if !found {
 		return
 	}
@@ -287,11 +287,13 @@ func (c *Container) getSingletonWithoutChecks(id string) (any, bool, error) {
 		return nil, false, err
 	}
 
-	if found {
-		c.instances[id] = singleton
+	if !found {
+		return nil, false, nil
 	}
 
-	return singleton, found, nil
+	c.instances[id] = singleton
+
+	return singleton, true, nil
 }
 
 // getServiceWithoutChecks calls the factory for the binding key, and reports

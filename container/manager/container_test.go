@@ -633,3 +633,4 @@ func TestPublishRunsEachPublisherThatTheProviderDefers(t *testing.T) {
 		t.Error("Publish must run each publisher that the provider defers, but did not")
 	}
 }
+

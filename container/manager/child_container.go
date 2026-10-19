@@ -35,7 +35,7 @@ func NewChildContainer(
 
 	if containerData != nil {
 		maps.Copy(child.singletons, containerData.GetSingletons())
-		maps.Copy(child.deferredCallbacks, containerData.GetDeferredCallbacks())
+		maps.Copy(child.callbacks, containerData.GetCallbacks())
 	}
 
 	return child
