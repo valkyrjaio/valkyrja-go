@@ -363,3 +363,21 @@ func TestDispatchByIDIfHasListenersCarriesTheContainerFailure(t *testing.T) {
 		t.Errorf("DispatchByIDIfHasListeners must carry the container's failure, but reported: %v", err)
 	}
 }
+
+func TestDispatchByIDReportsAnEventThatAnswersForAnotherID(t *testing.T) {
+	t.Parallel()
+
+	// The binding resolves an event, but one that states another identifier.
+	container := manager.NewContainer(nil)
+	container.Bind("valkyrja.tests.event.OtherEvent", func(_ containercontract.ContainerContract, _ []any) any {
+		return &fixtures.EventFixture{}
+	})
+
+	eventDispatcher := dispatcher.NewEventDispatcher(collection.NewListenerCollection(), container)
+
+	_, err := eventDispatcher.DispatchByID("valkyrja.tests.event.OtherEvent", nil)
+
+	if _, found := errors.AsType[*exception.EventInvalidEventError](err); !found {
+		t.Errorf("DispatchByID must report an event that answers for another identifier, but reported: %v", err)
+	}
+}
