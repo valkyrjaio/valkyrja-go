@@ -12,8 +12,8 @@ package constant
 // Package version metadata. The release workflow rewrites these values.
 const (
 	// Version is the package version.
-	Version = "26.0.17"
+	Version = "26.0.18"
 
 	// VersionBuildDateTime is the package version build datetime.
-	VersionBuildDateTime = "October 20 2026 09:42:57 MST"
+	VersionBuildDateTime = "October 23 2026 09:52:06 MST"
 )
