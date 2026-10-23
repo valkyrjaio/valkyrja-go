@@ -29,7 +29,7 @@ func NewInputReceivedHandler(
 // InputReceived runs the next middleware, and returns the input where the
 // handler holds none.
 func (h *InputReceivedHandler) InputReceived(input contract.InputContract) contract.InputReceivedResultContract {
-	middleware, isMiddleware := h.getNext().(contract.InputReceivedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.InputReceivedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return data.NewInputReceivedInput(input)
 	}
@@ -55,7 +55,7 @@ func (h *RouteMatchedHandler) RouteMatched(
 	input contract.InputContract,
 	route contract.RouteContract,
 ) contract.RouteMatchedResultContract {
-	middleware, isMiddleware := h.getNext().(contract.RouteMatchedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RouteMatchedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return data.NewRouteMatchedRoute(route)
 	}
@@ -81,7 +81,7 @@ func (h *RouteNotMatchedHandler) RouteNotMatched(
 	input contract.InputContract,
 	output contract.OutputContract,
 ) contract.OutputContract {
-	middleware, isMiddleware := h.getNext().(contract.RouteNotMatchedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RouteNotMatchedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return output
 	}
@@ -108,7 +108,7 @@ func (h *RouteDispatchedHandler) RouteDispatched(
 	output contract.OutputContract,
 	route contract.RouteContract,
 ) contract.OutputContract {
-	middleware, isMiddleware := h.getNext().(contract.RouteDispatchedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RouteDispatchedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return output
 	}
@@ -135,7 +135,7 @@ func (h *ThrowableCaughtHandler) ThrowableCaught(
 	output contract.OutputContract,
 	throwable error,
 ) contract.OutputContract {
-	middleware, isMiddleware := h.getNext().(contract.ThrowableCaughtMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.ThrowableCaughtMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return output
 	}
@@ -158,7 +158,7 @@ func NewProcessExitingHandler(
 // ProcessExiting runs the next middleware, and returns where the handler holds
 // none.
 func (h *ProcessExitingHandler) ProcessExiting(input contract.InputContract, output contract.OutputContract) {
-	middleware, isMiddleware := h.getNext().(contract.ProcessExitingMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.ProcessExitingMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return
 	}

@@ -23,10 +23,11 @@ import (
 )
 
 const (
-	firstID   = "valkyrja.tests.cli.FirstMiddleware"
-	secondID  = "valkyrja.tests.cli.SecondMiddleware"
-	endingID  = "valkyrja.tests.cli.EndingMiddleware"
-	missingID = "valkyrja.tests.cli.MissingMiddleware"
+	firstID      = "valkyrja.tests.cli.FirstMiddleware"
+	secondID     = "valkyrja.tests.cli.SecondMiddleware"
+	endingID     = "valkyrja.tests.cli.EndingMiddleware"
+	missingID    = "valkyrja.tests.cli.MissingMiddleware"
+	otherStageID = "valkyrja.tests.cli.OtherStageMiddleware"
 )
 
 // newContainer builds a container that resolves a recording middleware under
@@ -144,6 +145,9 @@ func TestAMiddlewareThatEndsTheRunStopsTheHandler(t *testing.T) {
 	}
 }
 
+// notAMiddlewareFixture is a value that declares no middleware stage.
+type notAMiddlewareFixture struct{}
+
 func TestAHandlerSkipsAMiddlewareThatTheContainerCannotResolve(t *testing.T) {
 	t.Parallel()
 
@@ -152,10 +156,38 @@ func TestAHandlerSkipsAMiddlewareThatTheContainerCannotResolve(t *testing.T) {
 
 	typed := input.NewInput("", "cache:clear")
 
-	result := handler.NewInputReceivedHandler(container, missingID).InputReceived(typed)
+	// The entry after the missing one proves the skip, because a handler that
+	// ended the run instead would never reach it.
+	result := handler.NewInputReceivedHandler(container, missingID, firstID).InputReceived(typed)
 
 	if result.IsOutput() {
 		t.Error("a middleware that the container cannot resolve must be skipped, but ended the run")
+	}
+
+	if !slices.Contains(record, firstID) {
+		t.Errorf("the middleware after the one that cannot resolve must run, but the record is: %v", record)
+	}
+}
+
+func TestAHandlerSkipsAMiddlewareThatDeclaresAnotherStage(t *testing.T) {
+	t.Parallel()
+
+	record := []string{}
+	container := newContainer(&record, nil)
+	container.Bind(otherStageID, func(_ containercontract.ContainerContract, _ []any) any {
+		return &notAMiddlewareFixture{}
+	})
+
+	typed := input.NewInput("", "cache:clear")
+
+	result := handler.NewInputReceivedHandler(container, otherStageID, firstID).InputReceived(typed)
+
+	if result.IsOutput() {
+		t.Error("a middleware that declares another stage must be skipped, but ended the run")
+	}
+
+	if !slices.Contains(record, firstID) {
+		t.Errorf("the middleware after the one of another stage must run, but the record is: %v", record)
 	}
 }
 
