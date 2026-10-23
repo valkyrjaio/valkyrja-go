@@ -1,0 +1,239 @@
+/*
+ * This file is part of the Valkyrja Framework package.
+ *
+ * Copyright (c) 2016-present Melech Mizrachi
+ *
+ * Released under the MIT License. See LICENSE.md for details.
+ */
+
+// Package dispatcher runs the command that an input matches.
+package dispatcher
+
+import (
+	"slices"
+
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/contract"
+	interactionconstant "github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/constant"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/interaction/message"
+	"github.com/valkyrjaio/valkyrja-go/v26/cli/routing/constant"
+	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
+)
+
+type Router struct {
+	container  containercontract.ContainerContract
+	collection contract.RouteCollectionContract
+
+	outputFactory contract.OutputFactoryContract
+
+	routeMatchedHandler    contract.RouteMatchedHandlerContract
+	routeNotMatchedHandler contract.RouteNotMatchedHandlerContract
+	routeDispatchedHandler contract.RouteDispatchedHandlerContract
+	throwableCaughtHandler contract.ThrowableCaughtHandlerContract
+	processExitingHandler  contract.ProcessExitingHandlerContract
+}
+
+// NewRouter builds the router over a container, a collection, an output factory,
+// and the middleware handler of each stage.
+func NewRouter(
+	container containercontract.ContainerContract,
+	collection contract.RouteCollectionContract,
+	outputFactory contract.OutputFactoryContract,
+	routeMatchedHandler contract.RouteMatchedHandlerContract,
+	routeNotMatchedHandler contract.RouteNotMatchedHandlerContract,
+	routeDispatchedHandler contract.RouteDispatchedHandlerContract,
+	throwableCaughtHandler contract.ThrowableCaughtHandlerContract,
+	processExitingHandler contract.ProcessExitingHandlerContract,
+) *Router {
+	return &Router{
+		container:              container,
+		collection:             collection,
+		outputFactory:          outputFactory,
+		routeMatchedHandler:    routeMatchedHandler,
+		routeNotMatchedHandler: routeNotMatchedHandler,
+		routeDispatchedHandler: routeDispatchedHandler,
+		throwableCaughtHandler: throwableCaughtHandler,
+		processExitingHandler:  processExitingHandler,
+	}
+}
+
+// Dispatch matches the input to a command and runs it.
+func (r *Router) Dispatch(input contract.InputContract) contract.OutputContract {
+	name := input.GetCommandName()
+
+	if !r.collection.Has(name) {
+		return r.routeNotMatchedHandler.RouteNotMatched(input, r.createNotFoundOutput(name))
+	}
+
+	return r.DispatchRoute(input, r.collection.Get(name))
+}
+
+// DispatchRoute runs the command for the input.
+func (r *Router) DispatchRoute(
+	input contract.InputContract,
+	route contract.RouteContract,
+) contract.OutputContract {
+	filled, err := r.addParametersToRoute(input, route)
+	if err != nil {
+		return r.throwableCaughtHandler.ThrowableCaught(input, r.createThrowableOutput(err), err)
+	}
+
+	r.routeMatched(filled)
+
+	result := r.routeMatchedHandler.RouteMatched(input, filled)
+	if result.IsOutput() {
+		return result.GetOutput()
+	}
+
+	matched := result.GetRoute()
+
+	r.container.SetSingleton(constant.RouteContractServiceID, matched)
+
+	output := matched.GetHandler()(r.container, matched)
+
+	return r.routeDispatchedHandler.RouteDispatched(input, output, matched)
+}
+
+// GetProcessExitingHandler returns the handler that runs before the process
+// exits.
+func (r *Router) GetProcessExitingHandler() contract.ProcessExitingHandlerContract {
+	return r.processExitingHandler
+}
+
+// createNotFoundOutput builds the output that reports that the application has
+// no command under the name.
+func (r *Router) createNotFoundOutput(name string) contract.OutputContract {
+	text := "Command `" + name + "` was not found."
+
+	return r.outputFactory.CreateOutput(
+		interactionconstant.ExitCodeError,
+		message.NewBanner(message.NewErrorMessage(text)),
+	)
+}
+
+// createThrowableOutput builds the output that reports what went wrong.
+func (r *Router) createThrowableOutput(throwable error) contract.OutputContract {
+	return r.outputFactory.CreateOutput(
+		interactionconstant.ExitCodeError,
+		message.NewBanner(message.NewErrorMessage(throwable.Error())),
+	)
+}
+
+// routeMatched files the middleware of the command with each handler, and binds
+// the command in the container.
+func (r *Router) routeMatched(route contract.RouteContract) {
+	r.routeMatchedHandler.Add(route.GetRouteMatchedMiddleware()...)
+	r.routeDispatchedHandler.Add(route.GetRouteDispatchedMiddleware()...)
+	r.throwableCaughtHandler.Add(route.GetThrowableCaughtMiddleware()...)
+	r.processExitingHandler.Add(route.GetProcessExitingMiddleware()...)
+
+	r.container.SetSingleton(constant.RouteContractServiceID, route)
+}
+
+// addParametersToRoute fills each parameter of the command from what the caller
+// typed.
+func (r *Router) addParametersToRoute(
+	input contract.InputContract,
+	route contract.RouteContract,
+) (contract.RouteContract, error) {
+	withArguments, err := addArgumentsToRoute(input, route)
+	if err != nil {
+		return nil, err
+	}
+
+	return addOptionsToRoute(input, withArguments)
+}
+
+// addArgumentsToRoute fills each argument parameter from what the caller typed.
+//
+// Warning: an argument parameter in the array value mode takes every argument
+// that is left, so it must be the last one that the command declares. A
+// parameter that follows it receives nothing.
+func addArgumentsToRoute(
+	input contract.InputContract,
+	route contract.RouteContract,
+) (contract.RouteContract, error) {
+	typed := input.GetArguments()
+	parameters := route.GetArguments()
+	filled := make([]contract.ArgumentParameterContract, 0, len(parameters))
+
+	// Each parameter consumes what it took, so the next one reads what is left
+	// rather than the whole list. An array parameter consumes the rest.
+	for _, parameter := range parameters {
+		given, left := argumentsForParameter(parameter, typed)
+		typed = left
+
+		withArguments := parameter.WithArguments(given...)
+
+		err := withArguments.ValidateValues()
+		if err != nil {
+			return nil, err
+		}
+
+		filled = append(filled, withArguments)
+	}
+
+	return route.WithArguments(filled...), nil
+}
+
+// argumentsForParameter returns each argument that the parameter takes, and each
+// argument that is left for the parameters after it.
+//
+// Warning: a parameter in the array value mode takes every argument that is
+// left, so it must be the last one that the command declares. A parameter that
+// follows it receives nothing.
+func argumentsForParameter(
+	parameter contract.ArgumentParameterContract,
+	typed []contract.ArgumentContract,
+) (given []contract.ArgumentContract, left []contract.ArgumentContract) {
+	if parameter.GetValueMode() == constant.ArgumentValueModeArray {
+		return typed, nil
+	}
+
+	if len(typed) == 0 {
+		return nil, nil
+	}
+
+	return typed[:1], typed[1:]
+}
+
+// addOptionsToRoute fills each option parameter from what the caller typed.
+func addOptionsToRoute(
+	input contract.InputContract,
+	route contract.RouteContract,
+) (contract.RouteContract, error) {
+	typed := input.GetOptions()
+	parameters := route.GetOptions()
+	filled := make([]contract.OptionParameterContract, 0, len(parameters))
+
+	for _, parameter := range parameters {
+		withOptions, err := parameter.WithOptions(optionsForParameter(parameter, typed)...)
+		if err != nil {
+			return nil, err
+		}
+
+		err = withOptions.ValidateValues()
+		if err != nil {
+			return nil, err
+		}
+
+		filled = append(filled, withOptions)
+	}
+
+	return route.WithOptions(filled...), nil
+}
+
+// optionsForParameter returns each option that the parameter takes.
+func optionsForParameter(
+	parameter contract.OptionParameterContract,
+	typed []contract.OptionContract,
+) []contract.OptionContract {
+	given := make([]contract.OptionContract, 0, len(typed))
+
+	for _, option := range typed {
+		if option.GetName() == parameter.GetName() || slices.Contains(parameter.GetShortNames(), option.GetName()) {
+			given = append(given, option)
+		}
+	}
+
+	return given
+}
