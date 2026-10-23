@@ -45,7 +45,7 @@ func (h *Handler) hasNext() bool {
 // getNext returns the next middleware that the container resolves, and nil
 // where the handler holds no more.
 //
-// An entry the container cannot resolve is skipped, so one misconfigured
+// An entry the container resolves to nothing is skipped, so one misconfigured
 // binding key does not drop the entries after it.
 func (h *Handler) getNext() any {
 	for h.hasNext() {
@@ -53,7 +53,7 @@ func (h *Handler) getNext() any {
 		h.index++
 
 		resolved, err := h.container.Get(id, nil)
-		if err != nil {
+		if err != nil || resolved == nil {
 			continue
 		}
 

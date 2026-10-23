@@ -28,6 +28,7 @@ const (
 	endingID     = "valkyrja.tests.cli.EndingMiddleware"
 	missingID    = "valkyrja.tests.cli.MissingMiddleware"
 	otherStageID = "valkyrja.tests.cli.OtherStageMiddleware"
+	nothingID    = "valkyrja.tests.cli.NothingMiddleware"
 )
 
 // newContainer builds a container that resolves a recording middleware under
@@ -204,5 +205,27 @@ func TestAddAppendsEachMiddlewareAfterTheOnesTheHandlerHolds(t *testing.T) {
 
 	if !slices.Equal(record, []string{firstID, secondID}) {
 		t.Errorf("Add must append the middleware after the ones the handler holds, but ran: %v", record)
+	}
+}
+
+func TestAHandlerSkipsABindingThatResolvesToNothing(t *testing.T) {
+	t.Parallel()
+
+	record := []string{}
+	container := newContainer(&record, nil)
+	container.Bind(nothingID, func(_ containercontract.ContainerContract, _ []any) any {
+		return nil
+	})
+
+	typed := input.NewInput("", "cache:clear")
+
+	result := handler.NewInputReceivedHandler(container, nothingID, firstID).InputReceived(typed)
+
+	if result.IsOutput() {
+		t.Error("a binding that resolves to nothing must be skipped, but ended the run")
+	}
+
+	if !slices.Contains(record, firstID) {
+		t.Errorf("the middleware after the binding that resolves to nothing must run, but the record is: %v", record)
 	}
 }
