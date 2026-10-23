@@ -254,3 +254,24 @@ func TestEachHandlerSatisfiesItsContract(t *testing.T) {
 		built.Add(firstID)
 	}
 }
+
+func TestAHandlerSkipsABindingThatResolvesToNothing(t *testing.T) {
+	t.Parallel()
+
+	record := []string{}
+	container := newContainer(&record, nil)
+	container.Bind("valkyrja.tests.http.Nothing", func(_ containercontract.ContainerContract, _ []any) any {
+		return nil
+	})
+
+	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.Nothing", firstID).
+		RequestReceived(request.NewServerRequest(nil, "", nil, nil))
+
+	if result.IsResponse() {
+		t.Error("a binding that resolves to nothing must be skipped, but ended the run")
+	}
+
+	if !slices.Contains(record, firstID) {
+		t.Errorf("the middleware after the binding that resolves to nothing must run, but the record is: %v", record)
+	}
+}
