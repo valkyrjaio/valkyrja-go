@@ -31,7 +31,7 @@ func NewRequestReceivedHandler(
 func (h *RequestReceivedHandler) RequestReceived(
 	request contract.ServerRequestContract,
 ) contract.RequestReceivedResultContract {
-	middleware, isMiddleware := h.getNext().(contract.RequestReceivedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RequestReceivedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return data.NewRequestReceivedRequest(request)
 	}
@@ -57,7 +57,7 @@ func (h *RouteMatchedHandler) RouteMatched(
 	request contract.ServerRequestContract,
 	route contract.RouteContract,
 ) contract.RouteMatchedResultContract {
-	middleware, isMiddleware := h.getNext().(contract.RouteMatchedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RouteMatchedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return data.NewRouteMatchedRoute(route)
 	}
@@ -83,7 +83,7 @@ func (h *RouteNotMatchedHandler) RouteNotMatched(
 	request contract.ServerRequestContract,
 	response contract.ResponseContract,
 ) contract.ResponseContract {
-	middleware, isMiddleware := h.getNext().(contract.RouteNotMatchedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RouteNotMatchedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return response
 	}
@@ -110,7 +110,7 @@ func (h *RouteDispatchedHandler) RouteDispatched(
 	response contract.ResponseContract,
 	route contract.RouteContract,
 ) contract.ResponseContract {
-	middleware, isMiddleware := h.getNext().(contract.RouteDispatchedMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.RouteDispatchedMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return response
 	}
@@ -137,7 +137,7 @@ func (h *ThrowableCaughtHandler) ThrowableCaught(
 	response contract.ResponseContract,
 	throwable error,
 ) contract.ResponseContract {
-	middleware, isMiddleware := h.getNext().(contract.ThrowableCaughtMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.ThrowableCaughtMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return response
 	}
@@ -163,7 +163,7 @@ func (h *SendingResponseHandler) SendingResponse(
 	request contract.ServerRequestContract,
 	response contract.ResponseContract,
 ) contract.ResponseContract {
-	middleware, isMiddleware := h.getNext().(contract.SendingResponseMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.SendingResponseMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return response
 	}
@@ -189,7 +189,7 @@ func (h *ResponseSentHandler) ResponseSent(
 	request contract.ServerRequestContract,
 	response contract.ResponseContract,
 ) {
-	middleware, isMiddleware := h.getNext().(contract.ResponseSentMiddlewareContract)
+	middleware, isMiddleware := nextOf[contract.ResponseSentMiddlewareContract](&h.Handler)
 	if !isMiddleware {
 		return
 	}

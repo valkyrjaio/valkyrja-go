@@ -199,14 +199,17 @@ func TestAHandlerSkipsAMiddlewareThatTheContainerCannotResolve(t *testing.T) {
 
 	built := request.NewServerRequest(nil, "", nil, nil)
 
-	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.Unbound").RequestReceived(built)
+	// The entry after the unbound one proves the skip, because a handler that
+	// ended the run instead would never reach it.
+	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.Unbound", firstID).
+		RequestReceived(built)
 
 	if result.IsResponse() {
 		t.Error("a handler must skip a middleware that the container cannot resolve, but ended the run")
 	}
 
-	if len(record) != 0 {
-		t.Errorf("no middleware must run, but the record is: %v", record)
+	if !slices.Contains(record, firstID) {
+		t.Errorf("the middleware after the one that cannot resolve must run, but the record is: %v", record)
 	}
 }
 
@@ -219,11 +222,15 @@ func TestAHandlerSkipsABindingThatIsNoMiddleware(t *testing.T) {
 		return "not a middleware"
 	})
 
-	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.NotMiddleware").
+	result := handler.NewRequestReceivedHandler(container, "valkyrja.tests.http.NotMiddleware", firstID).
 		RequestReceived(request.NewServerRequest(nil, "", nil, nil))
 
 	if result.IsResponse() {
 		t.Error("a handler must skip a binding that is no middleware, but ended the run")
+	}
+
+	if !slices.Contains(record, firstID) {
+		t.Errorf("the middleware after the binding that is no middleware must run, but the record is: %v", record)
 	}
 }
 

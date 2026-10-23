@@ -42,19 +42,43 @@ func (h *Handler) hasNext() bool {
 	return h.index < len(h.middleware)
 }
 
-// getNext resolves the next middleware and advances the handler past it.
+// getNext returns the next middleware that the container resolves, and nil
+// where the handler holds no more.
+//
+// An entry the container cannot resolve is skipped, so one misconfigured
+// binding key does not drop the entries after it.
 func (h *Handler) getNext() any {
-	if !h.hasNext() {
-		return nil
+	for h.hasNext() {
+		id := h.middleware[h.index]
+		h.index++
+
+		resolved, err := h.container.Get(id, nil)
+		if err != nil {
+			continue
+		}
+
+		return resolved
 	}
 
-	id := h.middleware[h.index]
-	h.index++
+	return nil
+}
 
-	resolved, err := h.container.Get(id, nil)
-	if err != nil {
-		return nil
+// nextOf returns the next middleware that the stage contract names, and reports
+// whether the handler holds one.
+//
+// An entry that declares another stage is skipped, for the same reason getNext
+// skips one the container cannot resolve.
+func nextOf[T any](handler *Handler) (T, bool) {
+	for {
+		resolved := handler.getNext()
+		if resolved == nil {
+			var none T
+
+			return none, false
+		}
+
+		if middleware, isMiddleware := resolved.(T); isMiddleware {
+			return middleware, true
+		}
 	}
-
-	return resolved
 }
