@@ -86,11 +86,6 @@ func (h *InputHandler) Run(input contract.InputContract) {
 
 // writeFailure reports a failed write through the throwable-caught middleware,
 // and returns the output that carries the report.
-//
-// Warning: a middleware returns an output of its own, and that output can name
-// the destination that just failed. A second failure therefore falls back to an
-// output that the factory builds, and the exit code is the last diagnostic left
-// where even that write fails.
 func (h *InputHandler) writeFailure(input contract.InputContract, failure error) contract.OutputContract {
 	reported := h.throwableCaughtHandler.ThrowableCaught(
 		input,
@@ -103,6 +98,8 @@ func (h *InputHandler) writeFailure(input contract.InputContract, failure error)
 		return written
 	}
 
+	// A middleware answers with an output of its own, which can name the
+	// destination that just failed.
 	fallback := h.createRecoveryOutput(input, failure, err)
 
 	written, err = fallback.WriteMessages()
