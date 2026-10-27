@@ -1,6 +1,17 @@
 # Release Notes for 26.x
 
-## [Unreleased](https://github.com/valkyrjaio/project-template-go/compare/v26.0.19...26.x)
+## [Unreleased](https://github.com/valkyrjaio/project-template-go/compare/v26.1.0...26.x)
+
+## [v26.1.0](https://github.com/valkyrjaio/project-template-go/compare/v26.0.19...v26.1.0) - 2026-10-27
+
+* [Throwable] feat: Add the throwable contract by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/27
+* [Container] feat: Add the container contracts and binding keys by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/28
+* [Event] feat: Add the event contracts and binding keys by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/29
+* [Http] feat: Add the http contracts and constants by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/30
+* [Cli] feat: Add the cli contracts and constants by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/31
+* [Application] feat: Add the application contracts and constants by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/32
+* [Contract] feat: Add the log and validation contracts by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/33
+* [Throwable] feat: Add the base errors by [@MelechMizrachi](https://github.com/MelechMizrachi) in https://github.com/valkyrjaio/valkyrja-go/pull/12
 
 ## [v26.0.19](https://github.com/valkyrjaio/project-template-go/compare/v26.0.18...v26.0.19) - 2026-10-24
 
