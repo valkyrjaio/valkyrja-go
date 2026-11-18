@@ -1,0 +1,84 @@
+/*
+ * This file is part of the Valkyrja Framework package.
+ *
+ * Copyright (c) 2016-present Melech Mizrachi
+ *
+ * Released under the MIT License. See LICENSE.md for details.
+ */
+
+// Package handler runs the CLI middleware of one stage, in order.
+//
+// Each handler holds the binding key of every middleware that it runs, and it
+// resolves the middleware from the container as it reaches it. A middleware
+// receives the handler, so the middleware decides whether the run continues.
+package handler
+
+import (
+	containercontract "github.com/valkyrjaio/valkyrja-go/v26/container/contract"
+)
+
+type Handler struct {
+	container  containercontract.ContainerContract
+	middleware []string
+	index      int
+}
+
+// NewHandler builds a handler over a container, with the binding key of each
+// middleware that it runs.
+func NewHandler(container containercontract.ContainerContract, middleware ...string) Handler {
+	return Handler{
+		container:  container,
+		middleware: middleware,
+	}
+}
+
+// Add appends each middleware, by binding key, after the ones the handler holds.
+func (h *Handler) Add(middleware ...string) {
+	h.middleware = append(h.middleware, middleware...)
+}
+
+// hasNext reports whether the handler holds a middleware that it has not run.
+func (h *Handler) hasNext() bool {
+	return h.index < len(h.middleware)
+}
+
+// getNext returns the next middleware that the container resolves, and nil
+// where the handler holds no more.
+//
+// An entry the container resolves to nothing is skipped, so one misconfigured
+// binding key does not drop the entries after it.
+func (h *Handler) getNext() any {
+	for h.hasNext() {
+		id := h.middleware[h.index]
+		h.index++
+
+		resolved, err := h.container.Get(id, nil)
+		if err != nil || resolved == nil {
+			continue
+		}
+
+		return resolved
+	}
+
+	return nil
+}
+
+// nextOf returns the next middleware that the stage contract names, and reports
+// whether the handler holds one.
+//
+// An entry that declares another stage is skipped, for the same reason getNext
+// skips one the container cannot resolve.
+func nextOf[T any](handler *Handler) (T, bool) {
+	for {
+		resolved := handler.getNext()
+		if resolved == nil {
+			var none T
+
+			return none, false
+		}
+
+		if middleware, isMiddleware := resolved.(T); isMiddleware {
+			return middleware, true
+		}
+	}
+}
